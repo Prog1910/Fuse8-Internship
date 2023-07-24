@@ -5,7 +5,21 @@
 /// </summary>
 public class Lazy<TValue>
 {
-	// TODO Реализовать ленивое получение значение при первом обращении к Value
+    private Func<TValue>? _initValue;
+    private TValue? _value;
 
-	public TValue? Value { get; }
+    public Lazy(Func<TValue> initValue) => _initValue = initValue;
+
+    public TValue? Value
+    {
+        get
+        {
+            if (_initValue != null)
+            {
+                _value = _initValue();
+                _initValue = null;
+            }
+            return _value;
+        }
+    }
 }
