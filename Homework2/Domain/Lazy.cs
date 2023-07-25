@@ -14,7 +14,7 @@ public class Lazy<TValue>
     {
         get
         {
-            if (_initValue != null)
+            if (_initValue is not null)
             {
                 _value = _initValue();
                 _initValue = null;
