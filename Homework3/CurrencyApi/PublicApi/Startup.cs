@@ -37,6 +37,8 @@ public class Startup
 			app.UseSwaggerUI();
 		}
 
+		app.UseMiddleware<RequestLoggerMiddleware>();
+
 		app.UseRouting()
 			.UseEndpoints(endpoints => endpoints.MapControllers());
 	}
