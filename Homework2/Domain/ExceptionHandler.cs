@@ -24,14 +24,17 @@ public static class ExceptionHandler
                 _ => httpRequestException.StatusCode.ToString()
             };
         }
+        catch (NegativeRubleCountException)
+        {
+            return "Число рублей не может быть отрицательным";
+        }
+        catch (NotValidKopekCountException)
+        {
+            return "Количество копеек должно быть больше 0 и меньше 99";
+        }
         catch (MoneyException moneyException)
         {
-            return moneyException switch
-            {
-                NegativeRubleCountException => "Число рублей не может быть отрицательным",
-                NotValidKopekCountException => "Количество копеек должно быть больше 0 и меньше 99",
-                MoneyException => moneyException?.Message,
-            };
+            return moneyException.Message;
         }
         catch (Exception)
         {
