@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
@@ -24,9 +25,20 @@ public class Startup
 					// Этим конвертером задаем перевод в строковое занчение
 					options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 				});
-		;
+
 		services.AddEndpointsApiExplorer();
-		services.AddSwaggerGen();
+		services.AddSwaggerGen(options =>
+		{
+			options.SwaggerDoc("v1", new OpenApiInfo
+			{
+				Version = "v1",
+				Title = "Public API",
+			});
+
+			var xmlFilename = $"{typeof(Program).Assembly.GetName().Name}.xml";
+			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+			options.IncludeXmlComments(xmlPath);
+		});
 	}
 
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,7 +46,11 @@ public class Startup
 		if (env.IsDevelopment())
 		{
 			app.UseSwagger();
-			app.UseSwaggerUI();
+			app.UseSwaggerUI(options =>
+			{
+				options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+				options.RoutePrefix = string.Empty;
+			});
 		}
 
 		app.UseMiddleware<RequestLoggerMiddleware>();
