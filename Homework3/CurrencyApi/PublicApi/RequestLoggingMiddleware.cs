@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.IO;
-
+﻿
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
 public class RequestLoggerMiddleware
@@ -17,9 +15,7 @@ public class RequestLoggerMiddleware
 	public async Task InvokeAsync(HttpContext context)
 	{
 		var request = context.Request;
-
-		_logger.LogInformation("Incoming Request - {Method} {Path} {QueryString}",
-			request.Method, request.Path, request.QueryString);
+		_logger.LogInformation("Request - {Method} {Path} {QueryString}", request.Method, request.Path, request.QueryString);
 		await _next(context);
 	}
 }
