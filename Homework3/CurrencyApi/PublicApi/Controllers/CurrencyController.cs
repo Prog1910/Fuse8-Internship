@@ -59,7 +59,7 @@ public class CurrencyController : Controller
 	/// </response>
 	[HttpGet]
 	[Route("settings")]
-	public async Task<CurrentSettingsDto> ChechApiStatus()
+	public async Task<CurrentStatusDto> ChechApiStatus()
 	{
 		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = "https://api.currencyapi.com/v3/status";
