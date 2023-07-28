@@ -5,6 +5,9 @@ using Serilog.Exceptions.Core;
 
 var webHost = Host
 	.CreateDefaultBuilder()
+	.ConfigureAppConfiguration(config =>
+		config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+		)
 	.UseSerilog((context, services, configuration) =>
 		configuration
 		.ReadFrom.Configuration(context.Configuration)
@@ -13,6 +16,6 @@ var webHost = Host
 		.Enrich.WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers())
 		)
 	.ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-	.Build();	
+	.Build();
 
 await webHost.RunAsync();
