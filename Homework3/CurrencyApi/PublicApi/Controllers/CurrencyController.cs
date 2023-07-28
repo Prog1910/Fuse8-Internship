@@ -1,6 +1,9 @@
-﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
+﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Net;
 using System.Text.Json;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
@@ -18,67 +21,63 @@ public class CurrencyController : Controller
 	}
 
 	/// <summary>
-	/// Latest Сurrency Exchange Data (default currency RUB, default base currency USD)
+	/// Latest Сurrency Exchange Data (default currency RUB, default base currency USD).
 	/// </summary>
 	/// <response code="200">
-	/// Returns if it was possible to get the default currency data (default RUB).	
+	/// Returns if it was possible to get the default currency data.	
+	/// </response>
+	/// <response code="500">
+	/// Returns if the default currency data could not be retrieved.
 	/// </response>
 	[HttpGet]
 	[Route("currency")]
-	public async Task<CurrencyData> GetLatestExchangeRates()
+	public async Task<CurrencyDataDto> GetLatestExchangeRates()
 	{
 		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
-
-		var requestUri = "https://api.currencyapi.com/v3/latest?currencies=RUB&base_currency=USD";
-
-		var responseMessage = await _httpClient.GetAsync(requestUri);
-
+		var responseMessage = await _httpClient.GetAsync("https://api.currencyapi.com/v3/latest?currencies=RUB&base_currency=USD");
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var jsonDocument = JsonDocument.Parse(await responseMessage.Content.ReadAsStringAsync());
-			var root = jsonDocument.RootElement;
-
-			if (root.TryGetProperty("data", out var currencyData))
+			var responseContent = await responseMessage.Content.ReadAsStringAsync();
+			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
+			if (currencyResponse is not null)
 			{
-				var currencyDatum = currencyData.EnumerateObject().FirstOrDefault();
-				var code = currencyDatum.Value.GetProperty("code").GetString();
-				var value = Math.Round(currencyDatum.Value.GetProperty("value").GetDecimal(), _currencyServiceSettings.CurrencyRoundCount);
-				return new(code!, value);
+				var currencyData = currencyResponse.CurrenciesData[_currencyServiceSettings.DefaultCurrency];
+				return new(currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
 			}
 		}
-		throw new NotImplementedException();
+		throw new HttpRequestException("Failed to get default currency data", null, HttpStatusCode.InternalServerError);
 	}
 
+	/// <summary>
+	/// The status endpoint returns information about your current quota.
+	/// </summary>
+	/// <response code="200">
+	/// Returns if it was possible to get the information about your current quota.	
+	/// </response>
+	/// <response code="500">
+	/// Returns if the information about your current quota could not be retrieved.
+	/// </response>
 	[HttpGet]
 	[Route("settings")]
-	public async Task<CurrentSettings> ChechApiStatus()
+	public async Task<CurrentSettingsDto> ChechApiStatus()
 	{
 		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = "https://api.currencyapi.com/v3/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var jsonDocument = JsonDocument.Parse(await responseMessage.Content.ReadAsStringAsync());
-			var root = jsonDocument.RootElement;
-
-			if (root.TryGetProperty("quotas", out var quotas))
+			var responseContent = await responseMessage.Content.ReadAsStringAsync();
+			var apiStatus = JsonSerializer.Deserialize<ApiStatusDto>(responseContent);
+			if (apiStatus is not null)
 			{
-				if (quotas.TryGetProperty("month", out var month))
-				{
-					var defaultCurrency = _currencyServiceSettings.DefaultCurrency;
-					var baseCurrency = _currencyServiceSettings.BaseCurrency;
-					var currencyRoundCount = _currencyServiceSettings.CurrencyRoundCount;
-					var requestLimit = month.GetProperty("total").GetInt32();
-					var requestCount = month.GetProperty("used").GetInt32();
-
-					return new(defaultCurrency, baseCurrency, requestLimit, requestCount, currencyRoundCount);
-				}
+				var month = apiStatus.Quotas.Month;
+				return new(_currencyServiceSettings.DefaultCurrency,
+					_currencyServiceSettings.BaseCurrency,
+					month.Total,
+					month.Used,
+					_currencyServiceSettings.CurrencyRoundCount);
 			}
 		}
-		throw new NotImplementedException();
+		throw new HttpRequestException("Failed to get current settings", null, HttpStatusCode.InternalServerError);
 	}
 }
-
-public record CurrencyData(string Code, decimal Value);
-
-public record CurrentSettings(string DefaultCurrency, string BaseCurrency, int RequestLimit, int RequestCount, int CurrencyRoundCount);
