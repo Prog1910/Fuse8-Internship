@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
@@ -14,8 +16,10 @@ public class Startup
 
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.AddControllers()
+		services.Configure<CurrencyApiSettings>(_configuration.GetSection("CurrencyApi"));
+		services.AddHttpClient<CurrencyController>();
 
+		services.AddControllers()
 			// Добавляем глобальные настройки для преобразования Json
 			.AddJsonOptions(
 				options =>

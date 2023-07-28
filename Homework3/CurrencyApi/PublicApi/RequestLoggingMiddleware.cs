@@ -1,5 +1,4 @@
-﻿
-namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
+﻿namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
 public class RequestLoggerMiddleware
 {
