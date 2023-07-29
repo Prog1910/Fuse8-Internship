@@ -1,10 +1,10 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Microsoft.Extensions.Options;
 using System.Net;
+using System.Text.Json;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 
