@@ -21,6 +21,7 @@ public class CurrencyController : ControllerBase
 	{
 		_currencyServiceSettings = options.Value;
 		_httpClient = httpClient;
+		ConfigureRequestHeaders();
 	}
 
 	#region GET /currency
@@ -45,13 +46,11 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency")]
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRate()
 	{
-		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var responseMessage = await _httpClient.GetAsync(requestUri);
+		HttpResponseMessage responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var responseContent = await responseMessage.Content.ReadAsStringAsync();
-			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
+			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
 			if (currencyResponse is not null)
 			{
 				var currencyData = currencyResponse.CurrenciesData[_currencyServiceSettings.DefaultCurrency];
@@ -85,13 +84,11 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}")]
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
-		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var responseContent = await responseMessage.Content.ReadAsStringAsync();
-			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
+			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
 			if (currencyResponse is not null)
 			{
 				var currencyData = currencyResponse.CurrenciesData[currencyCode];
@@ -126,13 +123,11 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}/{date}")]
 	public async Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
-		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = $"https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var responseContent = await responseMessage.Content.ReadAsStringAsync();
-			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
+			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
 			if (currencyResponse is not null)
 			{
 				var currencyData = currencyResponse.CurrenciesData[currencyCode];
@@ -159,13 +154,11 @@ public class CurrencyController : ControllerBase
 	[HttpGet("settings")]
 	public async Task<CurrentStatusDto> GetApiSettings()
 	{
-		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 		var requestUri = "https://api.currencyapi.com/v3/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
-			var responseContent = await responseMessage.Content.ReadAsStringAsync();
-			var apiStatus = JsonSerializer.Deserialize<ApiStatusDto>(responseContent);
+			var apiStatus = await DeserializeResponse<ApiStatusDto>(responseMessage);
 			if (apiStatus is not null)
 			{
 				var month = apiStatus.Quotas.Month;
@@ -177,6 +170,16 @@ public class CurrencyController : ControllerBase
 			}
 		}
 		throw new HttpRequestException("Failed to get current settings", null, HttpStatusCode.InternalServerError);
+	}
+	#endregion
+
+	#region Helper Methods
+	private void ConfigureRequestHeaders() => _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
+
+	private static async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage)
+	{
+		var responseContent = await responseMessage.Content.ReadAsStringAsync();
+		return JsonSerializer.Deserialize<TDto>(responseContent);
 	}
 	#endregion
 }
