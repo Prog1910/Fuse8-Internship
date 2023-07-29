@@ -25,13 +25,22 @@ public class CurrencyController : ControllerBase
 
 	#region GET /currency
 	/// <summary>
-	/// Latest Сurrency Exchange Data (default currency RUB, default base currency USD)
+	/// Latest Default Сurrency Exchange Rate (default currency RUB, default base currency USD)
 	/// </summary>
 	/// <response code="200">
-	/// Returns if it was possible to get the default currency data
+	/// Default currency rate was received successfully
+	/// </response>
+	/// <response code="403">
+	/// You are not allowed to use this endpoint
+	/// </response>
+	/// <response code="404">
+	/// Requested endpoint does not exist
+	/// </response>
+	/// <response code="422">
+	/// Validation error
 	/// </response>
 	/// <response code="500">
-	/// Returns if the default currency data could not be retrieved
+	/// Internal server error 
 	/// </response>
 	[HttpGet("currency")]
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRate()
@@ -55,14 +64,23 @@ public class CurrencyController : ControllerBase
 
 	#region GET /currency/{currencyCode}
 	/// <summary>
-	/// Latest Сurrency Exchange Data (default base currency USD)
+	/// Latest Сurrency Exchange Rate (default base currency USD)
 	/// </summary>
 	/// <param name="currencyCode">Currency whose current rate will be returned (format: upper case)</param>
 	/// <response code="200">
-	/// Returns if data was received successfully currency passed as a parameter
+	/// Currency rate was received successfully
+	/// </response>
+	/// <response code="403">
+	/// You are not allowed to use this endpoint
+	/// </response>
+	/// <response code="404">
+	/// Requested endpoint does not exist
+	/// </response>
+	/// <response code="422">
+	/// Validation error
 	/// </response>
 	/// <response code="500">
-	/// Returns if the data could not be retrieved currency passed as a parameter
+	/// Internal server error 
 	/// </response>
 	[HttpGet("currency/{currencyCode}")]
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
@@ -86,15 +104,24 @@ public class CurrencyController : ControllerBase
 
 	#region GET /currency/{currencyCode}/{date}
 	/// <summary>
-	/// Historical Сurrency Exchange Data (default base currency USD)
+	/// Historical Сurrency Exchange Rate (default base currency USD)
 	/// </summary>
 	/// <param name="date">Date to retrieve historical rates from (format: yyyy-MM-dd)</param>
 	/// <param name="currencyCode">Currency whose current rate will be returned (format: upper case)</param>
 	/// <response code="200">
-	/// Returns if data was received successfully currency passed as a parameter
+	/// Historical currency rate was received successfully
+	/// </response>
+	/// <response code="403">
+	/// You are not allowed to use this endpoint
+	/// </response>
+	/// <response code="404">
+	/// Requested endpoint does not exist
+	/// </response>
+	/// <response code="422">
+	/// Validation error
 	/// </response>
 	/// <response code="500">
-	/// Returns if the data could not be retrieved currency passed as a parameter
+	/// Internal server error 
 	/// </response>
 	[HttpGet("currency/{currencyCode}/{date}")]
 	public async Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
@@ -118,13 +145,16 @@ public class CurrencyController : ControllerBase
 
 	#region GET /settings
 	/// <summary>
-	/// The status endpoint returns information about your current quota
+	/// Current Quota Information
 	/// </summary>
 	/// <response code="200">
-	/// Returns if it was possible to get the information about your current quota
+	/// API Status was received successfully
+	/// </response>
+	/// <response code="404">
+	/// Requested endpoint does not exist
 	/// </response>
 	/// <response code="500">
-	/// Returns if the information about your current quota could not be retrieved
+	/// Internal server error 
 	/// </response>
 	[HttpGet("settings")]
 	public async Task<CurrentStatusDto> GetApiSettings()
