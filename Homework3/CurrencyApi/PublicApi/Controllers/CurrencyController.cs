@@ -17,7 +17,7 @@ public class CurrencyController : ControllerBase
 	private readonly CurrencyApiSettings _currencyServiceSettings;
 	private readonly HttpClient _httpClient;
 
-	public CurrencyController(IOptions<CurrencyApiSettings> options, HttpClient httpClient)
+	public CurrencyController(IOptionsSnapshot<CurrencyApiSettings> options, HttpClient httpClient)
 	{
 		_currencyServiceSettings = options.Value;
 		_httpClient = httpClient;
