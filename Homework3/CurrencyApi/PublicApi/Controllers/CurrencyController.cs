@@ -40,6 +40,9 @@ public class CurrencyController : ControllerBase
 	/// <response code="422">
 	/// Validation error
 	/// </response>
+	/// <response code="429">
+	/// You have hit your rate limit or your monthly limit
+	/// </response>
 	/// <response code="500">
 	/// Internal server error 
 	/// </response>
@@ -77,6 +80,9 @@ public class CurrencyController : ControllerBase
 	/// </response>
 	/// <response code="422">
 	/// Validation error
+	/// </response>
+	/// <response code="429">
+	/// You have hit your rate limit or your monthly limit
 	/// </response>
 	/// <response code="500">
 	/// Internal server error 
@@ -116,6 +122,9 @@ public class CurrencyController : ControllerBase
 	/// </response>
 	/// <response code="422">
 	/// Validation error
+	/// </response>
+	/// <response code="429">
+	/// You have hit your rate limit or your monthly limit
 	/// </response>
 	/// <response code="500">
 	/// Internal server error 
