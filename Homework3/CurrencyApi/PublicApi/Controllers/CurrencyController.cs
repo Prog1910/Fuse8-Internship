@@ -57,7 +57,7 @@ public class CurrencyController : ControllerBase
 	/// <summary>
 	/// Latest Сurrency Exchange Data (default base currency USD)
 	/// </summary>
-	/// <param name="currencyCode">Сurrency the current rate of which will be returned</param>
+	/// <param name="currencyCode">Currency whose current rate will be returned (format: upper case)</param>
 	/// <response code="200">
 	/// Returns if data was received successfully currency passed as a parameter
 	/// </response>
