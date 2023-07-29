@@ -86,6 +86,35 @@ public class CurrencyController : ControllerBase
 	#endregion
 
 	#region GET /currency/{currencyCode}/{date}
+	/// <summary>
+	/// Historical Сurrency Exchange Data (default base currency USD)
+	/// </summary>
+	/// <param name="date">Date to retrieve historical rates from (format: yyyy-MM-dd)</param>
+	/// <param name="currencyCode">Currency whose current rate will be returned (format: upper case)</param>
+	/// <response code="200">
+	/// Returns if data was received successfully currency passed as a parameter
+	/// </response>
+	/// <response code="500">
+	/// Returns if the data could not be retrieved currency passed as a parameter
+	/// </response>
+	[HttpGet("currency/{currencyCode}/{date}")]
+	public async Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
+	{
+		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
+		var requestUri = $"https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
+		var responseMessage = await _httpClient.GetAsync(requestUri);
+		if (responseMessage.IsSuccessStatusCode)
+		{
+			var responseContent = await responseMessage.Content.ReadAsStringAsync();
+			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
+			if (currencyResponse is not null)
+			{
+				var currencyData = currencyResponse.CurrenciesData[currencyCode];
+				return new(date, currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
+			}
+		}
+		throw new HttpRequestException("Failed to get default currency data", null, HttpStatusCode.InternalServerError);
+	}
 	#endregion
 
 	#region GET /settings
