@@ -176,10 +176,7 @@ public class CurrencyController : ControllerBase
 	#region Helper Methods
 	private void ConfigureRequestHeaders() => _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 
-	private static async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage)
-	{
-		var responseContent = await responseMessage.Content.ReadAsStringAsync();
-		return JsonSerializer.Deserialize<TDto>(responseContent);
-	}
+	private async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage) =>
+		JsonSerializer.Deserialize<TDto>(await responseMessage.Content.ReadAsStringAsync());
 	#endregion
 }
