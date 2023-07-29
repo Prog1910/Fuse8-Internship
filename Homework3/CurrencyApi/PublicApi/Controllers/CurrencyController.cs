@@ -1,5 +1,6 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Exceptions;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -50,7 +51,7 @@ public class CurrencyController : ControllerBase
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRate()
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		HttpResponseMessage responseMessage = await _httpClient.GetAsync(requestUri);
+		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
 			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
@@ -183,9 +184,10 @@ public class CurrencyController : ControllerBase
 	#endregion
 
 	#region Helper Methods
-	private void ConfigureRequestHeaders() => _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
+	private void ConfigureRequestHeaders()
+		=> _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 
-	private async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage) =>
-		JsonSerializer.Deserialize<TDto>(await responseMessage.Content.ReadAsStringAsync());
+	private async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage)
+		=> JsonSerializer.Deserialize<TDto>(await responseMessage.Content.ReadAsStringAsync());
 	#endregion
 }
