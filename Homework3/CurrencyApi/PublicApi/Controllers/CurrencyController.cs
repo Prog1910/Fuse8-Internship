@@ -68,8 +68,7 @@ public class CurrencyController : ControllerBase
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
 		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
-		var validCurrencyCode = currencyCode.ToUpper();
-		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={validCurrencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
+		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		if (responseMessage.IsSuccessStatusCode)
 		{
@@ -77,7 +76,7 @@ public class CurrencyController : ControllerBase
 			var currencyResponse = JsonSerializer.Deserialize<CurrencyResponseDto>(responseContent);
 			if (currencyResponse is not null)
 			{
-				var currencyData = currencyResponse.CurrenciesData[validCurrencyCode];
+				var currencyData = currencyResponse.CurrenciesData[currencyCode];
 				return new(currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
 			}
 		}
