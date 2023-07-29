@@ -1,18 +1,18 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Net;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 
 /// <summary>
 /// Methods for handling exchange rate conversion
 /// </summary>
-[Route("currencyapi/")]
-public class CurrencyController : Controller
+[Route("currencyapi")]
+public class CurrencyController : ControllerBase
 {
 	private readonly CurrencyApiSettings _currencyServiceSettings;
 	private readonly HttpClient _httpClient;
@@ -64,7 +64,7 @@ public class CurrencyController : Controller
 	/// <response code="500">
 	/// Returns if the data could not be retrieved currency passed as a parameter
 	/// </response>
-	[HttpGet("/currency/{currencyCode}")]
+	[HttpGet("currency/{currencyCode}")]
 	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
 		_httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
@@ -86,18 +86,6 @@ public class CurrencyController : Controller
 	#endregion
 
 	#region GET /currency/{currencyCode}/{date}
-	/*
-	 * GET /currency/{currencyCode}/{date}
-	{date} должна иметь формат yyyy-MM-dd
-	Должен вызывать метод внешнего API https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency=USD согласно документации
-	Должен возвращать курс валюты, переданной в качестве параметра, на определенную дата
-	Базовую валюту USD необходимо брать из конфигурации приложения.
-	Курс должен округляться до двух знаков после зяпятой. Количество знаков следует брать из конфигурации приложения.
-	Должен возвращать JSON вида (дата должна иметь формат yyyy-MM-dd)
-	*/
-	//[HttpGet("/currency/{currencyCode}")]
-
-
 	#endregion
 
 	#region GET /settings
