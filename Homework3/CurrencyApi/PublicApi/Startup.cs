@@ -1,7 +1,12 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Filters;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using Audit.Http;
+using Polly.Extensions.Http;
+using Polly;
+using Audit.Core;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
@@ -17,9 +22,38 @@ public class Startup
 	public void ConfigureServices(IServiceCollection services)
 	{
 		services.Configure<CurrencyApiSettings>(_configuration.GetSection("CurrencyApi"));
-		services.AddHttpClient<CurrencyController>();
+		services.AddHttpClient<CurrencyController>("CurrencyController")
+			.AddPolicyHandler(HttpPolicyExtensions
+				.HandleTransientHttpError()
+				.WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1))
+			)
+			.AddAuditHandler(audit => audit
+				.IncludeRequestHeaders()
+				.IncludeRequestBody()
+				.IncludeResponseHeaders()
+				.IncludeResponseBody()
+				.IncludeContentHeaders()
+				);
 
-		services.AddControllers()
+		Configuration.Setup()
+			.UseSerilog(config => config.Message(
+				auditEvent =>
+				{
+					if (auditEvent is AuditEventHttpClient httpClientEvent)
+					{
+						var contentBody = httpClientEvent.Action?.Response?.Content?.Body;
+						if (contentBody is string { Length: > 1000 } stringBody)
+						{
+							httpClientEvent.Action!.Response.Content.Body = stringBody[..1000] + "<...>";
+						}
+					}
+					return auditEvent.ToJson();
+				})
+			);
+
+		services.AddControllers(
+			options => options.Filters.Add<GlobalExceptionsHandler>()
+			)
 			// Добавляем глобальные настройки для преобразования Json
 			.AddJsonOptions(
 				options =>
