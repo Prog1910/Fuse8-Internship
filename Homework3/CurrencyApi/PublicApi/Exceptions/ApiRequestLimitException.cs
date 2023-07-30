@@ -1,8 +1,14 @@
-﻿namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Exceptions;
+﻿using System.Net;
 
-public class ApiRequestLimitException : Exception
+namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Exceptions;
+
+public class ApiRequestLimitException : HttpRequestException
 {
 	public ApiRequestLimitException() : base("You have reached your request limit") { }
 
 	public ApiRequestLimitException(string? message) : base(message) { }
+
+	public ApiRequestLimitException(string? message, Exception? inner) : base(message, inner) { }
+
+	public ApiRequestLimitException(string? message, Exception? inner, HttpStatusCode? statusCode) : base(message, inner, statusCode) { }
 }
