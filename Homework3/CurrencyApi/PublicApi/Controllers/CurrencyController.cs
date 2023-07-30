@@ -1,11 +1,9 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Exceptions;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Extensions;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Text.Json;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 
@@ -48,20 +46,13 @@ public class CurrencyController : ControllerBase
 	/// Internal server error 
 	/// </response>
 	[HttpGet("currency")]
-	public async Task<CurrencyDataDto> GetCurrencyExchangeRate()
+	public async Task<IActionResult> GetCurrencyExchangeRate()
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var responseMessage = await _httpClient.GetAsync(requestUri);
-		if (responseMessage.IsSuccessStatusCode)
-		{
-			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
-			if (currencyResponse is not null)
-			{
-				var currencyData = currencyResponse.CurrenciesData[_currencyServiceSettings.DefaultCurrency];
-				return new(currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
-			}
-		}
-		throw new HttpRequestException("Failed to get default currency data", null, HttpStatusCode.InternalServerError);
+		var response = await _httpClient.GetAsync(requestUri);
+		var currencyInfo = await response.EnsureValidAndDeserialize<CurrencyInfoDto>();
+		var data = currencyInfo.Data[_currencyServiceSettings.DefaultCurrency];
+		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
 	}
 	#endregion
 
@@ -89,20 +80,13 @@ public class CurrencyController : ControllerBase
 	/// Internal server error 
 	/// </response>
 	[HttpGet("currency/{currencyCode}")]
-	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
+	public async Task<IActionResult> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
-		if (responseMessage.IsSuccessStatusCode)
-		{
-			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
-			if (currencyResponse is not null)
-			{
-				var currencyData = currencyResponse.CurrenciesData[currencyCode];
-				return new(currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
-			}
-		}
-		throw new HttpRequestException("Failed to get default currency data", null, HttpStatusCode.InternalServerError);
+		var currencyInfo = await responseMessage.EnsureValidAndDeserialize<CurrencyInfoDto>();
+		var data = currencyInfo.Data[currencyCode];
+		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
 	}
 	#endregion
 
@@ -131,20 +115,13 @@ public class CurrencyController : ControllerBase
 	/// Internal server error 
 	/// </response>
 	[HttpGet("currency/{currencyCode}/{date}")]
-	public async Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
+	public async Task<IActionResult> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var responseMessage = await _httpClient.GetAsync(requestUri);
-		if (responseMessage.IsSuccessStatusCode)
-		{
-			var currencyResponse = await DeserializeResponse<CurrencyResponseDto>(responseMessage);
-			if (currencyResponse is not null)
-			{
-				var currencyData = currencyResponse.CurrenciesData[currencyCode];
-				return new(date, currencyData.Code, Math.Round(currencyData.Value, _currencyServiceSettings.CurrencyRoundCount));
-			}
-		}
-		throw new HttpRequestException("Failed to get default currency data", null, HttpStatusCode.InternalServerError);
+		var response = await _httpClient.GetAsync(requestUri);
+		var currencyInfo = await response.EnsureValidAndDeserialize<CurrencyInfoDto>();
+		var data = currencyInfo.Data[currencyCode];
+		return Ok(new HistoricalCurrencyDataDto(date, data.Code, RoundValue(data.Value)));
 	}
 	#endregion
 
@@ -162,24 +139,18 @@ public class CurrencyController : ControllerBase
 	/// Internal server error 
 	/// </response>
 	[HttpGet("settings")]
-	public async Task<CurrentStatusDto> GetApiSettings()
+	public async Task<IActionResult> GetApiSettings()
 	{
 		var requestUri = "https://api.currencyapi.com/v3/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
-		if (responseMessage.IsSuccessStatusCode)
-		{
-			var apiStatus = await DeserializeResponse<ApiStatusDto>(responseMessage);
-			if (apiStatus is not null)
-			{
-				var month = apiStatus.Quotas.Month;
-				return new(_currencyServiceSettings.DefaultCurrency,
-					_currencyServiceSettings.BaseCurrency,
-					month.Total,
-					month.Used,
-					_currencyServiceSettings.CurrencyRoundCount);
-			}
-		}
-		throw new HttpRequestException("Failed to get current settings", null, HttpStatusCode.InternalServerError);
+		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<QuotaInfoDto>();
+		var month = quotaInfo.Quotas.Month;
+		return Ok(new CurrentStatusDto(DefaultCurrency: _currencyServiceSettings.DefaultCurrency,
+			BaseCurrency: _currencyServiceSettings.BaseCurrency,
+			RequestLimit: month.Total,
+			RequestCount: month.Used,
+			CurrencyRoundCount: _currencyServiceSettings.CurrencyRoundCount
+			));
 	}
 	#endregion
 
@@ -187,7 +158,7 @@ public class CurrencyController : ControllerBase
 	private void ConfigureRequestHeaders()
 		=> _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 
-	private async Task<TDto?> DeserializeResponse<TDto>(HttpResponseMessage responseMessage)
-		=> JsonSerializer.Deserialize<TDto>(await responseMessage.Content.ReadAsStringAsync());
+	private decimal RoundValue(decimal value)
+		=> Math.Round(value, _currencyServiceSettings.CurrencyRoundCount);
 	#endregion
 }
