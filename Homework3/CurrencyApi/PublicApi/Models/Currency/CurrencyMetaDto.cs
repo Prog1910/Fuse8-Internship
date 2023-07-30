@@ -7,5 +7,5 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 /// </summary>
 /// <param name="LastUpdatedAt">Datetime to let you know then this dataset was last updated</param>
 public record CurrencyMetaDto(
-	[property: JsonPropertyName("last_updated_at")] DateTime LastUpdatedAt
+	[property: JsonPropertyName("last_updated_at")] string LastUpdatedAt
    );
