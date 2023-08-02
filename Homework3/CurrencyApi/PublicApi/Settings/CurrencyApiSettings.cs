@@ -2,8 +2,9 @@
 
 public class CurrencyApiSettings
 {
-    public string ApiKey { get; set; } = string.Empty;
-    public string BaseCurrency { get; set; } = string.Empty;
-    public string DefaultCurrency { get; set; } = string.Empty;
+    public string ApiKey { get; init; } = string.Empty;
+    public string BaseUrl { get; init; } = string.Empty;
+    public string BaseCurrency { get; init; } = string.Empty;
+    public string DefaultCurrency { get; init; } = string.Empty;
     public int CurrencyRoundCount { get; set; }
 }

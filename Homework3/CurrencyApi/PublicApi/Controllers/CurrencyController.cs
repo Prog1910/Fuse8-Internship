@@ -10,15 +10,18 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 /// <summary>
 /// Methods for handling exchange rate conversion
 /// </summary>
+[ApiController]
 [Route("currencyapi")]
 public class CurrencyController : ControllerBase
 {
 	private readonly CurrencyApiSettings _currencyServiceSettings;
 	private readonly HttpClient _httpClient;
+	private readonly string _baseUrl;
 
 	public CurrencyController(IOptionsSnapshot<CurrencyApiSettings> options, HttpClient httpClient)
 	{
 		_currencyServiceSettings = options.Value;
+		_baseUrl = _currencyServiceSettings.BaseUrl;
 		_httpClient = httpClient;
 		ConfigureRequestHeaders();
 	}
@@ -47,7 +50,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency")]
 	public async Task<IActionResult> GetCurrencyExchangeRate()
 	{
-		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
+		var requestUri = $"{_currencyServiceSettings.BaseUrl}/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
 		var data = currencyResponse.Data[_currencyServiceSettings.DefaultCurrency];
@@ -79,7 +82,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}")]
 	public async Task<IActionResult> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
-		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
+		var requestUri = $"{_baseUrl}/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
 		var data = currencyResponse.Data[currencyCode];
@@ -112,7 +115,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}/{date}")]
 	public async Task<IActionResult> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
-		var requestUri = $"https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
+		var requestUri = $"{_baseUrl}/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
 		var data = currencyResponse.Data[currencyCode];
@@ -134,7 +137,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("settings")]
 	public async Task<IActionResult> GetApiSettings()
 	{
-		var requestUri = "https://api.currencyapi.com/v3/status";
+		var requestUri = $"{_baseUrl}/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<StatusResponse>();
 		var month = quotaInfo.Quotas.Month;
