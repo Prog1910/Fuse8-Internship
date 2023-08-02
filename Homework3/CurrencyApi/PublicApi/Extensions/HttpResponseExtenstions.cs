@@ -7,7 +7,7 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Extensions;
 
 public static class HttpResponseMessageExtenstions
 {
-	public async static Task<TDto> EnsureValidAndDeserialize<TDto>(this HttpResponseMessage responseMessage) where TDto : IInfo
+	public async static Task<TDto> EnsureValidAndDeserialize<TDto>(this HttpResponseMessage responseMessage) where TDto : IResponse
 	{
 		EnsureValid(responseMessage);
 		var response = await responseMessage.Deserialize<TDto>();

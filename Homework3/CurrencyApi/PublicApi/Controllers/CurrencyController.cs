@@ -23,7 +23,6 @@ public class CurrencyController : ControllerBase
 		ConfigureRequestHeaders();
 	}
 
-	#region GET /currency
 	/// <summary>
 	/// Latest Default Сurrency Exchange Rate (default currency RUB, default base currency USD)
 	/// </summary>
@@ -50,13 +49,11 @@ public class CurrencyController : ControllerBase
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
-		var currencyInfo = await response.EnsureValidAndDeserialize<CurrencyInfoDto>();
-		var data = currencyInfo.Data[_currencyServiceSettings.DefaultCurrency];
+		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
+		var data = currencyResponse.Data[_currencyServiceSettings.DefaultCurrency];
 		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
 	}
-	#endregion
 
-	#region GET /currency/{currencyCode}
 	/// <summary>
 	/// Latest Сurrency Exchange Rate (default base currency USD)
 	/// </summary>
@@ -84,13 +81,11 @@ public class CurrencyController : ControllerBase
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
-		var currencyInfo = await responseMessage.EnsureValidAndDeserialize<CurrencyInfoDto>();
-		var data = currencyInfo.Data[currencyCode];
+		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
+		var data = currencyResponse.Data[currencyCode];
 		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
 	}
-	#endregion
 
-	#region GET /currency/{currencyCode}/{date}
 	/// <summary>
 	/// Historical Сurrency Exchange Rate (default base currency USD)
 	/// </summary>
@@ -119,13 +114,11 @@ public class CurrencyController : ControllerBase
 	{
 		var requestUri = $"https://api.currencyapi.com/v3/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
-		var currencyInfo = await response.EnsureValidAndDeserialize<CurrencyInfoDto>();
-		var data = currencyInfo.Data[currencyCode];
+		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
+		var data = currencyResponse.Data[currencyCode];
 		return Ok(new HistoricalCurrencyDataDto(date, data.Code, RoundValue(data.Value)));
 	}
-	#endregion
 
-	#region GET /settings
 	/// <summary>
 	/// Current Quota Information
 	/// </summary>
@@ -143,7 +136,7 @@ public class CurrencyController : ControllerBase
 	{
 		var requestUri = "https://api.currencyapi.com/v3/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
-		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<QuotaInfoDto>();
+		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<StatusResponse>();
 		var month = quotaInfo.Quotas.Month;
 		return Ok(new CurrentStatusDto(DefaultCurrency: _currencyServiceSettings.DefaultCurrency,
 			BaseCurrency: _currencyServiceSettings.BaseCurrency,
@@ -152,13 +145,10 @@ public class CurrencyController : ControllerBase
 			CurrencyRoundCount: _currencyServiceSettings.CurrencyRoundCount
 			));
 	}
-	#endregion
 
-	#region Helper Methods
 	private void ConfigureRequestHeaders()
 		=> _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
 
 	private decimal RoundValue(decimal value)
 		=> Math.Round(value, _currencyServiceSettings.CurrencyRoundCount);
-	#endregion
 }
