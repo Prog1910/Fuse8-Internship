@@ -11,7 +11,7 @@ public static class HttpResponseMessageExtenstions
 	{
 		EnsureValid(responseMessage);
 		var response = await responseMessage.Deserialize<TDto>();
-		return response is not null ? response : throw new CurrencyNotFoundException();
+		return response ?? throw new CurrencyNotFoundException();
 	}
 
 	public static void EnsureValid(this HttpResponseMessage responseMessage)
