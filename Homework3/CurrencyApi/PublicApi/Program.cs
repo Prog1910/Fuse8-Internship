@@ -5,9 +5,6 @@ using Serilog.Exceptions.Core;
 
 var webHost = Host
 	.CreateDefaultBuilder()
-	.ConfigureAppConfiguration(config =>
-		config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-		)
 	.UseSerilog((context, services, configuration) =>
 		configuration
 		.ReadFrom.Configuration(context.Configuration)
