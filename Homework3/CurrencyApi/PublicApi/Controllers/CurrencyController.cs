@@ -1,9 +1,5 @@
-﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Extensions;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Mvc;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 
@@ -14,16 +10,11 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 [Route("currencyapi")]
 public class CurrencyController : ControllerBase
 {
-	private readonly CurrencyApiSettings _currencyServiceSettings;
-	private readonly HttpClient _httpClient;
-	private readonly string _baseUrl;
+	private readonly ICurrencyService _currencyService;
 
-	public CurrencyController(IOptionsSnapshot<CurrencyApiSettings> options, HttpClient httpClient)
+	public CurrencyController(ICurrencyService currencyService)
 	{
-		_currencyServiceSettings = options.Value;
-		_baseUrl = _currencyServiceSettings.BaseUrl;
-		_httpClient = httpClient;
-		ConfigureRequestHeaders();
+		_currencyService = currencyService;
 	}
 
 	/// <summary>
@@ -50,11 +41,8 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency")]
 	public async Task<IActionResult> GetCurrencyExchangeRate()
 	{
-		var requestUri = $"{_currencyServiceSettings.BaseUrl}/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var response = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
-		var data = currencyResponse.Data[_currencyServiceSettings.DefaultCurrency];
-		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
+		var currencyData = await _currencyService.GetCurrencyExchangeRate();
+		return Ok(currencyData);
 	}
 
 	/// <summary>
@@ -82,11 +70,8 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}")]
 	public async Task<IActionResult> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
-		var requestUri = $"{_baseUrl}/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var responseMessage = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
-		var data = currencyResponse.Data[currencyCode];
-		return Ok(new CurrencyDataDto(Code: data.Code, Value: RoundValue(data.Value)));
+		var currencyData = await _currencyService.GetCurrencyExchangeRateByCode(currencyCode);
+		return Ok(currencyData);
 	}
 
 	/// <summary>
@@ -115,11 +100,8 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}/{date}")]
 	public async Task<IActionResult> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
-		var requestUri = $"{_baseUrl}/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
-		var response = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
-		var data = currencyResponse.Data[currencyCode];
-		return Ok(new HistoricalCurrencyDataDto(date, data.Code, RoundValue(data.Value)));
+		var currencyData = await _currencyService.GetHistoricalCurrencyExchangeRate(currencyCode, date);
+		return Ok(currencyData);
 	}
 
 	/// <summary>
@@ -137,21 +119,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("settings")]
 	public async Task<IActionResult> GetApiSettings()
 	{
-		var requestUri = $"{_baseUrl}/status";
-		var responseMessage = await _httpClient.GetAsync(requestUri);
-		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<StatusResponse>();
-		var month = quotaInfo.Quotas.Month;
-		return Ok(new CurrentStatusDto(DefaultCurrency: _currencyServiceSettings.DefaultCurrency,
-			BaseCurrency: _currencyServiceSettings.BaseCurrency,
-			RequestLimit: month.Total,
-			RequestCount: month.Used,
-			CurrencyRoundCount: _currencyServiceSettings.CurrencyRoundCount
-			));
+		var status = await _currencyService.GetApiSettings();
+		return Ok(status);
 	}
-
-	private void ConfigureRequestHeaders()
-		=> _httpClient.DefaultRequestHeaders.Add("apikey", _currencyServiceSettings.ApiKey);
-
-	private decimal RoundValue(decimal value)
-		=> Math.Round(value, _currencyServiceSettings.CurrencyRoundCount);
 }

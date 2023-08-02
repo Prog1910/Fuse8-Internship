@@ -7,6 +7,8 @@ using Audit.Http;
 using Polly.Extensions.Http;
 using Polly;
 using Audit.Core;
+using Microsoft.AspNetCore.Authorization;
+using Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
@@ -22,7 +24,8 @@ public class Startup
 	public void ConfigureServices(IServiceCollection services)
 	{
 		services.Configure<CurrencyApiSettings>(_configuration.GetSection("CurrencyApi"));
-		services.AddHttpClient<CurrencyController>("CurrencyController")
+
+		services.AddHttpClient<ICurrencyService, CurrencyService>("Client1")
 			.AddPolicyHandler(HttpPolicyExtensions
 				.HandleTransientHttpError()
 				.WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1))
