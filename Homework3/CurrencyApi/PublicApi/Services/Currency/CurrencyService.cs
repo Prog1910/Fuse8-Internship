@@ -8,11 +8,11 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
 
 public class CurrencyService : ICurrencyService
 {
-	private readonly CurrencyApiSettings _currencyServiceSettings;
+	private readonly CurrencyServiceOptions _currencyServiceSettings;
 	private readonly HttpClient _httpClient;
 	private readonly string _baseUrl;
 
-	public CurrencyService(IOptionsSnapshot<CurrencyApiSettings> options, HttpClient httpClient)
+	public CurrencyService(IOptionsSnapshot<CurrencyServiceOptions> options, HttpClient httpClient)
 	{
 		_currencyServiceSettings = options.Value;
 		_baseUrl = _currencyServiceSettings.BaseUrl;
@@ -20,40 +20,40 @@ public class CurrencyService : ICurrencyService
 		ConfigureRequestHeaders();
 	}
 
-	public async Task<CurrencyDataDto> GetCurrencyExchangeRate()
+	public async Task<ExchangeRate> GetCurrencyExchangeRate()
 	{
 		var requestUri = $"{_baseUrl}/latest?currencies={_currencyServiceSettings.DefaultCurrency}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
+		var currencyResponse = await response.EnsureValidAndDeserialize<ExchangeRateResponse>();
 		var data = currencyResponse.Data[_currencyServiceSettings.DefaultCurrency];
-		return new CurrencyDataDto(data.Code, RoundValue(data.Value));
+		return new ExchangeRate(data.Code, RoundValue(data.Value));
 	}
 
-	public async Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode)
+	public async Task<ExchangeRate> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
 		var requestUri = $"{_baseUrl}/latest?currencies={currencyCode}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
+		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<ExchangeRateResponse>();
 		var data = currencyResponse.Data[currencyCode];
-		return new CurrencyDataDto(data.Code, RoundValue(data.Value));
+		return new ExchangeRate(data.Code, RoundValue(data.Value));
 	}
 
-	public async Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
+	public async Task<HistoricalExchangeRate> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
 		var requestUri = $"{_baseUrl}/historical?currencies={currencyCode}&date={date}&base_currency={_currencyServiceSettings.BaseCurrency}";
 		var response = await _httpClient.GetAsync(requestUri);
-		var currencyResponse = await response.EnsureValidAndDeserialize<CurrencyResponse>();
+		var currencyResponse = await response.EnsureValidAndDeserialize<ExchangeRateResponse>();
 		var data = currencyResponse.Data[currencyCode];
-		return new HistoricalCurrencyDataDto(date, data.Code, RoundValue(data.Value));
+		return new HistoricalExchangeRate(date, data.Code, RoundValue(data.Value));
 	}
 
-	public async Task<CurrentStatusDto> GetApiSettings()
+	public async Task<Status> GetApiSettings()
 	{
 		var requestUri = $"{_baseUrl}/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var quotaInfo = await responseMessage.EnsureValidAndDeserialize<StatusResponse>();
 		var month = quotaInfo.Quotas.Month;
-		return new CurrentStatusDto(
+		return new Status(
 			DefaultCurrency: _currencyServiceSettings.DefaultCurrency,
 			BaseCurrency: _currencyServiceSettings.BaseCurrency,
 			RequestLimit: month.Total,

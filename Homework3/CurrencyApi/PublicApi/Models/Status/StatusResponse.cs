@@ -9,5 +9,4 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
 /// <param name="Quotas">Contains information about your request quota</param>
 public record StatusResponse(
 	[property: JsonPropertyName("account_id")] long AccountId,
-	[property: JsonPropertyName("quotas")] QuotasDto Quotas
-	) : IResponse;
+	[property: JsonPropertyName("quotas")] Quotas Quotas);

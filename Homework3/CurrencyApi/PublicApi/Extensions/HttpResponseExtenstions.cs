@@ -1,16 +1,14 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Exceptions;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Models;
 using System.Net;
-using System.Text.Json;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Extensions;
 
 public static class HttpResponseMessageExtenstions
 {
-	public async static Task<TDto> EnsureValidAndDeserialize<TDto>(this HttpResponseMessage responseMessage) where TDto : IResponse
+	public async static Task<T> EnsureValidAndDeserialize<T>(this HttpResponseMessage responseMessage)
 	{
 		EnsureValid(responseMessage);
-		var response = await responseMessage.Deserialize<TDto>();
+		var response = await responseMessage.Deserialize<T>();
 		return response ?? throw new CurrencyNotFoundException();
 	}
 
@@ -25,6 +23,6 @@ public static class HttpResponseMessageExtenstions
 			};
 	}
 
-	public static async Task<TDto?> Deserialize<TDto>(this HttpResponseMessage responseMessage)
-		=> JsonSerializer.Deserialize<TDto>(await responseMessage.Content.ReadAsStringAsync());
+	public static async Task<T?> Deserialize<T>(this HttpResponseMessage responseMessage)
+		=> await responseMessage.Content.ReadFromJsonAsync<T>();
 }

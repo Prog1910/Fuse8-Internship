@@ -7,7 +7,6 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 /// </summary>
 /// <param name="Code">Currency code</param>
 /// <param name="Value">Currency rate</param>
-public record CurrencyDataDto(
+public record ExchangeRate(
 	[property: JsonPropertyName("code")] string Code,
-	[property: JsonPropertyName("value")] decimal Value
-	);
+	[property: JsonPropertyName("value")] decimal Value);

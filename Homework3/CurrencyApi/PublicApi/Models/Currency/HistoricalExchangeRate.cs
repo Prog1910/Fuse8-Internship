@@ -8,8 +8,7 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 /// <param name="Date">Date of exchange rate relevance</param>
 /// <param name="Code">Currency code</param>
 /// <param name="Value">Currency rate</param>
-public record HistoricalCurrencyDataDto(
+public record HistoricalExchangeRate(
 	[property: JsonPropertyName("date")] string Date,
 	string Code,
-	decimal Value
-	) : CurrencyDataDto(Code, Value);
+	decimal Value) : ExchangeRate(Code, Value);

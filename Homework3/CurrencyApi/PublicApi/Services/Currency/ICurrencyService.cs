@@ -5,8 +5,8 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
 
 public interface ICurrencyService
 {
-    Task<CurrencyDataDto> GetCurrencyExchangeRate();
-    Task<CurrencyDataDto> GetCurrencyExchangeRateByCode(string currencyCode);
-    Task<HistoricalCurrencyDataDto> GetHistoricalCurrencyExchangeRate(string currencyCode, string date);
-    Task<CurrentStatusDto> GetApiSettings();
+    Task<ExchangeRate> GetCurrencyExchangeRate();
+    Task<ExchangeRate> GetCurrencyExchangeRateByCode(string currencyCode);
+    Task<HistoricalExchangeRate> GetHistoricalCurrencyExchangeRate(string currencyCode, string date);
+    Task<Status> GetApiSettings();
 }

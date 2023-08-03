@@ -1,5 +1,4 @@
-﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
+﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Filters;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
@@ -7,7 +6,6 @@ using Audit.Http;
 using Polly.Extensions.Http;
 using Polly;
 using Audit.Core;
-using Microsoft.AspNetCore.Authorization;
 using Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
@@ -23,7 +21,7 @@ public class Startup
 
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.Configure<CurrencyApiSettings>(_configuration.GetSection("CurrencyApi"));
+		services.Configure<CurrencyServiceOptions>(_configuration.GetSection(CurrencyServiceOptions.SectionName));
 
 		services.AddHttpClient<ICurrencyService, CurrencyService>("Client1")
 			.AddPolicyHandler(HttpPolicyExtensions

@@ -7,7 +7,6 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Currency;
 /// </summary>
 /// <param name="Meta">Holds useful information</param>
 /// <param name="Data">Holds the actual currency information</param>
-public record CurrencyResponse(
-	[property: JsonPropertyName("meta")] CurrencyMetaDto Meta,
-	[property: JsonPropertyName("data")] Dictionary<string, CurrencyDataDto> Data
-	) : IResponse;
+public record ExchangeRateResponse(
+	[property: JsonPropertyName("meta")] ExchangeRateMeta Meta,
+	[property: JsonPropertyName("data")] Dictionary<string, ExchangeRate> Data);
