@@ -1,12 +1,13 @@
-﻿using Fuse8_ByteMinds.SummerSchool.PublicApi.Settings;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Filters;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Audit.Http;
 using Polly.Extensions.Http;
 using Polly;
 using Audit.Core;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
+using Fuse8_ByteMinds.SummerSchool.Application;
+using Fuse8_ByteMinds.SummerSchool.Application.Services;
+using Fuse8_ByteMinds.SummerSchool.Application.Filters;
+using Fuse8_ByteMinds.SummerSchool.Application.Middleware;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 
@@ -21,20 +22,20 @@ public class Startup
 
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.Configure<CurrencyServiceOptions>(_configuration.GetSection(CurrencyServiceOptions.SectionName));
+		services.AddApplication(_configuration);
 
 		services.AddHttpClient<ICurrencyService, CurrencyService>("Client1")
-			.AddPolicyHandler(HttpPolicyExtensions
-				.HandleTransientHttpError()
-				.WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1))
-			)
-			.AddAuditHandler(audit => audit
-				.IncludeRequestHeaders()
-				.IncludeRequestBody()
-				.IncludeResponseHeaders()
-				.IncludeResponseBody()
-				.IncludeContentHeaders()
-				);
+				.AddPolicyHandler(HttpPolicyExtensions
+					.HandleTransientHttpError()
+					.WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1))
+				)
+				.AddAuditHandler(audit => audit
+					.IncludeRequestHeaders()
+					.IncludeRequestBody()
+					.IncludeResponseHeaders()
+					.IncludeResponseBody()
+					.IncludeContentHeaders()
+					);
 
 		Configuration.Setup()
 			.UseSerilog(config => config.Message(

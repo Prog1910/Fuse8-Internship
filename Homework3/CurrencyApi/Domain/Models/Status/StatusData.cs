@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
+namespace Fuse8_ByteMinds.SummerSchool.Domain.Models.Status;
 
 /// <summary>
 /// Current API settings
@@ -10,9 +10,9 @@ namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Models.Status;
 /// <param name="RequestLimit">Total number of available requests received from external API</param>
 /// <param name="RequestCount">Number of used requests received from external API</param>
 /// <param name="CurrencyRoundCount">The number of decimal places to which the value of the exchange rate should be rounded</param>
-public record Status(
-	[property: JsonPropertyName("default_currency")] string DefaultCurrency,
-	[property: JsonPropertyName("base_currency")] string BaseCurrency,
-	[property: JsonPropertyName("request_limit")] int RequestLimit,
-	[property: JsonPropertyName("request_count")] int RequestCount,
-	[property: JsonPropertyName("currency_round_count")] int CurrencyRoundCount);
+public record StatusData(
+    [property: JsonPropertyName("default_currency")] string DefaultCurrency,
+    [property: JsonPropertyName("base_currency")] string BaseCurrency,
+    [property: JsonPropertyName("request_limit")] int RequestLimit,
+    [property: JsonPropertyName("request_count")] int RequestCount,
+    [property: JsonPropertyName("currency_round_count")] int CurrencyRoundCount);

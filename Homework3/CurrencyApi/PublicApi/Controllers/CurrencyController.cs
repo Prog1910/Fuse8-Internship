@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Fuse8_ByteMinds.SummerSchool.PublicApi.Services.Currency;
+﻿using Fuse8_ByteMinds.SummerSchool.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;
 
@@ -41,7 +41,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency")]
 	public async Task<IActionResult> GetCurrencyExchangeRate()
 	{
-		var currencyData = await _currencyService.GetCurrencyExchangeRate();
+		var currencyData = await _currencyService.GetDefaultExchangeRate();
 		return Ok(currencyData);
 	}
 
@@ -70,7 +70,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}")]
 	public async Task<IActionResult> GetCurrencyExchangeRateByCode(string currencyCode)
 	{
-		var currencyData = await _currencyService.GetCurrencyExchangeRateByCode(currencyCode);
+		var currencyData = await _currencyService.GetExchangeRateByCode(currencyCode);
 		return Ok(currencyData);
 	}
 
@@ -100,7 +100,7 @@ public class CurrencyController : ControllerBase
 	[HttpGet("currency/{currencyCode}/{date}")]
 	public async Task<IActionResult> GetHistoricalCurrencyExchangeRate(string currencyCode, string date)
 	{
-		var currencyData = await _currencyService.GetHistoricalCurrencyExchangeRate(currencyCode, date);
+		var currencyData = await _currencyService.GetHistoricalExchangeRateByCode(currencyCode, date);
 		return Ok(currencyData);
 	}
 
@@ -117,9 +117,9 @@ public class CurrencyController : ControllerBase
 	/// Internal server error 
 	/// </response>
 	[HttpGet("settings")]
-	public async Task<IActionResult> GetApiSettings()
+	public async Task<IActionResult> GetStatus()
 	{
-		var status = await _currencyService.GetApiSettings();
+		var status = await _currencyService.GetStatus();
 		return Ok(status);
 	}
 }
