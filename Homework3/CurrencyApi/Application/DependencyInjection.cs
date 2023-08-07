@@ -1,6 +1,6 @@
 ﻿using Fuse8_ByteMinds.SummerSchool.Domain.Options;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Fuse8_ByteMinds.SummerSchool.Application;
 

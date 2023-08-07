@@ -1,13 +1,13 @@
-﻿using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
+﻿using Audit.Core;
 using Audit.Http;
-using Polly.Extensions.Http;
-using Polly;
-using Audit.Core;
 using Fuse8_ByteMinds.SummerSchool.Application;
-using Fuse8_ByteMinds.SummerSchool.Application.Services;
 using Fuse8_ByteMinds.SummerSchool.Application.Filters;
 using Fuse8_ByteMinds.SummerSchool.Application.Middleware;
+using Fuse8_ByteMinds.SummerSchool.Application.Services;
+using Microsoft.OpenApi.Models;
+using Polly;
+using Polly.Extensions.Http;
+using System.Text.Json.Serialization;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
 

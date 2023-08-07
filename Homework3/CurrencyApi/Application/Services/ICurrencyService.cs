@@ -5,8 +5,11 @@ namespace Fuse8_ByteMinds.SummerSchool.Application.Services;
 
 public interface ICurrencyService
 {
-    Task<CurrencyData> GetDefaultExchangeRate();
-    Task<CurrencyData> GetExchangeRateByCode(string currencyCode);
-	Task<HistoricalCurrencyData> GetHistoricalExchangeRateByCode(string currencyCode, string date);
-    Task<StatusData> GetStatus();
+	Task<Currency> GetDefaultExchangeRate();
+
+	Task<Currency> GetExchangeRateByCode(string currencyCode);
+
+	Task<CurrencyOnDate> GetHistoricalExchangeRateByCode(string currencyCode, string date);
+
+	Task<Status> GetStatus();
 }

@@ -22,40 +22,40 @@ public class CurrencyService : ICurrencyService
 		ConfigureRequestHeaders();
 	}
 
-	public async Task<CurrencyData> GetDefaultExchangeRate()
+	public async Task<Currency> GetDefaultExchangeRate()
 	{
 		var requestUri = $"{_baseUrl}/latest?currencies={_options.DefaultCurrency}&base_currency={_options.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
-		var currencyData = currencyResponse.Data[_options.DefaultCurrency];
-		return new CurrencyData(currencyData.Code, RoundValue(currencyData.Value));
+		var currency = currencyResponse.Data[_options.DefaultCurrency];
+		return new Currency(currency.Code, RoundValue(currency.Value));
 	}
 
-	public async Task<CurrencyData> GetExchangeRateByCode(string currencyCode)
+	public async Task<Currency> GetExchangeRateByCode(string currencyCode)
 	{
 		var requestUri = $"{_baseUrl}/latest?currencies={currencyCode}&base_currency={_options.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
-		var currencyData = currencyResponse.Data[currencyCode];
-		return new CurrencyData(currencyData.Code, RoundValue(currencyData.Value));
+		var currency = currencyResponse.Data[currencyCode];
+		return new Currency(currency.Code, RoundValue(currency.Value));
 	}
 
-	public async Task<HistoricalCurrencyData> GetHistoricalExchangeRateByCode(string currencyCode, string date)
+	public async Task<CurrencyOnDate> GetHistoricalExchangeRateByCode(string currencyCode, string date)
 	{
 		var requestUri = $"{_baseUrl}/historical?date={date}&currencies={currencyCode}&base_currency={_options.BaseCurrency}";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var currencyResponse = await responseMessage.EnsureValidAndDeserialize<CurrencyResponse>();
-		var currencyData = currencyResponse.Data[currencyCode];
-		return new HistoricalCurrencyData(date, currencyData.Code, RoundValue(currencyData.Value));
+		var currency = currencyResponse.Data[currencyCode];
+		return new CurrencyOnDate(date, currency.Code, RoundValue(currency.Value));
 	}
 
-	public async Task<StatusData> GetStatus()
+	public async Task<Status> GetStatus()
 	{
 		var requestUri = $"{_baseUrl}/status";
 		var responseMessage = await _httpClient.GetAsync(requestUri);
 		var statusResponse = await responseMessage.EnsureValidAndDeserialize<StatusResponse>();
 		var month = statusResponse.Quotas.Month;
-		return new StatusData(
+		return new Status(
 			DefaultCurrency: _options.DefaultCurrency,
 			BaseCurrency: _options.BaseCurrency,
 			RequestLimit: month.Total,
