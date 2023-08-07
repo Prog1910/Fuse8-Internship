@@ -3,12 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Fuse8_ByteMinds.SummerSchool.Application.Middleware;
 
-public class RequestLoggerMiddleware
+public class RequestLoggingMiddleware
 {
 	private readonly RequestDelegate _next;
-	private readonly ILogger<RequestLoggerMiddleware> _logger;
+	private readonly ILogger<RequestLoggingMiddleware> _logger;
 
-	public RequestLoggerMiddleware(RequestDelegate next, ILogger<RequestLoggerMiddleware> logger)
+	public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 	{
 		_next = next;
 		_logger = logger;

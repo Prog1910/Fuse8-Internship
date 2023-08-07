@@ -9,7 +9,7 @@ using Polly;
 using Polly.Extensions.Http;
 using System.Text.Json.Serialization;
 
-namespace Fuse8_ByteMinds.SummerSchool.PublicApi;
+namespace Fuse8_ByteMinds.SummerSchool.InternalApi;
 
 public class Startup
 {

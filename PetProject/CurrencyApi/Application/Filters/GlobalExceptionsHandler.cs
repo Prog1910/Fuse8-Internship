@@ -9,9 +9,9 @@ namespace Fuse8_ByteMinds.SummerSchool.Application.Filters;
 
 public class GlobalExceptionsHandler : IExceptionFilter
 {
-	private readonly ILogger<RequestLoggerMiddleware> _logger;
+	private readonly ILogger<RequestLoggingMiddleware> _logger;
 
-	public GlobalExceptionsHandler(ILogger<RequestLoggerMiddleware> logger) => _logger = logger;
+	public GlobalExceptionsHandler(ILogger<RequestLoggingMiddleware> logger) => _logger = logger;
 
 	public void OnException(ExceptionContext context)
 	{
