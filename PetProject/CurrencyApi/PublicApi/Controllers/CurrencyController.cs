@@ -1,4 +1,4 @@
-﻿using Fuse8_ByteMinds.SummerSchool.Application.Services;
+﻿using Fuse8_ByteMinds.SummerSchool.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fuse8_ByteMinds.SummerSchool.PublicApi.Controllers;

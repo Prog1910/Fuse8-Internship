@@ -1,9 +1,10 @@
 ﻿using Audit.Core;
 using Audit.Http;
 using Fuse8_ByteMinds.SummerSchool.Application;
+using Fuse8_ByteMinds.SummerSchool.Application.Contracts;
 using Fuse8_ByteMinds.SummerSchool.Application.Filters;
 using Fuse8_ByteMinds.SummerSchool.Application.Middleware;
-using Fuse8_ByteMinds.SummerSchool.Application.Services;
+using Fuse8_ByteMinds.SummerSchool.InternalApi.Services;
 using Microsoft.OpenApi.Models;
 using Polly;
 using Polly.Extensions.Http;

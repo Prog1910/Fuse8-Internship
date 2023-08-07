@@ -1,7 +1,7 @@
 using Fuse8_ByteMinds.SummerSchool.Domain.Models.Currency;
 using Fuse8_ByteMinds.SummerSchool.Domain.Models.Status;
 
-namespace Fuse8_ByteMinds.SummerSchool.Application.Services;
+namespace Fuse8_ByteMinds.SummerSchool.Application.Contracts;
 
 public interface ICurrencyService
 {
