@@ -1,6 +1,6 @@
-﻿using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Application.Persistence;
-using CurrencyApi.Infrastructure.Persistence;
+using CurrencyApi.Infrastructure.Persistence.Repositories;
 using CurrencyApi.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,6 +1,6 @@
 using CurrencyApi.Application.Common.Errors;
+using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Application.Common.Services.Common.Responses;
-using CurrencyApi.Application.Common.Services.Interfaces;
 using CurrencyApi.Domain.Aggregates.CurrenciesOnDateAggregate;
 using CurrencyApi.Domain.Aggregates.CurrencyAggregate;
 using CurrencyApi.Domain.Aggregates.SettingsAggregate;

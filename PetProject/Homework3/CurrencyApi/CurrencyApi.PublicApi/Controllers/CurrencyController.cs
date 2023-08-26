@@ -1,4 +1,4 @@
-﻿using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Contracts;
 using CurrencyApi.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;

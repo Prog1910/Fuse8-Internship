@@ -1,4 +1,4 @@
-﻿using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Protos;
 using Grpc.Core;
 using MapsterMapper;

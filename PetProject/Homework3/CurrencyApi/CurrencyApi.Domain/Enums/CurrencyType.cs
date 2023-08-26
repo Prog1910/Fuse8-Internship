@@ -5,8 +5,7 @@ namespace CurrencyApi.Domain.Enums;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CurrencyType
 {
-	Default,
-	AED,
+	AED = 1,
 	AFN,
 	ALL,
 	AMD,

@@ -1,4 +1,4 @@
-﻿using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Protos;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;

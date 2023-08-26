@@ -1,6 +1,6 @@
 ﻿using Audit.Http;
+using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Application.Common.Services;
-using CurrencyApi.Application.Common.Services.Interfaces;
 using CurrencyApi.Domain.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

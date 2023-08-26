@@ -2,30 +2,31 @@
 using CurrencyApi.Domain.Aggregates.CurrencyAggregate;
 using System.Text.Json;
 
-namespace CurrencyApi.Infrastructure.Persistence;
+namespace CurrencyApi.Infrastructure.Persistence.Repositories;
 
 public sealed class CurrencyRepository : ICurrencyRepository
 {
 	private const string CachedCurrenciesDirectoryName = "CachedCurrencies";
+	private const string CachedCurrenciesOnDateDirectoryName = "CachedCurrenciesOnDate";
 	private const string JsonFileNameExtension = ".json";
 
 	private readonly TimeSpan _expirationTime;
 	private readonly string _cacheDirectoryPath;
+	private readonly string _cacheOnDateDirectoryPath;
 
 	public CurrencyRepository()
 	{
-		_cacheDirectoryPath = Path.Combine(@"D:\Projects\Code\PetProject\Homework3\CurrencyApi", CachedCurrenciesDirectoryName);
+		_cacheDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), CachedCurrenciesDirectoryName);
+		_cacheOnDateDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), CachedCurrenciesOnDateDirectoryName);
 		_expirationTime = TimeSpan.FromHours(2);
 	}
 
 	public void AddCurrentCurrencies(string baseCurrency, Currency[] currencies)
 	{
-		// Prepare directory and file for currencies
 		var formattedDate = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
 		var cacheFilePath = Path.Combine(_cacheDirectoryPath, $"{baseCurrency}_{formattedDate}{JsonFileNameExtension}");
 		Directory.CreateDirectory(_cacheDirectoryPath);
 
-		// Write currencies to file
 		using FileStream fileStream = File.Open(cacheFilePath, FileMode.OpenOrCreate);
 		JsonSerializer.Serialize(
 			utf8Json: fileStream,
@@ -35,18 +36,16 @@ public sealed class CurrencyRepository : ICurrencyRepository
 
 	public Currency[]? GetCurrentCurrencies(string baseCurrency)
 	{
-		// Check directory and file for currencies
 		if (Directory.Exists(_cacheDirectoryPath))
 		{
-			var cacheFilesOnDate = Directory.GetFiles(_cacheDirectoryPath, $"{baseCurrency}_*{JsonFileNameExtension}")
+			var cacheFiles = Directory.GetFiles(_cacheDirectoryPath, $"{baseCurrency}_*{JsonFileNameExtension}")
 				.OrderByDescending(File.GetLastWriteTimeUtc)
 				.FirstOrDefault();
 
-			if (cacheFilesOnDate is not null
-				&& IsCacheExpired(File.GetLastWriteTimeUtc(cacheFilesOnDate), _expirationTime) == false)
+			if (cacheFiles is not null
+				&& IsCacheExpired(File.GetLastWriteTimeUtc(cacheFiles), _expirationTime) == false)
 			{
-				// Get current currencies
-				var currencies = JsonSerializer.Deserialize<Currency[]>(File.ReadAllText(cacheFilesOnDate));
+				var currencies = JsonSerializer.Deserialize<Currency[]>(File.ReadAllText(cacheFiles));
 
 				return currencies;
 			}
@@ -57,12 +56,10 @@ public sealed class CurrencyRepository : ICurrencyRepository
 
 	public void AddCurrenciesOnDate(string baseCurrency, DateTime date, Currency[] currencies)
 	{
-		// Prepare directory and file for currencies
 		var formattedDate = date.ToString("yyyy-MM-dd_HH-mm-ss");
-		var cacheFilePath = Path.Combine(_cacheDirectoryPath, $"{baseCurrency}_{formattedDate}{JsonFileNameExtension}");
-		Directory.CreateDirectory(_cacheDirectoryPath);
+		var cacheFilePath = Path.Combine(_cacheOnDateDirectoryPath, $"{baseCurrency}_{formattedDate}{JsonFileNameExtension}");
+		Directory.CreateDirectory(_cacheOnDateDirectoryPath);
 
-		// Write currencies to file
 		using FileStream fileStream = File.Open(cacheFilePath, FileMode.OpenOrCreate);
 		JsonSerializer.Serialize(
 			utf8Json: fileStream,
@@ -72,20 +69,18 @@ public sealed class CurrencyRepository : ICurrencyRepository
 
 	public Currency[]? GetCurrenciesOnDate(string baseCurrency, DateOnly date)
 	{
-		// Check directory and file for currencies
 		var formattedDate = date.ToString("yyyy-MM-dd");
 
-		if (Directory.Exists(_cacheDirectoryPath))
+		if (Directory.Exists(_cacheOnDateDirectoryPath))
 		{
-			var cacheFilesOnDate = Directory.GetFiles(_cacheDirectoryPath, $"{baseCurrency}_{formattedDate}_*{JsonFileNameExtension}")
+			var cacheFiles = Directory.GetFiles(_cacheOnDateDirectoryPath, $"{baseCurrency}_{formattedDate}*{JsonFileNameExtension}")
 				.OrderByDescending(File.GetLastWriteTimeUtc)
 				.FirstOrDefault();
 
-			if (cacheFilesOnDate is not null)
+			if (cacheFiles is not null)
 			{
-				// Get current currencies
-				var cacheTime = File.GetLastWriteTimeUtc(cacheFilesOnDate);
-				var currencies = JsonSerializer.Deserialize<Currency[]>(File.ReadAllText(cacheFilesOnDate));
+				var cacheTime = File.GetLastWriteTimeUtc(cacheFiles);
+				var currencies = JsonSerializer.Deserialize<Currency[]>(File.ReadAllText(cacheFiles));
 
 				return currencies;
 			}

@@ -1,4 +1,4 @@
-﻿using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
 using CurrencyApi.Contracts;
 using CurrencyApi.Domain.Enums;
 using CurrencyApi.Domain.Options;
@@ -35,7 +35,7 @@ public sealed class InternalService : IInternalApi
 		var currencyProtoResponse = await _grpcClient.GetCurrencyOnDateAsync(new()
 		{
 			CurrencyType = (Protos.CurrencyType)currencyType,
-			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue))
+			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue).ToUniversalTime())
 		});
 
 		return _mapper.Map<CurrencyResponse>(currencyProtoResponse);

@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="Common\Services\Protos\currency.proto" />
+		<Protobuf Include="Common\Protos\currency.proto" />
 	</ItemGroup>
 
 </Project>

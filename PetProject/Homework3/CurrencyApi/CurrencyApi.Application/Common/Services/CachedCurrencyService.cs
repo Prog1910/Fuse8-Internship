@@ -1,5 +1,5 @@
-﻿using CurrencyApi.Application.Common.Services.Common.Dtos;
-using CurrencyApi.Application.Common.Services.Interfaces;
+﻿using CurrencyApi.Application.Common.Interfaces;
+using CurrencyApi.Application.Common.Services.Common.Dtos;
 using CurrencyApi.Application.Persistence;
 using CurrencyApi.Domain.Enums;
 using CurrencyApi.Domain.Options;
@@ -25,7 +25,7 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 
 	public async Task<CurrencyDto> GetCurrentCurrencyAsync(CurrencyType currencyType, CancellationToken cancellationToken)
 	{
-		if (currencyType is CurrencyType.Default) currencyType = Enum.Parse<CurrencyType>(_options.DefaultCurrency);
+		if (currencyType is 0) currencyType = Enum.Parse<CurrencyType>(_options.DefaultCurrency);
 		var currencies = _repository.GetCurrentCurrencies(_options.BaseCurrency);
 		if (currencies is null)
 		{
@@ -39,7 +39,7 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 
 	public async Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
 	{
-		if (currencyType is CurrencyType.Default) currencyType = Enum.Parse<CurrencyType>(_options.DefaultCurrency);
+		if (currencyType is 0) currencyType = Enum.Parse<CurrencyType>(_options.DefaultCurrency);
 		var currencies = _repository.GetCurrenciesOnDate(_options.BaseCurrency, date);
 		if (currencies is null)
 		{
