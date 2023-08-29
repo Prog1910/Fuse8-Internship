@@ -94,6 +94,7 @@ public static class DependencyInjection
 	private static IServiceCollection AddPersistenceToPublicApi(this IServiceCollection services)
 	{
 		services.AddScoped<ISettingsRepository, SettingsRepository>();
+		services.AddScoped<IFavoriteCurrenciesRepository, FavoriteCurrenciesRepository>();
 
 		return services;
 	}

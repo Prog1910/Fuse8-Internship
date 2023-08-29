@@ -9,6 +9,8 @@ service CurrencyGrpc {
 	 
 	rpc GetCurrencyOnDate(CurrencyOnDateRequest) returns (CurrencyResponse);
 
+	rpc GetCurrentFavoriteCurrency(CurrencyRequest) returns (CurrencyResponse);
+
 	rpc GetSettings(google.protobuf.Empty) returns (SettingsResponse);
 }
 
@@ -22,7 +24,6 @@ message CurrencyOnDateRequest {
 	CurrencyType base_currency = 2; 
 	google.protobuf.Timestamp date = 3;
 } 
-
 message CurrencyResponse {
 	string currency_type = 1;
 	double value = 2;

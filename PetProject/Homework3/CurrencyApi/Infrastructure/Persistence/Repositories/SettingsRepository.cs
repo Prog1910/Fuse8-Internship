@@ -4,30 +4,30 @@ namespace Infrastructure.Persistence.Repositories;
 
 public sealed class SettingsRepository : ISettingsRepository
 {
-	private readonly PublicDbContext _dbContext;
+	private readonly PublicDbContext _context;
 
-	public SettingsRepository(PublicDbContext dbContext)
+	public SettingsRepository(PublicDbContext context)
 	{
-		_dbContext = dbContext;
+		_context = context;
 	}
 
 	public void UpdateDefaultCurrency(string defaultCurrency)
 	{
-		var query = _dbContext.Settings.FirstOrDefault();
-		if (query is not null)
+		var settings = _context.Settings.FirstOrDefault();
+		if (settings is not null)
 		{
-			query.DefaultCurrency = defaultCurrency.ToString();
-			_dbContext.Settings.Update(query);
+			settings.DefaultCurrency = defaultCurrency.ToString();
+			_context.SaveChanges();
 		}
-		_dbContext.SaveChanges();
 	}
 
 	public void UpdateCurrencyRoundCount(int currencyRoundCount)
 	{
-		var query = _dbContext.Settings.FirstOrDefault();
-		if (query is not null)
-			query.CurrencyRoundCount = currencyRoundCount;
-
-		_dbContext.SaveChanges();
+		var settings = _context.Settings.FirstOrDefault();
+		if (settings is not null)
+		{
+			settings.CurrencyRoundCount = currencyRoundCount;
+			_context.SaveChanges();
+		}
 	}
 }

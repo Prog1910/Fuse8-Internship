@@ -9,7 +9,7 @@ namespace InternalApi.Controllers;
 /// Controller for handling currency-related operations.
 /// </summary>
 [ApiController]
-[Route("currencyapi")]
+[Route("currency-api")]
 public sealed class CurrencyController : ControllerBase
 {
 	private readonly ICachedCurrencyApi _currencyService;

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Data.Migrations.Public
+namespace Infrastructure.Migrations.Public
 {
     [DbContext(typeof(PublicDbContext))]
     partial class PublicDbContextModelSnapshot : ModelSnapshot
@@ -21,7 +21,7 @@ namespace Infrastructure.Data.Migrations.Public
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Aggregates.CachedFavoriteCurrenciesAggregate.CachedFavoriteCurrencies", b =>
+            modelBuilder.Entity("Domain.Aggregates.CachedFavoriteCurrenciesAggregate.CachedFavoriteCurrency", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(64)
@@ -46,6 +46,10 @@ namespace Infrastructure.Data.Migrations.Public
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_favorite_currencies_name");
+
+                    b.HasIndex("Currency", "BaseCurrency")
+                        .IsUnique()
+                        .HasDatabaseName("ix_favorite_currencies_currency_base_currency");
 
                     b.ToTable("favorite_currencies", "user");
                 });
@@ -73,14 +77,6 @@ namespace Infrastructure.Data.Migrations.Public
                         .HasName("pk_settings");
 
                     b.ToTable("settings", "user");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CurrencyRoundCount = 2,
-                            DefaultCurrency = "RUB"
-                        });
                 });
 #pragma warning restore 612, 618
         }

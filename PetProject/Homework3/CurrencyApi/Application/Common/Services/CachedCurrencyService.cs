@@ -24,7 +24,7 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 		_mapper = mapper;
 	}
 
-	public async Task<CurrencyDto> GetCurrentCurrencyAsync(CurrencyType currencyType, CancellationToken cancellationToken)
+	public async Task<CurrencyDto> GetCurrentCurrencyAsync(CurrencyType defaultCurrency, CancellationToken cancellationToken)
 	{
 		var currencies = _repository.GetCurrencies(_options.BaseCurrency);
 		if (currencies is null)
@@ -32,12 +32,12 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 			currencies = await _currencyApi.GetAllCurrentCurrenciesAsync(_options.BaseCurrency, cancellationToken);
 			_repository.AddCurrencies(_options.BaseCurrency, currencies);
 		}
-		var currency = currencies.SingleOrDefault(c => c.Code.Equals(currencyType.ToString())) ?? throw new CurrencyNotFoundException();
+		var currency = currencies.SingleOrDefault(c => c.Code.Equals(defaultCurrency.ToString())) ?? throw new CurrencyNotFoundException();
 
 		return _mapper.Map<CurrencyDto>(currency);
 	}
 
-	public async Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
+	public async Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType defaultCurrency, DateOnly date, CancellationToken cancellationToken)
 	{
 		var currencies = _repository.GetCurrencies(_options.BaseCurrency, date);
 		if (currencies is null)
@@ -47,9 +47,21 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 			currencies = currenciesOnDate.Currencies;
 			_repository.AddCurrencies(_options.BaseCurrency, currencies, lastUpdateAt);
 		}
-		var currency = currencies.SingleOrDefault(c => c.Code.Equals(currencyType.ToString())) ?? throw new CurrencyNotFoundException();
+		var currency = currencies.SingleOrDefault(c => c.Code.Equals(defaultCurrency.ToString())) ?? throw new CurrencyNotFoundException();
 
 		return _mapper.Map<CurrencyDto>(currency);
+	}
+
+	public async Task<CurrencyDto> GetCurrentFavoriteCurrencyAsync(CurrencyType defaultCurrency, CurrencyType baseCurrency, CancellationToken cancellationToken)
+	{
+		var defaultCurrencyDto = await GetCurrentCurrencyAsync(defaultCurrency, cancellationToken);
+		if (_options.BaseCurrency.Equals(baseCurrency.ToString())) return defaultCurrencyDto;
+
+		var baseCurrencyDto = await GetCurrentCurrencyAsync(baseCurrency, cancellationToken);
+		var newValue = defaultCurrencyDto.Value / baseCurrencyDto.Value;
+		var resultCurrencyDto = new CurrencyDto(defaultCurrency, newValue);
+
+		return resultCurrencyDto;
 	}
 
 	public async Task<SettingsDto> GetSettingsAsync(CancellationToken cancellationToken)
@@ -58,4 +70,5 @@ public sealed class CachedCurrencyService : ICachedCurrencyApi
 
 		return _mapper.Map<SettingsDto>(settings);
 	}
+
 }

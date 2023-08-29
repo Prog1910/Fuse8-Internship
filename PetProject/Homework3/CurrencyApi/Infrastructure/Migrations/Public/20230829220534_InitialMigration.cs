@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Data.Migrations.Public
+namespace Infrastructure.Migrations.Public
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -46,8 +46,15 @@ namespace Infrastructure.Data.Migrations.Public
             migrationBuilder.InsertData(
                 schema: "user",
                 table: "settings",
-                columns: new[] { "id", "currency_round_count", "default_currency" },
-                values: new object[] { 1, 2, "RUB" });
+                columns: new[] { "id", "default_currency", "currency_round_count" },
+                values: new object[] { 1, "RUB", 2 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_favorite_currencies_currency_base_currency",
+                schema: "user",
+                table: "favorite_currencies",
+                columns: new[] { "currency", "base_currency" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_favorite_currencies_name",

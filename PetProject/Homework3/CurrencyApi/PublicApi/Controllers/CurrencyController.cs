@@ -1,6 +1,5 @@
 ﻿using Application.Common.Interfaces;
 using Contracts;
-using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PublicApi.Controllers;
@@ -9,16 +8,14 @@ namespace PublicApi.Controllers;
 /// Controller for handling currency-related operations.
 /// </summary>
 [ApiController]
-[Route("currencyapi")]
+[Route("currency-api")]
 public sealed class CurrencyController : ControllerBase
 {
 	private readonly IInternalApi _internalService;
-	private readonly IPublicApi _publicService;
 
-	public CurrencyController(IInternalApi internalService, IPublicApi publicService)
+	public CurrencyController(IInternalApi internalService)
 	{
 		_internalService = internalService;
-		_publicService = publicService;
 	}
 
 	/// <summary>
@@ -59,6 +56,24 @@ public sealed class CurrencyController : ControllerBase
 	}
 
 	/// <summary>
+	/// Gets the current exchange rate in the specified currency.
+	/// </summary>
+	/// <response code="200">The exchange rate for the requested currency was successfully obtained.</response>
+	/// <response code="403">You do not have permission to access this endpoint.</response>
+	/// <response code="404">The requested endpoint could not be found.</response>
+	/// <response code="422">A validation error occurred while processing the request.</response>
+	/// <response code="429">You have reached your rate or monthly limit for accessing this endpoint.</response>
+	/// <response code="500">An internal server error occurred while processing the request.</response>
+	[HttpGet("favorite-currency/{name}")]
+	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
+	public async Task<IActionResult> GetCurrentFavoriteCurrencyByNameAsync(string name)
+	{
+		var currencyResponse = await _internalService.GetCurrentCurrencyAsync();
+
+		return Ok(currencyResponse);
+	}
+
+	/// <summary>
 	/// Retrieves the API configuration settings.
 	/// </summary>
 	/// <response code="200">The settings was successfully obtained.</response>
@@ -72,37 +87,5 @@ public sealed class CurrencyController : ControllerBase
 		var settingsResponse = await _internalService.GetSettingsAsync();
 
 		return Ok(settingsResponse);
-	}
-
-	/// <summary>
-	/// Retrieves the API configuration settings.
-	/// </summary>
-	/// <response code="200">The default currency was successfully changed.</response>
-	/// <response code="403">You do not have permission to access this endpoint.</response>
-	/// <response code="404">The requested endpoint could not be found.</response>
-	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpPut("/settings/default-currency")]
-	[ProducesDefaultResponseType(typeof(void))]
-	public async Task<IActionResult> UpdateDefaultCurrency([FromQuery] CurrencyType defaultCurrency)
-	{
-		await _publicService.UpdateDefaultCurrencyAsync(defaultCurrency);
-
-		return Accepted();
-	}
-
-	/// <summary>
-	/// Retrieves the API configuration settings.
-	/// </summary>
-	/// <response code="200">The currency round count was successfully changed.</response>
-	/// <response code="403">You do not have permission to access this endpoint.</response>
-	/// <response code="404">The requested endpoint could not be found.</response>
-	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpPut("/settings/currency-round-count")]
-	[ProducesDefaultResponseType(typeof(void))]
-	public async Task<IActionResult> UpdateCurrencyRoundCount([FromQuery] int currencyRoundCount)
-	{
-		await _publicService.UpdateCurrencyRoundCountAsync(currencyRoundCount);
-
-		return Accepted();
 	}
 }

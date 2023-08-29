@@ -1,5 +1,3 @@
-using Domain.Enums;
-
 namespace Application.Persistence;
 
 public interface ISettingsRepository
