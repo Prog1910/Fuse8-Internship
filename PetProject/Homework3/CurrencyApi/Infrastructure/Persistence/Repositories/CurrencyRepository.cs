@@ -16,9 +16,6 @@ public sealed class CurrencyRepository : ICurrencyRepository
 	public void AddCurrencies(string baseCurrency, Currency[] currencies, DateTime? date = null)
 	{
 		var dateTime = date?.ToUniversalTime() ?? DateTime.UtcNow;
-		if (dateTime.Date.Equals(date?.Date))
-			RemoveExpiredCache(baseCurrency, dateTime);
-
 		var currenciesToCache = new CachedCurrencies()
 		{
 			LastUpdatedAt = dateTime,
@@ -30,12 +27,6 @@ public sealed class CurrencyRepository : ICurrencyRepository
 		_dbContext.SaveChanges();
 	}
 
-	private void RemoveExpiredCache(string baseCurrency, DateTime date)
-	{
-		var queryBaseCurrency = _dbContext.CurrenciesOnDate.Where(ccod => ccod.BaseCurrency.Equals(baseCurrency));
-		var queryDate = queryBaseCurrency.Where(ccod => DateOnly.FromDateTime(ccod.LastUpdatedAt.ToUniversalTime()).Equals(date));
-		_dbContext.CurrenciesOnDate.RemoveRange(queryDate);
-	}
 
 	public Currency[]? GetCurrencies(string baseCurrency, DateOnly? date = null)
 	{

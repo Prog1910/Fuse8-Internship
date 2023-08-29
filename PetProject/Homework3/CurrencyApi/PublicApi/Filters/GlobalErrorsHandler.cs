@@ -1,4 +1,6 @@
-﻿using Application.Common.Errors;
+﻿using System.Net;
+using Application.Common.Errors;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using PublicApi.Middleware;
@@ -14,40 +16,22 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 	public void OnException(ExceptionContext context)
 	{
 		var error = context.Exception;
+		var type = error.GetType().Name;
 
-		while (error.InnerException != null)
+		if (error is RpcException rpcException)
 		{
-			error = error.InnerException;
-			if (error is CurrencyNotFoundException currencyNotFoundException)
+			type = rpcException.Trailers.GetValue("ExceptionType");
+			context.Result = new ObjectResult(new ProblemDetails
 			{
-				context.Result = new ObjectResult(new ProblemDetails
-				{
-					Title = currencyNotFoundException.Message,
-					Status = (int?)currencyNotFoundException.StatusCode,
-				});
+				Title = type,
+				Status = (int?)rpcException.StatusCode,
+			});
 
-				LogError(currencyNotFoundException);
-				context.ExceptionHandled = true;
-				return;
-			}
+			if (type?.Contains(nameof(ApiRequestLimitException)) ?? false)
+				LogError(rpcException);
 		}
-
-		context.Result = new ObjectResult(new ProblemDetails
-		{
-			Title = error?.Message,
-			Status = (int?)(error as HttpRequestException)?.StatusCode,
-		});
-
-		switch (error)
-		{
-			case ApiRequestLimitException:
-				LogError(error);
-				break;
-
-			default:
-				LogError(error);
-				break;
-		};
+		else if (type?.Contains(nameof(CurrencyNotFoundException)) == false)
+			LogError(error);
 
 		context.ExceptionHandled = true;
 	}
