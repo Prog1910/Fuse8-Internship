@@ -11,9 +11,10 @@ public sealed class SummerSchoolDbContext : DbContext
 
 	public DbSet<CachedCurrencies> CurrenciesOnDate { get; set; }
 
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.HasDefaultSchema("cur");
+		modelBuilder.Entity<CachedCurrencies>().ToTable(name: "currencies_on_date", schema: "cur");
 
 		modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 

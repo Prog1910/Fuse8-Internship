@@ -9,11 +9,11 @@ namespace Infrastructure.Services;
 
 public sealed class InternalService : IInternalApi
 {
-	private readonly CurrencyApiOptions _options;
+	private readonly PublicApiOptions _options;
 	private readonly Protos.CurrencyGrpc.CurrencyGrpcClient _grpcClient;
 	private readonly IMapper _mapper;
 
-	public InternalService(IOptionsSnapshot<CurrencyApiOptions> options, Protos.CurrencyGrpc.CurrencyGrpcClient grpcClient, IMapper mapper)
+	public InternalService(IOptionsSnapshot<PublicApiOptions> options, Protos.CurrencyGrpc.CurrencyGrpcClient grpcClient, IMapper mapper)
 	{
 		_options = options.Value;
 		_grpcClient = grpcClient;

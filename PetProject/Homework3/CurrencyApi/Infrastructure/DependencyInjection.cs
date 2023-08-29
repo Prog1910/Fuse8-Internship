@@ -31,9 +31,21 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddInfrastructureToPublicApi(this IServiceCollection services)
+	public static IServiceCollection AddInfrastructureToPublicApi(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddServices();
+
+		services.AddDbContext<SummerSchoolDbContext>(options =>
+				 {
+					 options.UseNpgsql(
+						connectionString: configuration.GetConnectionString("SummerSchool"),
+						npgsqlOptionsAction: sqlOptionsBuilder =>
+						{
+							sqlOptionsBuilder.EnableRetryOnFailure();
+							sqlOptionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "user");
+						});
+					 options.UseSnakeCaseNamingConvention();
+				 });
 
 		return services;
 	}

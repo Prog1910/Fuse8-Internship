@@ -15,13 +15,13 @@ namespace Application.Common.Services;
 
 public sealed class CurrencyService : ICurrencyApi
 {
-	private readonly CurrencyApiOptions _options;
+	private readonly InternalApiOptions _options;
 	private readonly HttpClient _httpClient;
 	private readonly IMapper _mapper;
 	private readonly string _currencyTypes;
 	private readonly string _baseUrl;
 
-	public CurrencyService(IOptionsSnapshot<CurrencyApiOptions> options, HttpClient httpClient, IMapper mapper)
+	public CurrencyService(IOptionsSnapshot<InternalApiOptions> options, HttpClient httpClient, IMapper mapper)
 	{
 		_options = options.Value;
 		_httpClient = httpClient;
@@ -71,10 +71,8 @@ public sealed class CurrencyService : ICurrencyApi
 		var month = settingsResponse?.Quotas.Month ?? throw GenerateExceptionWithInternalServerError("Month in SettingsResponse not found.");
 		var settings = new Settings
 		{
-			DefaultCurrency = _options.DefaultCurrency,
 			BaseCurrency = _options.BaseCurrency,
 			NewRequestsAvailable = month.Total > month.Used,
-			CurrencyRoundCount = _options.CurrencyRoundCount
 		};
 
 		return settings;

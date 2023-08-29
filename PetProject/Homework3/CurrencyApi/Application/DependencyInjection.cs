@@ -13,7 +13,7 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddApplicationToInternalApi(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.ConfigureCurrencyApiOptions(configuration);
+		services.Configure<InternalApiOptions>(configuration.GetSection(InternalApiOptions.SectionName));
 
 		services.AddCachedCurrencyClient();
 
@@ -24,14 +24,7 @@ public static class DependencyInjection
 
 	public static IServiceCollection AddApplicationToPublicApi(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.ConfigureCurrencyApiOptions(configuration);
-
-		return services;
-	}
-
-	private static IServiceCollection ConfigureCurrencyApiOptions(this IServiceCollection services, IConfiguration configuration)
-	{
-		services.Configure<CurrencyApiOptions>(configuration.GetSection(CurrencyApiOptions.SectionName));
+		services.Configure<PublicApiOptions>(configuration.GetSection(PublicApiOptions.SectionName));
 
 		return services;
 	}

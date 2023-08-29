@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 	ConfigureSerilog(builder);
 
 	builder.Services.AddPresentation(builder.Configuration)
-		.AddInfrastructureToPublicApi()
+		.AddInfrastructureToPublicApi(builder.Configuration)
 		.AddApplicationToPublicApi(builder.Configuration);
 }
 

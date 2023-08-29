@@ -11,12 +11,12 @@ namespace Application.Common.Services;
 
 public sealed class CachedCurrencyService : ICachedCurrencyApi
 {
-	private readonly CurrencyApiOptions _options;
+	private readonly InternalApiOptions _options;
 	private readonly ICurrencyRepository _repository;
 	private readonly ICurrencyApi _currencyApi;
 	private readonly IMapper _mapper;
 
-	public CachedCurrencyService(IOptionsSnapshot<CurrencyApiOptions> options, ICurrencyRepository repository, ICurrencyApi currencyApi, IMapper mapper)
+	public CachedCurrencyService(IOptionsSnapshot<InternalApiOptions> options, ICurrencyRepository repository, ICurrencyApi currencyApi, IMapper mapper)
 	{
 		_options = options.Value;
 		_repository = repository;
