@@ -27,6 +27,8 @@ public sealed class InternalService : IInternalApi
 			CurrencyType = (Protos.CurrencyType)currencyType
 		});
 
+		currencyProtoResponse.Value = Math.Round(currencyProtoResponse.Value, _options.CurrencyRoundCount);
+
 		return _mapper.Map<CurrencyResponse>(currencyProtoResponse);
 	}
 
@@ -38,6 +40,8 @@ public sealed class InternalService : IInternalApi
 			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc)),
 		});
 
+		currencyProtoResponse.Value = Math.Round(currencyProtoResponse.Value, _options.CurrencyRoundCount);
+
 		return _mapper.Map<CurrencyResponse>(currencyProtoResponse);
 	}
 
@@ -46,5 +50,10 @@ public sealed class InternalService : IInternalApi
 		var settingsProtoResponse = await _grpcClient.GetSettingsAsync(new());
 
 		return _mapper.Map<SettingsResponse>((_options.DefaultCurrency, settingsProtoResponse, _options.CurrencyRoundCount));
+	}
+
+	public Task<SettingsResponse> UpdateSettingsAsync(CurrencyType defaultCurrency, int currencyRoundCount)
+	{
+		throw new NotImplementedException();
 	}
 }

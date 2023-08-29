@@ -10,4 +10,6 @@ public interface IInternalApi
 	public Task<CurrencyResponse> GetCurrencyOnDateAsync(CurrencyType currencyType, DateOnly date);
 
 	public Task<SettingsResponse> GetSettingsAsync();
+
+	public Task<SettingsResponse> UpdateSettingsAsync(CurrencyType defaultCurrency, int currencyRoundCount);
 }

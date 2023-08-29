@@ -73,4 +73,20 @@ public sealed class CurrencyController : ControllerBase
 
 		return Ok(settingsResponse);
 	}
+
+	/// <summary>
+	/// Retrieves the API configuration settings.
+	/// </summary>
+	/// <response code="200">The exchange rate for the requested currency was successfully obtained.</response>
+	/// <response code="403">You do not have permission to access this endpoint.</response>
+	/// <response code="404">The requested endpoint could not be found.</response>
+	/// <response code="500">An internal server error occurred while processing the request.</response>
+	[HttpPut("/settings")]
+	[ProducesDefaultResponseType(typeof(SettingsResponse))]
+	public async Task<IActionResult> UpdateSettings([FromQuery] CurrencyType defaultCurrency, [FromQuery] int currencyRoundCount)
+	{
+		var settingsResponse = await _internalService.UpdateSettingsAsync(defaultCurrency, currencyRoundCount);
+
+		return Ok(settingsResponse);
+	}
 }
