@@ -5,7 +5,7 @@ namespace Domain.Enums;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CurrencyType
 {
-	AED = 1,
+	AED,
 	AFN,
 	ALL,
 	AMD,

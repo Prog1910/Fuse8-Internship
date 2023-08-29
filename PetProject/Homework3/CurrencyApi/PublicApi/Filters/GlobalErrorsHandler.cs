@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Application.Common.Errors;
+﻿using Application.Common.Errors;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -31,7 +30,14 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 				LogError(rpcException);
 		}
 		else if (type?.Contains(nameof(CurrencyNotFoundException)) == false)
+		{
+			context.Result = new ObjectResult(new ProblemDetails
+			{
+				Title = type,
+				Detail = error.Message
+			});
 			LogError(error);
+		}
 
 		context.ExceptionHandled = true;
 	}

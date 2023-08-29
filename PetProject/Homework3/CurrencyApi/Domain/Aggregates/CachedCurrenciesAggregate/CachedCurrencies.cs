@@ -1,6 +1,6 @@
 using Domain.Aggregates.CurrencyAggregate;
 
-namespace Domain.Aggregates.CurrenciesOnDateAggregate;
+namespace Domain.Aggregates.CachedCurrenciesAggregate;
 
 public sealed class CachedCurrencies
 {

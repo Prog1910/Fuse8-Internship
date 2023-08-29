@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Persistence;
 using Contracts;
 using Domain.Enums;
 using Domain.Options;
@@ -20,26 +21,26 @@ public sealed class InternalService : IInternalApi
 		_mapper = mapper;
 	}
 
-	public async Task<CurrencyResponse> GetCurrentCurrencyAsync(CurrencyType currencyType)
+	public async Task<CurrencyResponse> GetCurrentCurrencyAsync()
 	{
 		var currencyProtoResponse = await _grpcClient.GetCurrentCurrencyAsync(new()
 		{
-			CurrencyType = (Protos.CurrencyType)currencyType
+			DefaultCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_options.DefaultCurrency),
+			BaseCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_options.BaseCurrency),
 		});
-
 		currencyProtoResponse.Value = Math.Round(currencyProtoResponse.Value, _options.CurrencyRoundCount);
 
 		return _mapper.Map<CurrencyResponse>(currencyProtoResponse);
 	}
 
-	public async Task<CurrencyResponse> GetCurrencyOnDateAsync(CurrencyType currencyType, DateOnly date)
+	public async Task<CurrencyResponse> GetCurrencyOnDateAsync(DateOnly date)
 	{
 		var currencyProtoResponse = await _grpcClient.GetCurrencyOnDateAsync(new()
 		{
-			CurrencyType = (Protos.CurrencyType)currencyType,
+			DefaultCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_options.DefaultCurrency),
+			BaseCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_options.BaseCurrency),
 			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc)),
 		});
-
 		currencyProtoResponse.Value = Math.Round(currencyProtoResponse.Value, _options.CurrencyRoundCount);
 
 		return _mapper.Map<CurrencyResponse>(currencyProtoResponse);
@@ -50,10 +51,5 @@ public sealed class InternalService : IInternalApi
 		var settingsProtoResponse = await _grpcClient.GetSettingsAsync(new());
 
 		return _mapper.Map<SettingsResponse>((_options.DefaultCurrency, settingsProtoResponse, _options.CurrencyRoundCount));
-	}
-
-	public Task<SettingsResponse> UpdateSettingsAsync(CurrencyType defaultCurrency, int currencyRoundCount)
-	{
-		throw new NotImplementedException();
 	}
 }

@@ -13,12 +13,14 @@ service CurrencyGrpc {
 }
 
 message CurrencyRequest {
-	CurrencyType currency_type = 1; 
+	CurrencyType default_currency = 1; 
+	CurrencyType base_currency = 2; 
 } 
 
 message CurrencyOnDateRequest {
-	CurrencyType currency_type = 1; 
-	google.protobuf.Timestamp date = 2;
+	CurrencyType default_currency = 1; 
+	CurrencyType base_currency = 2; 
+	google.protobuf.Timestamp date = 3;
 } 
 
 message CurrencyResponse {

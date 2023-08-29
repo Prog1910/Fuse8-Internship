@@ -1,15 +1,12 @@
 ﻿using Contracts;
-using Domain.Enums;
 
 namespace Application.Common.Interfaces;
 
 public interface IInternalApi
 {
-	public Task<CurrencyResponse> GetCurrentCurrencyAsync(CurrencyType currencyType);
+	public Task<CurrencyResponse> GetCurrentCurrencyAsync();
 
-	public Task<CurrencyResponse> GetCurrencyOnDateAsync(CurrencyType currencyType, DateOnly date);
+	public Task<CurrencyResponse> GetCurrencyOnDateAsync(DateOnly date);
 
 	public Task<SettingsResponse> GetSettingsAsync();
-
-	public Task<SettingsResponse> UpdateSettingsAsync(CurrencyType defaultCurrency, int currencyRoundCount);
 }

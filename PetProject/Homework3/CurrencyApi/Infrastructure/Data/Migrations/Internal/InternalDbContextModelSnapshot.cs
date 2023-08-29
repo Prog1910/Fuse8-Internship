@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Data.Migrations.Internal
 {
-    [DbContext(typeof(SummerSchoolDbContext))]
-    partial class SummerSchoolDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(InternalDbContext))]
+    partial class InternalDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -22,7 +22,7 @@ namespace Infrastructure.Data.Migrations.Internal
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Aggregates.CurrenciesOnDateAggregate.CachedCurrencies", b =>
+            modelBuilder.Entity("Domain.Aggregates.CachedCurrenciesAggregate.CachedCurrencies", b =>
                 {
                     b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -39,7 +39,7 @@ namespace Infrastructure.Data.Migrations.Internal
                     b.ToTable("currencies_on_date", "cur");
                 });
 
-            modelBuilder.Entity("Domain.Aggregates.CurrenciesOnDateAggregate.CachedCurrencies", b =>
+            modelBuilder.Entity("Domain.Aggregates.CachedCurrenciesAggregate.CachedCurrencies", b =>
                 {
                     b.OwnsMany("Domain.Aggregates.CurrencyAggregate.Currency", "Currencies", b1 =>
                         {

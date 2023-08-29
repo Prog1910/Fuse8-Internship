@@ -1,14 +1,14 @@
 ﻿using Application.Persistence;
-using Domain.Aggregates.CurrenciesOnDateAggregate;
+using Domain.Aggregates.CachedCurrenciesAggregate;
 using Domain.Aggregates.CurrencyAggregate;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public sealed class CurrencyRepository : ICurrencyRepository
+public sealed class CurrenciesRepository : ICurrenciesRepository
 {
-	private readonly SummerSchoolDbContext _dbContext;
+	private readonly InternalDbContext _dbContext;
 
-	public CurrencyRepository(SummerSchoolDbContext dbContext)
+	public CurrenciesRepository(InternalDbContext dbContext)
 	{
 		_dbContext = dbContext;
 	}
@@ -26,7 +26,6 @@ public sealed class CurrencyRepository : ICurrencyRepository
 		_dbContext.Add(currenciesToCache);
 		_dbContext.SaveChanges();
 	}
-
 
 	public Currency[]? GetCurrencies(string baseCurrency, DateOnly? date = null)
 	{

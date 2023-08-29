@@ -1,10 +1,9 @@
-﻿using System.Net;
-using Application.Common.Errors;
+﻿using Application.Common.Errors;
 using Application.Common.Interfaces;
 using Grpc.Core;
 using MapsterMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Protos;
+using System.Net;
 
 namespace Infrastructure.Services;
 
@@ -23,8 +22,9 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var currencyType = (Domain.Enums.CurrencyType)request.CurrencyType;
-			var currencyDto = await _cachedCurrenyService.GetCurrentCurrencyAsync(currencyType, context.CancellationToken);
+			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
+			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
+			var currencyDto = await _cachedCurrenyService.GetCurrentCurrencyAsync(defaultCurrency, context.CancellationToken);
 
 			return _mapper.Map<CurrencyResponse>(currencyDto);
 		}
@@ -58,9 +58,10 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var currencyType = (Domain.Enums.CurrencyType)request.CurrencyType;
+			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
+			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
 			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
-			var currencyDto = await _cachedCurrenyService.GetCurrencyOnDateAsync(currencyType, date, context.CancellationToken);
+			var currencyDto = await _cachedCurrenyService.GetCurrencyOnDateAsync(defaultCurrency, date, context.CancellationToken);
 
 			return _mapper.Map<CurrencyResponse>(currencyDto);
 		}
