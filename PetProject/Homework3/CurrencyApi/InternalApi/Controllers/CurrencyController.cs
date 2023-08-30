@@ -1,12 +1,13 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces.Rest;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Protos;
+using CurrencyType = Domain.Enums.CurrencyType;
 
 namespace InternalApi.Controllers;
 
 /// <summary>
-/// Controller for handling currency-related operations.
+///     Controller for handling currency-related operations.
 /// </summary>
 [ApiController]
 [Route("currency-api")]
@@ -22,7 +23,7 @@ public sealed class CurrencyController : ControllerBase
 	}
 
 	/// <summary>
-	/// Gets the current exchange rate in the specified currency.
+	///     Gets the current exchange rate in the specified currency.
 	/// </summary>
 	/// <param name="currencyType">Type of currency for which you want to get the current rate.</param>
 	/// <param name="cancellationToken">Cancellation token.</param>
@@ -34,7 +35,7 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("currencies")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentCurrency([FromQuery] Domain.Enums.CurrencyType currencyType, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrentCurrency([FromQuery] CurrencyType currencyType, CancellationToken cancellationToken)
 	{
 		var currencyDto = await _currencyService.GetCurrentCurrencyAsync(currencyType, cancellationToken);
 
@@ -42,7 +43,7 @@ public sealed class CurrencyController : ControllerBase
 	}
 
 	/// <summary>
-	/// Gets information about the currency for the specified date.
+	///     Gets information about the currency for the specified date.
 	/// </summary>
 	/// <param name="currencyType">Type of currency for which you want to get the current rate.</param>
 	/// <param name="date">Date on which you want to get information about the currency.</param>
@@ -55,7 +56,7 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("currencies/{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrencyOnDate([FromQuery] Domain.Enums.CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrencyOnDate([FromQuery] CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
 	{
 		var currencyDto = await _currencyService.GetCurrencyOnDateAsync(currencyType, date, cancellationToken);
 
@@ -63,7 +64,7 @@ public sealed class CurrencyController : ControllerBase
 	}
 
 	/// <summary>
-	/// Retrieves the API configuration settings.
+	///     Retrieves the API configuration settings.
 	/// </summary>
 	/// <response code="200">The exchange rate for the requested currency was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>

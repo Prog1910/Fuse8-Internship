@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations.Public
 {
     [DbContext(typeof(PublicDbContext))]
-    [Migration("20230829220534_InitialMigration")]
+    [Migration("20230831062637_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -54,7 +54,14 @@ namespace Infrastructure.Migrations.Public
                         .IsUnique()
                         .HasDatabaseName("ix_favorite_currencies_currency_base_currency");
 
-                    b.ToTable("favorite_currencies", "user");
+                    b.ToTable("favorite_currencies", "user", t =>
+                        {
+                            t.HasCheckConstraint("CK_favorite_currencies_base_currency_MinLength", "LENGTH(base_currency) >= 3");
+
+                            t.HasCheckConstraint("CK_favorite_currencies_currency_MinLength", "LENGTH(currency) >= 3");
+
+                            t.HasCheckConstraint("CK_favorite_currencies_name_MinLength", "LENGTH(name) >= 1");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Aggregates.CachedSettingsAggregate.CachedSettings", b =>
@@ -79,7 +86,12 @@ namespace Infrastructure.Migrations.Public
                     b.HasKey("Id")
                         .HasName("pk_settings");
 
-                    b.ToTable("settings", "user");
+                    b.ToTable("settings", "user", t =>
+                        {
+                            t.HasCheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 2147483647");
+
+                            t.HasCheckConstraint("CK_settings_default_currency_MinLength", "LENGTH(default_currency) >= 3");
+                        });
                 });
 #pragma warning restore 612, 618
         }

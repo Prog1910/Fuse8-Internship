@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Domain.Aggregates.CachedFavoriteCurrenciesAggregate;
 
 public sealed class CachedFavoriteCurrency
 {
-	public string Name { get; set; } = string.Empty;
-	public string Currency { get; set; } = string.Empty;
-	public string BaseCurrency { get; set; } = string.Empty;
+	[StringLength(maximumLength: 64, MinimumLength = 1)] public string Name { get; set; } = string.Empty;
+	[StringLength(maximumLength: 8, MinimumLength = 3)] public string Currency { get; set; } = string.Empty;
+	[StringLength(maximumLength: 8, MinimumLength = 3)] public string BaseCurrency { get; set; } = string.Empty;
 }

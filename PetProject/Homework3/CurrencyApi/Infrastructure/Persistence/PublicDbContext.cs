@@ -16,8 +16,8 @@ public sealed class PublicDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<CachedSettings>().ToTable("settings", "user");
-		modelBuilder.Entity<CachedFavoriteCurrency>().ToTable("favorite_currencies", "user");
+		modelBuilder.Entity<CachedSettings>().ToTable(name: "settings", schema: "user");
+		modelBuilder.Entity<CachedFavoriteCurrency>().ToTable(name: "favorite_currencies", schema: "user");
 
 		modelBuilder.ApplyConfiguration(new SettingsConfiguration());
 		modelBuilder.ApplyConfiguration(new FavoriteCurrenciesConfiguration());

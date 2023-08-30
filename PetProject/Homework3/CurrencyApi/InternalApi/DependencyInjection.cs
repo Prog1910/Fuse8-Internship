@@ -46,7 +46,7 @@ public static class DependencyInjection
 	private static IServiceCollection AddGlobalErrorsHandler(this IServiceCollection services)
 	{
 		services.AddControllers(options => options.Filters.Add<GlobalErrorsHandler>())
-					.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+			.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 		return services;
 	}
@@ -55,10 +55,10 @@ public static class DependencyInjection
 	{
 		services.AddSwaggerGen(options =>
 		{
-			options.SwaggerDoc("v1", new OpenApiInfo
+			options.SwaggerDoc(name: "v1", new OpenApiInfo
 			{
 				Version = "v1",
-				Title = "Internal API",
+				Title = "Internal API"
 			});
 
 			options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml"));

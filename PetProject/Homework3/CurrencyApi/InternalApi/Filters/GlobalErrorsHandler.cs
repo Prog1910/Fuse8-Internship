@@ -9,7 +9,10 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 {
 	private readonly ILogger<RequestLoggingMiddleware> _logger;
 
-	public GlobalErrorsHandler(ILogger<RequestLoggingMiddleware> logger) => _logger = logger;
+	public GlobalErrorsHandler(ILogger<RequestLoggingMiddleware> logger)
+	{
+		_logger = logger;
+	}
 
 	public void OnException(ExceptionContext context)
 	{
@@ -18,7 +21,7 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 		context.Result = new ObjectResult(new ProblemDetails
 		{
 			Title = error?.Message,
-			Status = (int?)(error as HttpRequestException)?.StatusCode,
+			Status = (int?)(error as HttpRequestException)?.StatusCode
 		});
 
 		switch (error)
@@ -30,11 +33,14 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 			default:
 				LogError(error);
 				break;
-		};
+		}
+		;
 
 		context.ExceptionHandled = true;
 	}
 
 	private void LogError(Exception? exception)
-		=> _logger.LogError(exception, $"An error occurred.");
+	{
+		_logger.LogError(exception, "An error occurred.");
+	}
 }

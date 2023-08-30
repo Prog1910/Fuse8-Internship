@@ -1,11 +1,12 @@
 ﻿using Application.Common.Errors;
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.Rest;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using MapsterMapper;
 using Protos;
 using System.Net;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Services.Grpc;
 
 public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 {
@@ -23,7 +24,6 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		try
 		{
 			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
-			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
 			var currencyDto = await _cachedCurrenyService.GetCurrentCurrencyAsync(defaultCurrency, context.CancellationToken);
 
 			return _mapper.Map<CurrencyResponse>(currencyDto);
@@ -32,24 +32,33 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.NotFound, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException)
+					}
 				});
 		}
 		catch (ApiRequestLimitException ex)
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.TooManyRequests, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException)
+					}
 				});
 		}
 		catch (Exception ex)
 		{
 			throw new RpcException(
 				Status.DefaultCancelled,
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ??  string.Empty }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? string.Empty
+					}
 				});
 		}
 	}
@@ -59,7 +68,6 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		try
 		{
 			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
-			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
 			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
 			var currencyDto = await _cachedCurrenyService.GetCurrencyOnDateAsync(defaultCurrency, date, context.CancellationToken);
 
@@ -69,35 +77,44 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.NotFound, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException)
+					}
 				});
 		}
 		catch (ApiRequestLimitException ex)
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.TooManyRequests, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException)
+					}
 				});
 		}
 		catch (Exception ex)
 		{
 			throw new RpcException(
 				Status.DefaultCancelled,
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ??  string.Empty }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? string.Empty
+					}
 				});
 		}
 	}
 
-	public override async Task<CurrencyResponse> GetCurrentFavoriteCurrency(CurrencyRequest request, ServerCallContext context)
+	public override async Task<CurrencyResponse> GetCurrentFavoriteCurrency(FavoriteCurrencyRequest request, ServerCallContext context)
 	{
 		try
 		{
 			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
 			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
-			var currencyDto = await _cachedCurrenyService.GetCurrentCurrencyAsync(defaultCurrency, context.CancellationToken);
+			var currencyDto = await _cachedCurrenyService.GetCurrentFavoriteCurrencyAsync(defaultCurrency, baseCurrency, context.CancellationToken);
 
 			return _mapper.Map<CurrencyResponse>(currencyDto);
 		}
@@ -105,29 +122,84 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.NotFound, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException)
+					}
 				});
 		}
 		catch (ApiRequestLimitException ex)
 		{
 			throw new RpcException(
 				new Status((StatusCode)HttpStatusCode.TooManyRequests, ex.Message),
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException) }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException)
+					}
 				});
 		}
 		catch (Exception ex)
 		{
 			throw new RpcException(
 				Status.DefaultCancelled,
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ??  string.Empty }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? string.Empty
+					}
 				});
 		}
 	}
 
-	public override async Task<SettingsResponse> GetSettings(Google.Protobuf.WellKnownTypes.Empty request, ServerCallContext context)
+	public override async Task<CurrencyResponse> GetFavoriteCurrencyOnDate(FavoriteCurrencyOnDateRequest request, ServerCallContext context)
+	{
+		try
+		{
+			var defaultCurrency = (Domain.Enums.CurrencyType)request.DefaultCurrency;
+			var baseCurrency = (Domain.Enums.CurrencyType)request.BaseCurrency;
+			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
+			var currencyDto = await _cachedCurrenyService.GetFavoriteCurrencyOnDateAsync(defaultCurrency, baseCurrency, date, context.CancellationToken);
+
+			return _mapper.Map<CurrencyResponse>(currencyDto);
+		}
+		catch (CurrencyNotFoundException ex)
+		{
+			throw new RpcException(
+				new Status((StatusCode)HttpStatusCode.NotFound, ex.Message),
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(CurrencyNotFoundException)
+					}
+				});
+		}
+		catch (ApiRequestLimitException ex)
+		{
+			throw new RpcException(
+				new Status((StatusCode)HttpStatusCode.TooManyRequests, ex.Message),
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? nameof(ApiRequestLimitException)
+					}
+				});
+		}
+		catch (Exception ex)
+		{
+			throw new RpcException(
+				Status.DefaultCancelled,
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? string.Empty
+					}
+				});
+		}
+	}
+
+	public override async Task<SettingsResponse> GetSettings(Empty request, ServerCallContext context)
 	{
 		try
 		{
@@ -139,8 +211,11 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		{
 			throw new RpcException(
 				Status.DefaultCancelled,
-				new Metadata {
-					{"ExceptionType", ex?.GetType().Name ??  string.Empty }
+				new Metadata
+				{
+					{
+						"ExceptionType", ex?.GetType().Name ?? string.Empty
+					}
 				});
 		}
 	}

@@ -1,6 +1,6 @@
 using Application;
 using Infrastructure;
-using Infrastructure.Services;
+using Infrastructure.Services.Grpc;
 using InternalApi;
 using InternalApi.Middleware;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -36,12 +36,12 @@ var app = builder.Build();
 
 static void SetupGrpcService(WebApplicationBuilder builder, WebApplication app)
 {
-	app.UseWhen(predicate: context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
-			configuration: grpcBuilder =>
-			{
-				grpcBuilder.UseRouting();
-				grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
-			});
+	app.UseWhen(context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
+	            grpcBuilder =>
+	            {
+		            grpcBuilder.UseRouting();
+		            grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
+	            });
 }
 
 static void SetupSwagger(WebApplication app)
@@ -51,7 +51,7 @@ static void SetupSwagger(WebApplication app)
 		app.UseSwagger();
 		app.UseSwaggerUI(options =>
 		{
-			options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+			options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
 			options.RoutePrefix = "swagger";
 		});
 	}
@@ -60,8 +60,8 @@ static void SetupSwagger(WebApplication app)
 static void ConfigureSerilog(WebApplicationBuilder builder)
 {
 	builder.Host.UseSerilog((context, services, configuration) =>
-		configuration.ReadFrom.Configuration(context.Configuration).Enrich
-  .WithMachineName().Enrich
-  .FromLogContext().Enrich
-  .WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
+		                        configuration.ReadFrom.Configuration(context.Configuration).Enrich
+			                        .WithMachineName().Enrich
+			                        .FromLogContext().Enrich
+			                        .WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
 }

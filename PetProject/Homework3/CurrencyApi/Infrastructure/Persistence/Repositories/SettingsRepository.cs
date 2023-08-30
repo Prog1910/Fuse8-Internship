@@ -13,21 +13,41 @@ public sealed class SettingsRepository : ISettingsRepository
 
 	public void UpdateDefaultCurrency(string defaultCurrency)
 	{
-		var settings = _context.Settings.FirstOrDefault();
+		var settings = _context.Settings.SingleOrDefault();
 		if (settings is not null)
 		{
-			settings.DefaultCurrency = defaultCurrency.ToString();
+			settings.DefaultCurrency = defaultCurrency;
 			_context.SaveChanges();
 		}
 	}
 
 	public void UpdateCurrencyRoundCount(int currencyRoundCount)
 	{
-		var settings = _context.Settings.FirstOrDefault();
+		var settings = _context.Settings.SingleOrDefault();
 		if (settings is not null)
 		{
 			settings.CurrencyRoundCount = currencyRoundCount;
 			_context.SaveChanges();
+		}
+	}
+
+	public string? DefaultCurrency
+	{
+		get
+		{
+			var settings = _context.Settings.SingleOrDefault();
+
+			return settings?.DefaultCurrency;
+		}
+	}
+
+	public int? CurrencyRoundCount
+	{
+		get
+		{
+			var settings = _context.Settings.SingleOrDefault();
+
+			return settings?.CurrencyRoundCount;
 		}
 	}
 }

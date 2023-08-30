@@ -36,9 +36,9 @@ public sealed class FavoriteCurrenciesRepository : IFavoriteCurrenciesRepository
 		return favorites;
 	}
 
-	public bool TryUpdateFavoriteCurrencyByName(string name, CachedFavoriteCurrency favoriteCurrency)
+	public bool TryUpdateFavoriteCurrencyByName(CachedFavoriteCurrency favoriteCurrency)
 	{
-		if (GetFavoriteCurrencyByName(name) is null) return false;
+		if (GetFavoriteCurrencyByName(favoriteCurrency.Name) is null) return false;
 
 		_context.FavoriteCurrencies.Update(favoriteCurrency);
 

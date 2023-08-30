@@ -10,7 +10,10 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 {
 	private readonly ILogger<RequestLoggingMiddleware> _logger;
 
-	public GlobalErrorsHandler(ILogger<RequestLoggingMiddleware> logger) => _logger = logger;
+	public GlobalErrorsHandler(ILogger<RequestLoggingMiddleware> logger)
+	{
+		_logger = logger;
+	}
 
 	public void OnException(ExceptionContext context)
 	{
@@ -23,7 +26,7 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 			context.Result = new ObjectResult(new ProblemDetails
 			{
 				Title = type,
-				Status = (int?)rpcException.StatusCode,
+				Status = (int?)rpcException.StatusCode
 			});
 
 			if (type?.Contains(nameof(ApiRequestLimitException)) ?? false)
@@ -43,5 +46,7 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 	}
 
 	private void LogError(Exception? exception)
-		=> _logger.LogError(exception, $"An error occurred.");
+	{
+		_logger.LogError(exception, "An error occurred.");
+	}
 }

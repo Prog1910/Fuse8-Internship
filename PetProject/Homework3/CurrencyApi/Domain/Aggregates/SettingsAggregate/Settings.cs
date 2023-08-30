@@ -1,7 +1,7 @@
 namespace Domain.Aggregates.SettingsAggregate;
 
 /// <summary>
-/// Represents application settings.
+///     Represents application settings.
 /// </summary>
 /// <param name="BaseCurrency">The base currency.</param>
 /// <param name="NewRequestsAvailable">Indicates if new requests are available.</param>

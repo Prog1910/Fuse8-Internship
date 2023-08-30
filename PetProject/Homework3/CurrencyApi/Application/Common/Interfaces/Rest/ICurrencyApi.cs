@@ -2,7 +2,7 @@
 using Domain.Aggregates.CurrencyAggregate;
 using Domain.Aggregates.SettingsAggregate;
 
-namespace Application.Common.Interfaces;
+namespace Application.Common.Interfaces.Rest;
 
 public interface ICurrencyApi
 {

@@ -31,7 +31,7 @@ namespace Infrastructure.Migrations.Internal
                     b.Property<string>("BaseCurrency")
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)")
-                        .HasColumnName("from_currency");
+                        .HasColumnName("base_currency");
 
                     b.HasKey("LastUpdatedAt", "BaseCurrency")
                         .HasName("pk_currencies_on_date");
@@ -62,7 +62,7 @@ namespace Infrastructure.Migrations.Internal
                                 .IsRequired()
                                 .HasMaxLength(8)
                                 .HasColumnType("character varying(8)")
-                                .HasColumnName("to_currency");
+                                .HasColumnName("currency");
 
                             b1.Property<decimal>("Value")
                                 .HasColumnType("numeric")

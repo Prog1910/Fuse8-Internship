@@ -14,7 +14,7 @@ public sealed class InternalDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<CachedCurrencies>().ToTable("currencies_on_date", "cur");
+		modelBuilder.Entity<CachedCurrencies>().ToTable(name: "currencies_on_date", schema: "cur");
 
 		modelBuilder.ApplyConfiguration(new CurrenciesOnDateConfiguration());
 

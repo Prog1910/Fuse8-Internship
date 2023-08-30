@@ -1,4 +1,4 @@
-﻿using Application.Common.Services.Common.Dtos;
+﻿using Application.Common.Services.Rest.Common.Dtos;
 using Contracts;
 using Domain.Aggregates.CurrencyAggregate;
 using Domain.Enums;

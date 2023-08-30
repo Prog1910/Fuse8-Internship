@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Services;
+﻿using Application.Common.Interfaces.Rest;
+using Application.Common.Services.Rest;
 using Audit.Http;
 using Domain.Options;
 using Microsoft.Extensions.Configuration;
@@ -32,13 +32,13 @@ public static class DependencyInjection
 	private static IServiceCollection AddCurrencyClient(this IServiceCollection services)
 	{
 		services.AddHttpClient<ICurrencyApi, CurrencyService>("CurrencyClient")
-							.AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
-				.WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1)))
-							.AddAuditHandler(audit => audit.IncludeRequestHeaders()
-				.IncludeRequestBody()
-				.IncludeResponseHeaders()
-				.IncludeResponseBody()
-				.IncludeContentHeaders());
+			.AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
+				                  .WaitAndRetryAsync(retryCount: 3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(x: 2, retryAttempt) - 1)))
+			.AddAuditHandler(audit => audit.IncludeRequestHeaders()
+				                 .IncludeRequestBody()
+				                 .IncludeResponseHeaders()
+				                 .IncludeResponseBody()
+				                 .IncludeContentHeaders());
 
 		return services;
 	}

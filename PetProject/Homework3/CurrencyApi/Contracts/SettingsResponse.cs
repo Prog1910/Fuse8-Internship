@@ -1,7 +1,7 @@
 ﻿namespace Contracts;
 
 /// <summary>
-/// Represents a response containing settings information.
+///     Represents a response containing settings information.
 /// </summary>
 /// <param name="DefaultCurrency">The default currency.</param>
 /// <param name="BaseCurrency">The base currency.</param>

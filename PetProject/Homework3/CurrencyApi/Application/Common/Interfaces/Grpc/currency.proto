@@ -9,21 +9,33 @@ service CurrencyGrpc {
 	 
 	rpc GetCurrencyOnDate(CurrencyOnDateRequest) returns (CurrencyResponse);
 
-	rpc GetCurrentFavoriteCurrency(CurrencyRequest) returns (CurrencyResponse);
+	rpc GetCurrentFavoriteCurrency(FavoriteCurrencyRequest) returns (CurrencyResponse);
+
+	rpc GetFavoriteCurrencyOnDate(FavoriteCurrencyOnDateRequest) returns (CurrencyResponse);
 
 	rpc GetSettings(google.protobuf.Empty) returns (SettingsResponse);
 }
 
 message CurrencyRequest {
-	CurrencyType default_currency = 1; 
-	CurrencyType base_currency = 2; 
-} 
+	CurrencyType default_currency = 1;
+}
 
 message CurrencyOnDateRequest {
-	CurrencyType default_currency = 1; 
-	CurrencyType base_currency = 2; 
+	CurrencyType default_currency = 1;
+	google.protobuf.Timestamp date = 2;
+}
+
+message FavoriteCurrencyRequest {
+	CurrencyType default_currency = 1;
+	CurrencyType base_currency = 2;
+}
+
+message FavoriteCurrencyOnDateRequest {
+	CurrencyType default_currency = 1;
+	CurrencyType base_currency = 2;
 	google.protobuf.Timestamp date = 3;
-} 
+}
+
 message CurrencyResponse {
 	string currency_type = 1;
 	double value = 2;
