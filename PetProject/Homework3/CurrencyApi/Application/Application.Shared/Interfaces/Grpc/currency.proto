@@ -1,0 +1,219 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Protos";
+
+service CurrencyGrpc {
+    rpc GetCurrentCurrency (CurrencyRequest) returns (CurrencyResponse);
+ 
+    rpc GetCurrencyOnDate (CurrencyOnDateRequest) returns (CurrencyResponse);
+
+    rpc GetCurrentFavoriteCurrency (FavoriteCurrencyRequest) returns (CurrencyResponse);
+    
+    rpc GetFavoriteCurrencyOnDate (FavoriteCurrencyOnDateRequest) returns (CurrencyResponse);
+
+    rpc GetSettings (google.protobuf.Empty) returns (SettingsResponse);
+}
+
+message CurrencyRequest {
+    CurrencyType default_currency = 1; 
+}
+
+message CurrencyOnDateRequest {
+    CurrencyType default_currency = 1;
+    google.protobuf.Timestamp date = 2;
+}
+
+message FavoriteCurrencyRequest {
+    CurrencyType default_currency = 1;
+    CurrencyType base_currency = 2;
+}
+
+message FavoriteCurrencyOnDateRequest {
+    CurrencyType default_currency = 1;
+    CurrencyType base_currency = 2;
+    google.protobuf.Timestamp date = 3;
+}
+
+message CurrencyResponse {
+    string currency_type = 1;
+    double value = 2;
+}
+
+message SettingsResponse {
+    string base_currency = 1;
+    bool new_requests_available = 2;
+}
+
+enum CurrencyType
+{
+    CURRENCY_TYPE_AED = 0;
+    CURRENCY_TYPE_AFN = 1;
+    CURRENCY_TYPE_ALL = 2;
+    CURRENCY_TYPE_AMD = 3;
+    CURRENCY_TYPE_ANG = 4;
+    CURRENCY_TYPE_AOA = 5;
+    CURRENCY_TYPE_ARS = 6;
+    CURRENCY_TYPE_AUD = 7;
+    CURRENCY_TYPE_AWG = 8;
+    CURRENCY_TYPE_AZN = 9;
+    CURRENCY_TYPE_BAM = 10;
+    CURRENCY_TYPE_BBD = 11;
+    CURRENCY_TYPE_BDT = 12;
+    CURRENCY_TYPE_BGN = 13;
+    CURRENCY_TYPE_BHD = 14;
+    CURRENCY_TYPE_BIF = 15;
+    CURRENCY_TYPE_BMD = 16;
+    CURRENCY_TYPE_BND = 17;
+    CURRENCY_TYPE_BOB = 18;
+    CURRENCY_TYPE_BRL = 19;
+    CURRENCY_TYPE_BSD = 20;
+    CURRENCY_TYPE_BTN = 21;
+    CURRENCY_TYPE_BWP = 22;
+    CURRENCY_TYPE_BYN = 23;
+    CURRENCY_TYPE_BYR = 24;
+    CURRENCY_TYPE_BZD = 25;
+    CURRENCY_TYPE_CAD = 26;
+    CURRENCY_TYPE_CDF = 27;
+    CURRENCY_TYPE_CHF = 28;
+    CURRENCY_TYPE_CLF = 29;
+    CURRENCY_TYPE_CLP = 30;
+    CURRENCY_TYPE_CNY = 31;
+    CURRENCY_TYPE_COP = 32;
+    CURRENCY_TYPE_CRC = 33;
+    CURRENCY_TYPE_CUC = 34;
+    CURRENCY_TYPE_CUP = 35;
+    CURRENCY_TYPE_CVE = 36;
+    CURRENCY_TYPE_CZK = 37;
+    CURRENCY_TYPE_DJF = 38;
+    CURRENCY_TYPE_DKK = 39;
+    CURRENCY_TYPE_DOP = 40;
+    CURRENCY_TYPE_DZD = 41;
+    CURRENCY_TYPE_EGP = 42;
+    CURRENCY_TYPE_ERN = 43;
+    CURRENCY_TYPE_ETB = 44;
+    CURRENCY_TYPE_EUR = 45;
+    CURRENCY_TYPE_FJD = 46;
+    CURRENCY_TYPE_FKP = 47;
+    CURRENCY_TYPE_GBP = 48;
+    CURRENCY_TYPE_GEL = 49;
+    CURRENCY_TYPE_GGP = 50;
+    CURRENCY_TYPE_GHS = 51;
+    CURRENCY_TYPE_GIP = 52;
+    CURRENCY_TYPE_GMD = 53;
+    CURRENCY_TYPE_GNF = 54;
+    CURRENCY_TYPE_GTQ = 55;
+    CURRENCY_TYPE_GYD = 56;
+    CURRENCY_TYPE_HKD = 57;
+    CURRENCY_TYPE_HNL = 58;
+    CURRENCY_TYPE_HRK = 59;
+    CURRENCY_TYPE_HTG = 60;
+    CURRENCY_TYPE_HUF = 61;
+    CURRENCY_TYPE_IDR = 62;
+    CURRENCY_TYPE_ILS = 63;
+    CURRENCY_TYPE_IMP = 64;
+    CURRENCY_TYPE_INR = 65;
+    CURRENCY_TYPE_IQD = 66;
+    CURRENCY_TYPE_IRR = 67;
+    CURRENCY_TYPE_ISK = 68;
+    CURRENCY_TYPE_JEP = 69;
+    CURRENCY_TYPE_JMD = 70;
+    CURRENCY_TYPE_JOD = 71;
+    CURRENCY_TYPE_JPY = 72;
+    CURRENCY_TYPE_KES = 73;
+    CURRENCY_TYPE_KGS = 74;
+    CURRENCY_TYPE_KHR = 75;
+    CURRENCY_TYPE_KMF = 76;
+    CURRENCY_TYPE_KPW = 77;
+    CURRENCY_TYPE_KRW = 78;
+    CURRENCY_TYPE_KWD = 79;
+    CURRENCY_TYPE_KYD = 80;
+    CURRENCY_TYPE_KZT = 81;
+    CURRENCY_TYPE_LAK = 82;
+    CURRENCY_TYPE_LBP = 83;
+    CURRENCY_TYPE_LKR = 84;
+    CURRENCY_TYPE_LRD = 85;
+    CURRENCY_TYPE_LSL = 86;
+    CURRENCY_TYPE_LTL = 87;
+    CURRENCY_TYPE_LVL = 88;
+    CURRENCY_TYPE_LYD = 89;
+    CURRENCY_TYPE_MAD = 90;
+    CURRENCY_TYPE_MDL = 91;
+    CURRENCY_TYPE_MGA = 92;
+    CURRENCY_TYPE_MKD = 93;
+    CURRENCY_TYPE_MMK = 94;
+    CURRENCY_TYPE_MNT = 95;
+    CURRENCY_TYPE_MOP = 96;
+    CURRENCY_TYPE_MRO = 97;
+    CURRENCY_TYPE_MUR = 98;
+    CURRENCY_TYPE_MVR = 99;
+    CURRENCY_TYPE_MWK = 100;
+    CURRENCY_TYPE_MXN = 101;
+    CURRENCY_TYPE_MYR = 102;
+    CURRENCY_TYPE_MZN = 103;
+    CURRENCY_TYPE_NAD = 104;
+    CURRENCY_TYPE_NGN = 105;
+    CURRENCY_TYPE_NIO = 106;
+    CURRENCY_TYPE_NOK = 107;
+    CURRENCY_TYPE_NPR = 108;
+    CURRENCY_TYPE_NZD = 109;
+    CURRENCY_TYPE_OMR = 110;
+    CURRENCY_TYPE_PAB = 111;
+    CURRENCY_TYPE_PEN = 112;
+    CURRENCY_TYPE_PGK = 113;
+    CURRENCY_TYPE_PHP = 114;
+    CURRENCY_TYPE_PKR = 115;
+    CURRENCY_TYPE_PLN = 116;
+    CURRENCY_TYPE_PYG = 117;
+    CURRENCY_TYPE_QAR = 118;
+    CURRENCY_TYPE_RON = 119;
+    CURRENCY_TYPE_RSD = 120;
+    CURRENCY_TYPE_RUB = 121;
+    CURRENCY_TYPE_RWF = 122;
+    CURRENCY_TYPE_SAR = 123;
+    CURRENCY_TYPE_SBD = 124;
+    CURRENCY_TYPE_SCR = 125;
+    CURRENCY_TYPE_SDG = 126;
+    CURRENCY_TYPE_SEK = 127;
+    CURRENCY_TYPE_SGD = 128;
+    CURRENCY_TYPE_SHP = 129;
+    CURRENCY_TYPE_SLL = 130;
+    CURRENCY_TYPE_SOS = 131;
+    CURRENCY_TYPE_SRD = 132;
+    CURRENCY_TYPE_STD = 133;
+    CURRENCY_TYPE_SVC = 134;
+    CURRENCY_TYPE_SYP = 135;
+    CURRENCY_TYPE_SZL = 136;
+    CURRENCY_TYPE_THB = 137;
+    CURRENCY_TYPE_TJS = 138;
+    CURRENCY_TYPE_TMT = 139;
+    CURRENCY_TYPE_TND = 140;
+    CURRENCY_TYPE_TOP = 141;
+    CURRENCY_TYPE_TRY = 142;
+    CURRENCY_TYPE_TTD = 143;
+    CURRENCY_TYPE_TWD = 144;
+    CURRENCY_TYPE_TZS = 145;
+    CURRENCY_TYPE_UAH = 146;
+    CURRENCY_TYPE_UGX = 147;
+    CURRENCY_TYPE_USD = 148;
+    CURRENCY_TYPE_UYU = 149;
+    CURRENCY_TYPE_UZS = 150;
+    CURRENCY_TYPE_VEF = 151;
+    CURRENCY_TYPE_VND = 152;
+    CURRENCY_TYPE_VUV = 153;
+    CURRENCY_TYPE_WST = 154;
+    CURRENCY_TYPE_XAF = 155;
+    CURRENCY_TYPE_XAG = 156;
+    CURRENCY_TYPE_XAU = 157;
+    CURRENCY_TYPE_XCD = 158;
+    CURRENCY_TYPE_XDR = 159;
+    CURRENCY_TYPE_XOF = 160;
+    CURRENCY_TYPE_XPF = 161;
+    CURRENCY_TYPE_YER = 162;
+    CURRENCY_TYPE_ZAR = 163;
+    CURRENCY_TYPE_ZMK = 164;
+    CURRENCY_TYPE_ZMW = 165;
+    CURRENCY_TYPE_ZWL = 166;
+}

@@ -1,9 +1,6 @@
-using System.Text.Json.Serialization;
-
 namespace Contracts.Enums;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum CurrencyTypeDto
+public enum CurrencyType
 {
 	AED,
 	AFN,

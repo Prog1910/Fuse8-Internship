@@ -8,4 +8,4 @@ namespace Contracts;
 /// <param name="Name">The of favorite currency.</param>
 /// <param name="Currency"> The default currency for the favorite.</param>
 /// <param name="BaseCurrency">The base currency for the favorite.</param>
-public sealed record FavoriteCurrencyRequest(string Name, CurrencyTypeDto Currency, CurrencyTypeDto BaseCurrency);
+public sealed record FavoriteCurrencyRequest(string Name, CurrencyType Currency, CurrencyType BaseCurrency);
