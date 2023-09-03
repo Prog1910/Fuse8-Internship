@@ -4,9 +4,9 @@ namespace Application.Internal.Interfaces.Rest;
 
 public interface ICurrencyApi
 {
-	Task<Currency[]> GetAllCurrentCurrenciesAsync(string baseCurrency, CancellationToken cancellationToken);
+	Task<Currency[]> GetAllCurrentCurrenciesAsync(string baseCurrencyCode, CancellationToken cancellationToken);
 
-	Task<CurrenciesOnDate> GetAllCurrenciesOnDateAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken);
+	Task<CurrenciesOnDate> GetAllCurrenciesOnDateAsync(string baseCurrencyCode, DateOnly date, CancellationToken cancellationToken);
 
 	Task<Settings> GetSettingsAsync(CancellationToken cancellationToken);
 }

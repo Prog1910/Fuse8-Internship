@@ -9,7 +9,8 @@ public sealed class CurDbContext : DbContext
 	{
 	}
 
-	public DbSet<CachedCurrencies> CurrenciesOnDate { get; set; }
+	public DbSet<CurrenciesOnDateCache> CurrenciesOnDate { get; set; }
+	public DbSet<CacheTask> CacheTasks { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

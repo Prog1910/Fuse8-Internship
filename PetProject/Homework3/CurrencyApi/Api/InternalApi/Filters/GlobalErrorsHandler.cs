@@ -1,4 +1,5 @@
 ﻿using Domain.Errors;
+using Grpc.Core;
 using InternalApi.Middleware;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -18,29 +19,34 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 	{
 		var error = context.Exception;
 
-		context.Result = new ObjectResult(new ProblemDetails
+		if (error is RpcException rpcException)
 		{
-			Title = error?.Message,
-			Status = (int?)(error as HttpRequestException)?.StatusCode
-		});
+			var status = rpcException.Status;
+			var exception = status.DebugException;
+			context.Result = new ObjectResult(new ProblemDetails
+			{
+				Title = exception?.GetType().Name,
+				Detail = status.Detail,
+				Status = (int)status.StatusCode
+			});
 
-		switch (error)
-		{
-			case ApiRequestLimitException:
-				LogError(error);
-				break;
-
-			default:
-				LogError(error);
-				break;
+			if (exception is not CurrencyNotFoundException) LogError(exception);
 		}
-		;
+		else
+		{
+			if (error is not CurrencyNotFoundException)
+			{
+				context.Result = new ObjectResult(new ProblemDetails
+				{
+					Title = error.GetType().Name,
+					Detail = error.Message,
+				});
+				LogError(error);
+			}
+		}
 
 		context.ExceptionHandled = true;
 	}
 
-	private void LogError(Exception? exception)
-	{
-		_logger.LogError(exception, message: "An error occurred.");
-	}
+	private void LogError(Exception? exception) => _logger.LogError(exception, "An error occurred.");
 }

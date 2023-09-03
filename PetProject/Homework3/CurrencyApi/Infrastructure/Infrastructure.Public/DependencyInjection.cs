@@ -16,10 +16,7 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddScoped<IInternalApi, InternalService>();
-		services.AddScoped<IFavoriteCurrencyService, FavoriteCurrencyService>();
-		services.AddScoped<ISettingsWriterService, SettingsWriterService>();
-		services.AddScoped<ISettingsReaderService, SettingsReaderService>();
+		services.AddRestServices();
 
 		services.AddPersistence();
 
@@ -28,7 +25,14 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddPublicDbContext(this IServiceCollection services, IConfiguration configuration)
+	private static void AddRestServices(this IServiceCollection services)
+	{
+		services.AddScoped<IInternalApi, InternalService>();
+		services.AddScoped<IFavoritesService, FavoritesService>();
+		services.AddScoped<ISettingsService, SettingsService>();
+	}
+
+	private static void AddPublicDbContext(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<UserDbContext>(options =>
 		{
@@ -42,22 +46,18 @@ public static class DependencyInjection
 				.UseAllCheckConstraints()
 				.EnableDetailedErrors()
 				.ConfigureWarnings(p => p.Log(
-										   (CoreEventId.StartedTracking, LogLevel.Information),
-										   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
-										   (RelationalEventId.CommandCanceled, LogLevel.Warning))
-									   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
+						                   (CoreEventId.StartedTracking, LogLevel.Information),
+						                   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
+						                   (RelationalEventId.CommandCanceled, LogLevel.Warning))
+					                   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
 
 			options.UseSnakeCaseNamingConvention();
 		});
-
-		return services;
 	}
 
-	private static IServiceCollection AddPersistence(this IServiceCollection services)
+	private static void AddPersistence(this IServiceCollection services)
 	{
 		services.AddScoped<ISettingsRepository, SettingsRepository>();
-		services.AddScoped<IFavoriteCurrenciesRepository, FavoriteCurrenciesRepository>();
-
-		return services;
+		services.AddScoped<IFavoritesRepository, FavoritesRepository>();
 	}
 }

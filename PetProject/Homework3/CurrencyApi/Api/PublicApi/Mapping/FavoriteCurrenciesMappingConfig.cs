@@ -1,4 +1,5 @@
 using Application.Shared.Dtos;
+using Contracts;
 using Domain.Aggregates;
 using Mapster;
 
@@ -8,14 +9,14 @@ public sealed class FavoriteCurrenciesMappingConfig : IRegister
 {
 	public void Register(TypeAdapterConfig config)
 	{
-		config.NewConfig<FavoriteCurrencyDto, CachedFavoriteCurrency>()
-			.Map(dest => dest.Currency, src => src.Currency.ToString())
-			.Map(dest => dest.BaseCurrency, src => src.BaseCurrency.ToString());
+		config.NewConfig<FavoritesDto, FavoritesCache>();
 
-		config.NewConfig<Contracts.FavoriteCurrencyRequest, FavoriteCurrencyDto>();
+		config.NewConfig<FavoritesRequest, FavoritesDto>();
 
-		config.NewConfig<CachedFavoriteCurrency, Contracts.FavoriteCurrencyResponse>()
-			.Map(dest => dest.Currency, src => src.Currency.ToString())
-			.Map(dest => dest.BaseCurrency, src => src.BaseCurrency.ToString());
+		config.NewConfig<FavoritesCache, FavoritesResponse>();
+
+		config.NewConfig<FavoritesDto, FavoritesResponse>()
+			.Map(dest => dest.CurrencyCode, src => src.CurrencyCode.ToString())
+			.Map(dest => dest.BaseCurrencyCode, src => src.BaseCurrencyCode.ToString());
 	}
 }

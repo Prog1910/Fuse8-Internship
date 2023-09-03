@@ -37,11 +37,11 @@ var app = builder.Build();
 static void SetupGrpcService(WebApplicationBuilder builder, WebApplication app)
 {
 	app.UseWhen(context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
-				grpcBuilder =>
-				{
-					grpcBuilder.UseRouting();
-					grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
-				});
+	            grpcBuilder =>
+	            {
+		            grpcBuilder.UseRouting();
+		            grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
+	            });
 }
 
 static void SetupSwagger(WebApplication app)
@@ -59,9 +59,9 @@ static void SetupSwagger(WebApplication app)
 
 static void ConfigureSerilog(WebApplicationBuilder builder)
 {
-	builder.Host.UseSerilog((context, services, configuration) =>
-								configuration.ReadFrom.Configuration(context.Configuration).Enrich
-									.WithMachineName().Enrich
-									.FromLogContext().Enrich
-									.WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
+	builder.Host.UseSerilog(
+		(context, _, configuration) => configuration.ReadFrom.Configuration(context.Configuration).Enrich
+			.WithMachineName().Enrich
+			.FromLogContext().Enrich
+			.WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
 }

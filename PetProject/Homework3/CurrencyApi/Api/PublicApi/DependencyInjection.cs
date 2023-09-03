@@ -1,6 +1,7 @@
 ﻿using Audit.Core;
 using Audit.Http;
 using Microsoft.OpenApi.Models;
+using Protos;
 using PublicApi.Filters;
 using PublicApi.Mapping;
 using System.Text.Json.Serialization;
@@ -31,36 +32,30 @@ public static class DependencyInjection
 		Configuration.Setup()
 			.UseSerilog(config => config.Message(auditEvent =>
 			{
-				if (auditEvent is AuditEventHttpClient httpClientEvent)
-				{
-					var contentBody = httpClientEvent.Action?.Response?.Content?.Body;
-					if (contentBody is string { Length: > 1000 } stringBody)
-					{
-						httpClientEvent.Action!.Response.Content.Body = stringBody[..1000] + "<...>";
-					}
-				}
+				if (auditEvent is not AuditEventHttpClient httpClientEvent) return auditEvent.ToJson();
+
+				var contentBody = httpClientEvent.Action?.Response?.Content?.Body;
+				if (contentBody is not string { Length: > 1000 } stringBody) return auditEvent.ToJson();
+
+				var responseContent = httpClientEvent.Action!.Response?.Content;
+				if (responseContent is not null) responseContent.Body = stringBody[..1000] + "<...>";
 				return auditEvent.ToJson();
 			}));
 	}
 
-	// TODO: не нравится, что он тут. Нужно будет переместить
-	private static IServiceCollection AddGrpcClient(this IServiceCollection services, IConfiguration configuration)
+	private static void AddGrpcClient(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddGrpcClient<Protos.CurrencyGrpc.CurrencyGrpcClient>(o => o.Address = new Uri(configuration["InternalApiA:BaseUrl"] ?? "http://localhost:5000"))
+		services.AddGrpcClient<CurrencyGrpc.CurrencyGrpcClient>(o => o.Address = new Uri(configuration["InternalApi:BaseUrl"]!))
 			.AddAuditHandler(audit => audit.IncludeRequestBody());
-
-		return services;
 	}
 
-	private static IServiceCollection AddGlobalErrorsHandler(this IServiceCollection services)
+	private static void AddGlobalErrorsHandler(this IServiceCollection services)
 	{
 		services.AddControllers(options => options.Filters.Add<GlobalErrorsHandler>())
 			.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-		return services;
 	}
 
-	private static IServiceCollection AddSwagger(this IServiceCollection services)
+	private static void AddSwagger(this IServiceCollection services)
 	{
 		services.AddSwaggerGen(options =>
 
@@ -73,7 +68,5 @@ public static class DependencyInjection
 
 			options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml"));
 		});
-
-		return services;
 	}
 }

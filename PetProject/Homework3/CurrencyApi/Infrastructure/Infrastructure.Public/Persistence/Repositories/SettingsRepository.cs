@@ -1,52 +1,35 @@
 using Application.Public.Persistence;
+using Domain.Aggregates;
 
 namespace Infrastructure.Public.Persistence.Repositories;
 
 public sealed class SettingsRepository : ISettingsRepository
 {
 	private readonly UserDbContext _context;
+	private readonly SettingsCache _settings;
 
 	public SettingsRepository(UserDbContext context)
 	{
 		_context = context;
+		_settings = _context.Settings.SingleOrDefault() ?? throw new Exception("Settings not found.");
 	}
 
-	public string? DefaultCurrency
+	public string DefaultCurrencyCode
 	{
-		get
+		get => _settings.DefaultCurrencyCode;
+		set
 		{
-			var settings = _context.Settings.SingleOrDefault();
-
-			return settings?.DefaultCurrency;
-		}
-	}
-
-	public int? CurrencyRoundCount
-	{
-		get
-		{
-			var settings = _context.Settings.SingleOrDefault();
-
-			return settings?.CurrencyRoundCount;
-		}
-	}
-
-	public void UpdateDefaultCurrency(string defaultCurrency)
-	{
-		var settings = _context.Settings.SingleOrDefault();
-		if (settings is not null)
-		{
-			settings.DefaultCurrency = defaultCurrency;
+			_settings.DefaultCurrencyCode = value;
 			_context.SaveChanges();
 		}
 	}
 
-	public void UpdateCurrencyRoundCount(int currencyRoundCount)
+	public int CurrencyRoundCount
 	{
-		var settings = _context.Settings.SingleOrDefault();
-		if (settings is not null)
+		get => _settings.CurrencyRoundCount;
+		set
 		{
-			settings.CurrencyRoundCount = currencyRoundCount;
+			_settings.CurrencyRoundCount = value;
 			_context.SaveChanges();
 		}
 	}

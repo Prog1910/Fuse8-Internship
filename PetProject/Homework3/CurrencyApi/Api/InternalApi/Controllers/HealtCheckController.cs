@@ -52,3 +52,4 @@ public record HealthCheckResult
 		Failed = 2,
 	}
 }*/
+

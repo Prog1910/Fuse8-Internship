@@ -1,7 +1,6 @@
 ﻿using Application.Public.Interfaces.Rest;
-using Application.Shared.Dtos;
 using Contracts;
-using MapsterMapper;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PublicApi.Controllers;
@@ -10,16 +9,14 @@ namespace PublicApi.Controllers;
 ///     Controller for handling currency-related operations.
 /// </summary>
 [ApiController]
-[Route("currency-api")]
+[Route("currency-api/currency")]
 public sealed class CurrencyController : ControllerBase
 {
 	private readonly IInternalApi _internalService;
-	private readonly IMapper _mapper;
 
-	public CurrencyController(IInternalApi internalService, IMapper mapper)
+	public CurrencyController(IInternalApi internalService)
 	{
 		_internalService = internalService;
-		_mapper = mapper;
 	}
 
 	/// <summary>
@@ -31,14 +28,13 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="422">A validation error occurred while processing the request.</response>
 	/// <response code="429">You have reached your rate or monthly limit for accessing this endpoint.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpGet("currency")]
+	[HttpGet("")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
 	public async Task<IActionResult> GetCurrentCurrency()
 	{
 		var currencyDto = await _internalService.GetCurrentCurrencyAsync();
-		var currencyResponse = _mapper.Map<CurrencyResponse>(currencyDto);
 
-		return Ok(currencyResponse);
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
@@ -51,55 +47,52 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="422">A validation error occurred while processing the request.</response>
 	/// <response code="429">You have reached your rate or monthly limit for accessing this endpoint.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpGet("currency/{date}")]
+	[HttpGet("{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
 	public async Task<IActionResult> GetCurrencyOnDate(DateOnly date)
 	{
 		var currencyDto = await _internalService.GetCurrencyOnDateAsync(date);
-		var currencyResponse = _mapper.Map<CurrencyResponse>(currencyDto);
 
-		return Ok(currencyResponse);
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
-	///     Gets the current favorite currency exchange rate.
+	///     Gets the current favorite currencies exchange rate.
 	/// </summary>
-	/// <param name="name">The name of favorite currency you want to get.</param>
-	/// <response code="200">The favorite currency exchange rate was successfully obtained.</response>
+	/// <param name="name">The name of favorite currencies you want to get.</param>
+	/// <response code="200">The favorite currencies exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
 	/// <response code="422">A validation error occurred while processing the request.</response>
 	/// <response code="429">You have reached your rate or monthly limit for accessing this endpoint.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpGet("favorite-currency/{name}")]
+	[HttpGet("favorites/{name}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentFavoriteCurrencyByNameAsync(string name)
+	public async Task<IActionResult> GetCurrentFavoritesByName(string name)
 	{
-		var currencyDto = await _internalService.GetCurrentFavoriteCurrencyByNameAsync(name);
-		var currencyResponse = _mapper.Map<CurrencyResponse>(currencyDto);
+		var currencyDto = await _internalService.GetCurrentFavoritesByNameAsync(name);
 
-		return Ok(currencyResponse);
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
-	///     Gets the current favorite currency exchange rate for the specified date.
+	///     Gets the current favorite currencies exchange rate for the specified date.
 	/// </summary>
-	/// <param name="name">The name of favorite currency you want to get.</param>
-	/// <param name="date">The date on which you want to get favorite currency exchange rate.</param>
-	/// <response code="200">The favorite currency exchange rate was successfully obtained.</response>
+	/// <param name="name">The name of favorite currencies you want to get.</param>
+	/// <param name="date">The date on which you want to get favorite currencies exchange rate.</param>
+	/// <response code="200">The favorite currencies exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
 	/// <response code="422">A validation error occurred while processing the request.</response>
 	/// <response code="429">You have reached your rate or monthly limit for accessing this endpoint.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpGet("favorite-currency/{name}/{date}")]
+	[HttpGet("favorites/{name}/{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetFavoriteCurrencyOnDateAsync(string name, DateOnly date)
+	public async Task<IActionResult> GetFavoritesOnDate(string name, DateOnly date)
 	{
-		var currencyDto = await _internalService.GetFavoriteCurrencyOnDateByNameAsync(name, date);
-		var currencyResponse = _mapper.Map<CurrencyResponse>(currencyDto);
+		var currencyDto = await _internalService.GetFavoritesOnDateByNameAsync(name, date);
 
-		return Ok(currencyResponse);
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
@@ -109,13 +102,12 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
-	[HttpGet("/settings")]
+	[HttpGet("settings")]
 	[ProducesDefaultResponseType(typeof(SettingsResponse))]
 	public async Task<IActionResult> GetSettings()
 	{
-		var fullSettingsDto = await _internalService.GetSettingsAsync();
-		var settingsResponse = _mapper.Map<SettingsResponse>(fullSettingsDto);
+		var settingsDto = await _internalService.GetSettingsAsync();
 
-		return Ok(settingsResponse);
+		return Ok(settingsDto.Adapt<SettingsResponse>());
 	}
 }

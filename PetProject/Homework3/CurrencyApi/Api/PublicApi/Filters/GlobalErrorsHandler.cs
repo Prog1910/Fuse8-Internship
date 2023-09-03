@@ -18,35 +18,35 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 	public void OnException(ExceptionContext context)
 	{
 		var error = context.Exception;
-		var type = error.GetType().Name;
 
 		if (error is RpcException rpcException)
 		{
-			type = rpcException.Trailers.GetValue("ExceptionType");
+			var status = rpcException.Status;
+			var exception = status.DebugException;
 			context.Result = new ObjectResult(new ProblemDetails
 			{
-				Title = type,
-				Status = (int?)rpcException.StatusCode
+				Title = exception?.GetType().Name,
+				Detail = status.Detail,
+				Status = (int)status.StatusCode
 			});
 
-			if (type?.Contains(nameof(ApiRequestLimitException)) ?? false)
-				LogError(rpcException);
+			if (exception is not CurrencyNotFoundException) LogError(exception);
 		}
-		else if (type?.Contains(nameof(CurrencyNotFoundException)) == false)
+		else
 		{
-			context.Result = new ObjectResult(new ProblemDetails
+			if (error is not CurrencyNotFoundException)
 			{
-				Title = type,
-				Detail = error.Message
-			});
-			LogError(error);
+				context.Result = new ObjectResult(new ProblemDetails
+				{
+					Title = error.GetType().Name,
+					Detail = error.Message,
+				});
+				LogError(error);
+			}
 		}
 
 		context.ExceptionHandled = true;
 	}
 
-	private void LogError(Exception? exception)
-	{
-		_logger.LogError(exception, message: "An error occurred.");
-	}
+	private void LogError(Exception? exception) => _logger.LogError(exception, "An error occurred.");
 }

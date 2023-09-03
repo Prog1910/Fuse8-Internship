@@ -1,4 +1,5 @@
 using Application.Public.Interfaces.Rest;
+using Contracts.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PublicApi.Controllers;
@@ -10,9 +11,9 @@ namespace PublicApi.Controllers;
 [Route("currency-api/settings")]
 public sealed class SettingsController : ControllerBase
 {
-	private readonly ISettingsWriterService _settingsService;
+	private readonly ISettingsService _settingsService;
 
-	public SettingsController(ISettingsWriterService settingsService)
+	public SettingsController(ISettingsService settingsService)
 	{
 		_settingsService = settingsService;
 	}
@@ -25,11 +26,11 @@ public sealed class SettingsController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpPut("default-currency")]
 	[ProducesDefaultResponseType(typeof(void))]
-	public async Task<IActionResult> UpdateDefaultCurrency([FromQuery] Contracts.Enums.CurrencyType defaultCurrency)
+	public async Task<IActionResult> UpdateDefaultCurrency([FromQuery] CurrencyType defaultCurrency)
 	{
-		await _settingsService.UpdateDefaultCurrency((Domain.Enums.CurrencyType)defaultCurrency);
+		await Task.Run(() => _settingsService.DefaultCurrencyCode = (Domain.Enums.CurrencyType)defaultCurrency);
 
-		return Accepted();
+		return NoContent();
 	}
 
 	/// <summary>
@@ -42,8 +43,8 @@ public sealed class SettingsController : ControllerBase
 	[ProducesDefaultResponseType(typeof(void))]
 	public async Task<IActionResult> UpdateCurrencyRoundCount([FromQuery] int currencyRoundCount)
 	{
-		await _settingsService.UpdateCurrencyRoundCount(currencyRoundCount);
+		await Task.Run(() => _settingsService.CurrencyRoundCount = currencyRoundCount);
 
-		return Accepted();
+		return NoContent();
 	}
 }

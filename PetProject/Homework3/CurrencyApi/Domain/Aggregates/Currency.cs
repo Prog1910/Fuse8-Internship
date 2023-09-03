@@ -7,9 +7,8 @@ namespace Domain.Aggregates;
 /// </summary>
 /// <param name="Code">The currency code.</param>
 /// <param name="Value">The currency value.</param>
-public sealed class Currency
+public sealed record Currency
 {
 	[StringLength(maximumLength: 8, MinimumLength = 3)] public string Code { get; set; } = string.Empty;
-
 	[Range(minimum: 0, double.MaxValue)] public decimal Value { get; set; }
 }

@@ -1,6 +1,8 @@
-﻿using Application.Internal.Persistence;
+﻿using Application.Internal.Interfaces.Rest;
+using Application.Internal.Persistence;
 using Infrastructure.Internal.Persistence;
 using Infrastructure.Internal.Persistence.Repositories;
+using Infrastructure.Internal.Services.Rest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -14,14 +16,21 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 	{
+		services.AddInternalDbContext(configuration);
+
 		services.AddPersistence();
 
-		services.AddInternalDbContext(configuration);
+		services.AddRestServices();
 
 		return services;
 	}
 
-	private static IServiceCollection AddInternalDbContext(this IServiceCollection services, IConfiguration configuration)
+	private static void AddRestServices(this IServiceCollection services)
+	{
+		services.AddScoped<ICacheRecalculationApi, CacheRecalculationService>();
+	}
+
+	private static void AddInternalDbContext(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<CurDbContext>(options =>
 		{
@@ -34,21 +43,17 @@ public static class DependencyInjection
 					})
 				.EnableDetailedErrors()
 				.ConfigureWarnings(p => p.Log(
-										   (CoreEventId.StartedTracking, LogLevel.Information),
-										   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
-										   (RelationalEventId.CommandCanceled, LogLevel.Warning))
-									   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
-
+						                   (CoreEventId.StartedTracking, LogLevel.Information),
+						                   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
+						                   (RelationalEventId.CommandCanceled, LogLevel.Warning))
+					                   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
 			options.UseSnakeCaseNamingConvention();
 		});
-
-		return services;
 	}
 
-	private static IServiceCollection AddPersistence(this IServiceCollection services)
+	private static void AddPersistence(this IServiceCollection services)
 	{
-		services.AddScoped<ICurrenciesRepository, CurrenciesRepository>();
-
-		return services;
+		services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+		services.AddScoped<ITaskRepository, TaskRepository>();
 	}
 }

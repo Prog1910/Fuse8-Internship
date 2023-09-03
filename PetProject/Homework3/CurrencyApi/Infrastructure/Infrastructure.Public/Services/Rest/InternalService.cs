@@ -1,85 +1,80 @@
 ﻿using Application.Public.Interfaces.Rest;
 using Application.Shared.Dtos;
-using Domain.Enums;
-using MapsterMapper;
+using Google.Protobuf.WellKnownTypes;
+using Mapster;
+using Protos;
 
 namespace Infrastructure.Public.Services.Rest;
 
 public sealed class InternalService : IInternalApi
 {
-	private readonly IFavoriteCurrencyService _favoriteCurrencyService;
-	private readonly Protos.CurrencyGrpc.CurrencyGrpcClient _grpcClient;
-	private readonly ISettingsReaderService _settings;
-	private readonly IMapper _mapper;
+	private readonly IFavoritesService _favoritesService;
+	private readonly CurrencyGrpc.CurrencyGrpcClient _grpcClient;
+	private readonly ISettingsService _settings;
 
-	public InternalService(
-		IFavoriteCurrencyService favoriteCurrencyService,
-		Protos.CurrencyGrpc.CurrencyGrpcClient grpcClient,
-		ISettingsReaderService settings,
-		IMapper mapper)
+	public InternalService(IFavoritesService favoritesService, CurrencyGrpc.CurrencyGrpcClient grpcClient, ISettingsService settings)
 	{
-		_favoriteCurrencyService = favoriteCurrencyService;
+		_favoritesService = favoritesService;
 		_grpcClient = grpcClient;
 		_settings = settings;
-		_mapper = mapper;
 	}
 
 	public async Task<CurrencyDto> GetCurrentCurrencyAsync()
 	{
-		var currencyProto = await _grpcClient.GetCurrentCurrencyAsync(new Protos.CurrencyRequest
+		var currencyProto = await _grpcClient.GetCurrentCurrencyAsync(new CurrencyRequest
 		{
-			DefaultCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_settings.DefaultCurrency)
+			DefaultCurrencyCode = (CurrencyType)(int)_settings.DefaultCurrencyCode
 		});
 		currencyProto.Value = Math.Round(currencyProto.Value, _settings.CurrencyRoundCount);
 
-		return _mapper.Map<CurrencyDto>(currencyProto);
+		return currencyProto.Adapt<CurrencyDto>();
 	}
 
 	public async Task<CurrencyDto> GetCurrencyOnDateAsync(DateOnly date)
 	{
-		var currencyProto = await _grpcClient.GetCurrencyOnDateAsync(new Protos.CurrencyOnDateRequest
+		var currencyProto = await _grpcClient.GetCurrencyOnDateAsync(new CurrencyOnDateRequest
 		{
-			DefaultCurrency = (Protos.CurrencyType)Enum.Parse<CurrencyType>(_settings.DefaultCurrency),
-			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc))
+			DefaultCurrencyCode = (CurrencyType)(int)_settings.DefaultCurrencyCode,
+			Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc))
 		});
 		currencyProto.Value = Math.Round(currencyProto.Value, _settings.CurrencyRoundCount);
 
-		return _mapper.Map<CurrencyDto>(currencyProto);
+		return currencyProto.Adapt<CurrencyDto>();
 	}
 
-	public async Task<CurrencyDto> GetCurrentFavoriteCurrencyByNameAsync(string name)
+	public async Task<CurrencyDto> GetCurrentFavoritesByNameAsync(string name)
 	{
-		var favoriteDto = await _favoriteCurrencyService.GetFavoriteCurrencyByNameAsync(name) ?? throw new Exception("The favorite currency not found.");
+		var favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name) ?? throw new Exception("The favorite currencies not found.");
 
-		var currencyProto = await _grpcClient.GetCurrentFavoriteCurrencyAsync(new Protos.FavoriteCurrencyRequest
+		var currencyProto = await _grpcClient.GetCurrentFavoriteCurrencyAsync(new FavoriteCurrencyRequest
 		{
-			DefaultCurrency = (Protos.CurrencyType)favoriteDto.Currency,
-			BaseCurrency = (Protos.CurrencyType)favoriteDto.BaseCurrency
+			DefaultCurrencyCode = (CurrencyType)(int)favoriteDto.CurrencyCode,
+			BaseCurrencyCode = (CurrencyType)(int)favoriteDto.BaseCurrencyCode
 		});
 		currencyProto.Value = Math.Round(currencyProto.Value, _settings.CurrencyRoundCount);
 
-		return _mapper.Map<CurrencyDto>(currencyProto);
+		return currencyProto.Adapt<CurrencyDto>();
 	}
 
-	public async Task<CurrencyDto> GetFavoriteCurrencyOnDateByNameAsync(string name, DateOnly date)
+	public async Task<CurrencyDto> GetFavoritesOnDateByNameAsync(string name, DateOnly date)
 	{
-		var favoriteDto = await _favoriteCurrencyService.GetFavoriteCurrencyByNameAsync(name) ?? throw new Exception("The favorite currency not found.");
+		var favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name) ?? throw new Exception("The favorite currencies not found.");
 
-		var currencyProto = await _grpcClient.GetFavoriteCurrencyOnDateAsync(new Protos.FavoriteCurrencyOnDateRequest
+		var currencyProto = await _grpcClient.GetFavoriteCurrencyOnDateAsync(new FavoriteCurrencyOnDateRequest
 		{
-			DefaultCurrency = (Protos.CurrencyType)favoriteDto.Currency,
-			BaseCurrency = (Protos.CurrencyType)favoriteDto.BaseCurrency,
-			Date = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc))
+			DefaultCurrencyCode = (CurrencyType)(int)favoriteDto.CurrencyCode,
+			BaseCurrencyCode = (CurrencyType)(int)favoriteDto.BaseCurrencyCode,
+			Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc))
 		});
 		currencyProto.Value = Math.Round(currencyProto.Value, _settings.CurrencyRoundCount);
 
-		return _mapper.Map<CurrencyDto>(currencyProto);
+		return currencyProto.Adapt<CurrencyDto>();
 	}
 
 	public async Task<FullSettingsDto> GetSettingsAsync()
 	{
-		var settingsProto = await _grpcClient.GetSettingsAsync(new Google.Protobuf.WellKnownTypes.Empty());
+		var settingsProto = await _grpcClient.GetSettingsAsync(new Empty());
 
-		return _mapper.Map<FullSettingsDto>((_settings.DefaultCurrency, settingsProto, _settings.CurrencyRoundCount));
+		return (_settings.DefaultCurrencyCode, settingsProto, _settings.CurrencyRoundCount).Adapt<FullSettingsDto>();
 	}
 }

@@ -2,9 +2,13 @@ using Domain.Aggregates;
 
 namespace Application.Internal.Persistence;
 
-public interface ICurrenciesRepository
+public interface ICurrencyRepository
 {
-	void AddCurrencies(string baseCurrency, Currency[] currencies, DateTime? date = null);
+	void AddCurrenciesByBaseCode(string baseCurrency, IEnumerable<Currency> currencies, DateTime? date = default);
 
-	Currency[]? GetCurrencies(string baseCurrency, DateOnly? date = null);
+	IEnumerable<Currency>? GetCurrenciesByBaseCode(string baseCurrency, DateOnly? date = default);
+
+	IEnumerable<CurrenciesOnDateCache>? GetAllCurrenciesOnDates(DateOnly? date = default);
+
+	void UpdateCurrenciesOnDate(CurrenciesOnDateCache currenciesOnDate);
 }

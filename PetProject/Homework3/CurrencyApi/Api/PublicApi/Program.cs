@@ -25,25 +25,25 @@ var app = builder.Build();
 
 	await app.RunAsync();
 }
+return;
 
 static void SetupSwagger(WebApplication app)
 {
-	if (app.Environment.IsDevelopment())
+	if (!app.Environment.IsDevelopment()) return;
+
+	app.UseSwagger();
+	app.UseSwaggerUI(options =>
 	{
-		app.UseSwagger();
-		app.UseSwaggerUI(options =>
-		{
-			options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
-			options.RoutePrefix = "swagger";
-		});
-	}
+		options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+		options.RoutePrefix = "swagger";
+	});
 }
 
 static void ConfigureSerilog(WebApplicationBuilder builder)
 {
-	builder.Host.UseSerilog((context, services, configuration) =>
-		configuration.ReadFrom.Configuration(context.Configuration).Enrich
-  .WithMachineName().Enrich
-  .FromLogContext().Enrich
-  .WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
+	builder.Host.UseSerilog(
+		(context, _, configuration) => configuration.ReadFrom.Configuration(context.Configuration).Enrich
+			.WithMachineName().Enrich
+			.FromLogContext().Enrich
+			.WithExceptionDetails(new DestructuringOptionsBuilder().WithDefaultDestructurers()));
 }

@@ -2,11 +2,7 @@ namespace Application.Public.Persistence;
 
 public interface ISettingsRepository
 {
-	string? DefaultCurrency { get; }
+	string DefaultCurrencyCode { get; set; }
 
-	int? CurrencyRoundCount { get; }
-
-	void UpdateDefaultCurrency(string defaultCurrency);
-
-	void UpdateCurrencyRoundCount(int currencyRoundCount);
+	int CurrencyRoundCount { get; set; }
 }

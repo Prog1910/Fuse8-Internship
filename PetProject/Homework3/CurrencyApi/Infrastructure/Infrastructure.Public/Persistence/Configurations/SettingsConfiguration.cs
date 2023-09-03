@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Public.Persistence.Configurations;
 
-public sealed class SettingsConfiguration : IEntityTypeConfiguration<CachedSettings>
+public sealed class SettingsConfiguration : IEntityTypeConfiguration<SettingsCache>
 {
-	public void Configure(EntityTypeBuilder<CachedSettings> builder)
+	public void Configure(EntityTypeBuilder<SettingsCache> builder)
 	{
 		builder.HasKey(s => s.Id);
 
-		builder.Property(s => s.DefaultCurrency).IsRequired();
+		builder.Property(s => s.DefaultCurrencyCode).IsRequired().HasConversion<string>();
 		builder.Property(s => s.CurrencyRoundCount).IsRequired();
 	}
 }

@@ -1,7 +1,7 @@
 namespace Application.Shared.Dtos;
 
 public sealed record FullSettingsDto(
-	string DefaultCurrency,
-	string BaseCurrency,
+	string DefaultCurrencyCode,
+	string BaseCurrencyCode,
 	bool NewRequestsAvailable,
 	int CurrencyRoundCount);

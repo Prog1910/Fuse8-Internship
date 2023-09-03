@@ -1,6 +1,7 @@
 ﻿using Application.Internal.Interfaces.Rest;
 using Contracts;
-using MapsterMapper;
+using Contracts.Enums;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternalApi.Controllers;
@@ -12,13 +13,13 @@ namespace InternalApi.Controllers;
 [Route("currency-api")]
 public sealed class CurrencyController : ControllerBase
 {
-	private readonly ICachedCurrencyApi _currencyService;
-	private readonly IMapper _mapper;
+	private readonly ICacheCurrencyApi _currencyService;
+	private readonly IRestApi _restService;
 
-	public CurrencyController(ICachedCurrencyApi currencyService, IMapper mapper)
+	public CurrencyController(ICacheCurrencyApi currencyService, IRestApi restService)
 	{
 		_currencyService = currencyService;
-		_mapper = mapper;
+		_restService = restService;
 	}
 
 	/// <summary>
@@ -34,11 +35,11 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("currencies")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentCurrency([FromQuery] Contracts.Enums.CurrencyType currencyType, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrentCurrency([FromQuery] CurrencyType currencyType, CancellationToken cancellationToken)
 	{
 		var currencyDto = await _currencyService.GetCurrentCurrencyAsync((Domain.Enums.CurrencyType)currencyType, cancellationToken);
 
-		return Ok(_mapper.Map<CurrencyResponse>(currencyDto));
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
@@ -55,11 +56,11 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("currencies/{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrencyOnDate([FromQuery] Contracts.Enums.CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrencyOnDate([FromQuery] CurrencyType currencyType, DateOnly date, CancellationToken cancellationToken)
 	{
 		var currencyDto = await _currencyService.GetCurrencyOnDateAsync((Domain.Enums.CurrencyType)currencyType, date, cancellationToken);
 
-		return Ok(_mapper.Map<CurrencyResponse>(currencyDto));
+		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
 
 	/// <summary>
@@ -75,6 +76,22 @@ public sealed class CurrencyController : ControllerBase
 	{
 		var settingsDto = await _currencyService.GetSettingsAsync(cancellationToken);
 
-		return Ok(_mapper.Map<SettingsResponse>(settingsDto));
+		return Ok(settingsDto.Adapt<SettingsResponse>());
+	}
+
+	/// <summary>
+	///     Recalculates cached currency exchange rates relative to the specified base currency.
+	/// </summary>
+	/// <param name="baseCurrency">The base currency for which exchange rates should be recalculated.</param>
+	/// <response code="200">Currencies was successfully recalculated.</response>
+	/// <response code="404">The requested endpoint could not be found.</response>
+	/// <response code="500">An internal server error occurred while processing the request.</response>
+	[HttpPost("/recalculation")]
+	[ProducesDefaultResponseType(typeof(Guid))]
+	public async Task<AcceptedResult> RecalculateCurrencyCacheA([FromQuery] CurrencyType baseCurrency)
+	{
+		var taskId = await _restService.RecalculateCurrencyCacheAsync((Domain.Enums.CurrencyType)baseCurrency);
+
+		return Accepted(taskId);
 	}
 }

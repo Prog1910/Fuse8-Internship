@@ -9,8 +9,8 @@ public sealed class UserDbContext : DbContext
 	{
 	}
 
-	public DbSet<CachedSettings> Settings { get; set; }
-	public DbSet<CachedFavoriteCurrency> FavoriteCurrencies { get; set; }
+	public DbSet<SettingsCache> Settings { get; set; }
+	public DbSet<FavoritesCache> Favorites { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

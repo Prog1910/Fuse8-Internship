@@ -22,47 +22,47 @@ namespace Infrastructure.Public.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Aggregates.CachedFavoriteCurrency", b =>
+            modelBuilder.Entity("Domain.Aggregates.FavoritesCache", b =>
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)")
                         .HasColumnName("name");
 
-                    b.Property<string>("BaseCurrency")
+                    b.Property<string>("BaseCurrencyCode")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)")
-                        .HasColumnName("base_currency");
+                        .HasColumnName("base_currency_code");
 
-                    b.Property<string>("Currency")
+                    b.Property<string>("CurrencyCode")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)")
-                        .HasColumnName("currency");
+                        .HasColumnName("currency_code");
 
                     b.HasKey("Name")
-                        .HasName("pk_favorite_currencies");
+                        .HasName("pk_favorites");
 
                     b.HasIndex("Name")
                         .IsUnique()
-                        .HasDatabaseName("ix_favorite_currencies_name");
+                        .HasDatabaseName("ix_favorites_name");
 
-                    b.HasIndex("Currency", "BaseCurrency")
+                    b.HasIndex("CurrencyCode", "BaseCurrencyCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_favorite_currencies_currency_base_currency");
+                        .HasDatabaseName("ix_favorites_currency_code_base_currency_code");
 
-                    b.ToTable("favorite_currencies", "user", t =>
+                    b.ToTable("favorites", "user", t =>
                         {
-                            t.HasCheckConstraint("CK_favorite_currencies_base_currency_MinLength", "LENGTH(base_currency) >= 3");
+                            t.HasCheckConstraint("CK_favorites_base_currency_code_MinLength", "LENGTH(base_currency_code) >= 3");
 
-                            t.HasCheckConstraint("CK_favorite_currencies_currency_MinLength", "LENGTH(currency) >= 3");
+                            t.HasCheckConstraint("CK_favorites_currency_code_MinLength", "LENGTH(currency_code) >= 3");
 
-                            t.HasCheckConstraint("CK_favorite_currencies_name_MinLength", "LENGTH(name) >= 1");
+                            t.HasCheckConstraint("CK_favorites_name_MinLength", "LENGTH(name) >= 1");
                         });
                 });
 
-            modelBuilder.Entity("Domain.Aggregates.CachedSettings", b =>
+            modelBuilder.Entity("Domain.Aggregates.SettingsCache", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,11 +75,11 @@ namespace Infrastructure.Public.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_round_count");
 
-                    b.Property<string>("DefaultCurrency")
+                    b.Property<string>("DefaultCurrencyCode")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)")
-                        .HasColumnName("default_currency");
+                        .HasColumnName("default_currency_code");
 
                     b.HasKey("Id")
                         .HasName("pk_settings");
@@ -88,7 +88,7 @@ namespace Infrastructure.Public.Migrations
                         {
                             t.HasCheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 10");
 
-                            t.HasCheckConstraint("CK_settings_default_currency_MinLength", "LENGTH(default_currency) >= 3");
+                            t.HasCheckConstraint("CK_settings_default_currency_code_MinLength", "LENGTH(default_currency_code) >= 3");
                         });
                 });
 #pragma warning restore 612, 618

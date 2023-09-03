@@ -4,7 +4,7 @@ using Domain.Aggregates;
 using Domain.Enums;
 using Domain.Errors;
 using Domain.Options;
-using MapsterMapper;
+using Mapster;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Json;
@@ -16,40 +16,36 @@ public sealed class CurrencyService : ICurrencyApi
 	private readonly string _baseUrl;
 	private readonly string _currencyTypes;
 	private readonly HttpClient _httpClient;
-	private readonly IMapper _mapper;
 	private readonly InternalApiOptions _options;
 
-	public CurrencyService(IOptionsSnapshot<InternalApiOptions> options, HttpClient httpClient, IMapper mapper)
+	public CurrencyService(IOptions<InternalApiOptions> options, HttpClient httpClient)
 	{
 		_options = options.Value;
 		_httpClient = httpClient;
-		_mapper = mapper;
 		ConfigureRequestHeaders();
 		_currencyTypes = CombineCurrencyTypesWithCommas();
 		_baseUrl = _options.BaseUrl;
 	}
 
-	public async Task<Currency[]> GetAllCurrentCurrenciesAsync(string baseCurrency, CancellationToken cancellationToken)
+	public async Task<Currency[]> GetAllCurrentCurrenciesAsync(string baseCurrencyCode, CancellationToken cancellationToken)
 	{
-		var requestUri = $"{_baseUrl}/latest?currencies={_currencyTypes}&base_currency={baseCurrency}";
+		var requestUri = $"{_baseUrl}/latest?currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
 		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		EnsureValidResponse(response);
+		var currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
 
-		var currencyResponse = await response.Content.ReadFromJsonAsync<CurrencyResponse>(cancellationToken: cancellationToken);
-		var currencies = _mapper.Map<Currency[]>(currencyResponse?.Data.Values.ToArray() ?? throw new CurrencyNotFoundException());
+		var currencies = currencyResponse.Data.Values.ToArray().Adapt<Currency[]>();
 
 		return currencies;
 	}
 
-	public async Task<CurrenciesOnDate> GetAllCurrenciesOnDateAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
+	public async Task<CurrenciesOnDate> GetAllCurrenciesOnDateAsync(string baseCurrencyCode, DateOnly date, CancellationToken cancellationToken)
 	{
-		var requestUri = $"{_baseUrl}/historical?date={date}&currencies={_currencyTypes}&base_currency={baseCurrency}";
+		var requestUri = $"{_baseUrl}/historical?date={date}&currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
 		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		EnsureValidResponse(response);
+		var currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
 
-		var currencyResponse = await response.Content.ReadFromJsonAsync<CurrencyResponse>(cancellationToken: cancellationToken);
-		var lastUpdatedAt = currencyResponse?.Meta.LastUpdatedAt ?? throw GenerateExceptionWithInternalServerError("Meta in CurrencyResponse not found.");
-		var currencies = _mapper.Map<Currency[]>(currencyResponse?.Data.Values.ToArray() ?? throw GenerateExceptionWithInternalServerError("Data in CurrencyResponse not found."));
+		var lastUpdatedAt = currencyResponse.Meta.LastUpdatedAt;
+		var currencies = currencyResponse.Data.Values.Adapt<Currency[]>();
 		var currenciesOnDate = new CurrenciesOnDate
 		{
 			LastUpdatedAt = DateTime.Parse(lastUpdatedAt).Date.ToUniversalTime(),
@@ -63,46 +59,39 @@ public sealed class CurrencyService : ICurrencyApi
 	{
 		var requestUri = $"{_baseUrl}/status";
 		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		EnsureValidResponse(response);
+		var settingsResponse = await EnsureValidAndDeserializeResponse<SettingsResponse>(response, cancellationToken);
 
-		var settingsResponse = await response.Content.ReadFromJsonAsync<SettingsResponse>(cancellationToken: cancellationToken);
-		var month = settingsResponse?.Quotas.Month ?? throw GenerateExceptionWithInternalServerError("Month in SettingsResponse not found.");
+		var month = settingsResponse.Quotas.Month;
 		var settings = new Settings
 		{
-			BaseCurrency = _options.BaseCurrency,
+			BaseCurrencyCode = _options.BaseCurrencyCode,
 			NewRequestsAvailable = month.Total > month.Used
 		};
 
 		return settings;
 	}
 
-	private void ConfigureRequestHeaders()
+	private static async Task<TResponse> EnsureValidAndDeserializeResponse<TResponse>(HttpResponseMessage response, CancellationToken cancellationToken)
 	{
-		_httpClient.DefaultRequestHeaders.Add(name: "apikey", _options.ApiKey);
-	}
-
-	private static string CombineCurrencyTypesWithCommas()
-	{
-		return string.Join(separator: ",", Enum.GetValues<CurrencyType>());
-	}
-
-	public static void EnsureValidResponse(HttpResponseMessage response)
-	{
-		if (response.IsSuccessStatusCode == false)
+		if (response.IsSuccessStatusCode is false)
 		{
 			throw response.StatusCode switch
 			{
 				HttpStatusCode.TooManyRequests => new ApiRequestLimitException(),
-				_ => GenerateExceptionWithInternalServerError()
+
+				_ => GenerateInternalServerError()
 			};
 		}
+
+		return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken) ?? throw GenerateInternalServerError();
 	}
 
-	public static Exception GenerateExceptionWithInternalServerError(string message = "An error occurred.", Exception? exception = null)
-	{
-		return new HttpRequestException(
-			message,
-			exception,
-			HttpStatusCode.InternalServerError);
-	}
+	private void ConfigureRequestHeaders()
+		=> _httpClient.DefaultRequestHeaders.Add(name: "apikey", _options.ApiKey);
+
+	private static string CombineCurrencyTypesWithCommas()
+		=> string.Join(separator: ",", Enum.GetValues<CurrencyType>());
+
+	private static Exception GenerateInternalServerError(string message = "An error occurred.", Exception? exception = default)
+		=> new HttpRequestException(message, exception, HttpStatusCode.InternalServerError);
 }
