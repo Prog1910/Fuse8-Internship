@@ -59,7 +59,10 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 			{
 				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode)) continue;
 
-				var relativeBaseCurrencyRate = currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value ?? throw new CurrencyNotFoundException();
+				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
+				// var relativeBaseCurrencyRate = currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value ?? throw new CurrencyNotFoundException();
+				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate) continue;
+
 				var newCurrenciesOnDate = new CurrenciesOnDateCache
 				{
 					LastUpdatedAt = currenciesOnDate.LastUpdatedAt,

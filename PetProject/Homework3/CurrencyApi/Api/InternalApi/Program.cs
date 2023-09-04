@@ -16,6 +16,10 @@ var builder = WebApplication.CreateBuilder();
 		.AddInfrastructure(builder.Configuration)
 		.AddApplication(builder.Configuration);
 
+	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://localhost:5000"), "InternalApi");
+	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://localhost:50051"), "GrpcServer");
+	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://currencyapi.com"), "CurrencyApi");
+
 	builder.WebHost.UseKestrel((builderContext, options) =>
 	{
 		var grpcPort = builderContext.Configuration.GetValue<int>("GrpcPort");
@@ -34,7 +38,7 @@ var app = builder.Build();
 
 	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
 
-	app.MapHealthChecks("/healthz");
+	app.MapHealthChecks("/health-check");
 
 	SetupGrpcService(builder, app);
 
