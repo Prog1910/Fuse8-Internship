@@ -5,7 +5,6 @@ using Domain.Enums;
 using Domain.Errors;
 using Domain.Options;
 using Infrastructure.Internal.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -31,75 +30,51 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 	public async Task RecalculateCacheAsync(Guid cacheTaskId, CancellationToken cancellationToken)
 	{
 		var cacheTask = _taskRepo.GetCacheTaskById(cacheTaskId);
-		var strategy = _curDbContext.Database.CreateExecutionStrategy();
-		await strategy.ExecuteAsync(async () =>
+		try
 		{
-			await using var transaction = await _curDbContext.Database.BeginTransactionAsync(cancellationToken);
-			try
+			cacheTask.Status = CacheTaskStatus.InProgress;
+			await _curDbContext.SaveChangesAsync(cancellationToken);
+			if (_currencyRepo.GetAllCurrenciesOnDates()?.ToList() is { } currenciesOnDates)
 			{
-				cacheTask.Status = CacheTaskStatus.InProgress;
+				var newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
+				await RecalculateCurrencyCacheAsync(currenciesOnDates, newBaseCurrencyCode, cancellationToken);
+				_options.BaseCurrencyCode = newBaseCurrencyCode;
+				cacheTask.Status = CacheTaskStatus.CompletedSuccessfully;
 				await _curDbContext.SaveChangesAsync(cancellationToken);
-				await transaction.CreateSavepointAsync("InProgress", cancellationToken);
 			}
-			catch (Exception e)
-			{
-				cacheTask.Status = CacheTaskStatus.CompletedWithError;
-				await _curDbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogError(e, message: "An error occurred.");
-				await transaction.RollbackToSavepointAsync("InProgress", cancellationToken);
-			}
-			try
-			{
-				if (_currencyRepo.GetAllCurrenciesOnDates()?.ToList() is { } currenciesOnDates)
-				{
-					var newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
-					await RecalculateCurrenciesOnDatesAsync(currenciesOnDates, newBaseCurrencyCode, cancellationToken);
-					cacheTask.Status = CacheTaskStatus.CompletedSuccessfully;
-					await _curDbContext.SaveChangesAsync(cancellationToken);
-					await transaction.CreateSavepointAsync("CompletedSuccessfully", cancellationToken);
-					_options.BaseCurrencyCode = newBaseCurrencyCode;
-					await transaction.CommitAsync(cancellationToken);
-				}
-			}
-			catch (Exception e)
-			{
-				cacheTask.Status = CacheTaskStatus.CompletedWithError;
-				await _curDbContext.SaveChangesAsync(cancellationToken);
-				_logger.LogError(e, message: "An error occurred.");
-			}
-		});
+		}
+		catch (Exception e)
+		{
+			cacheTask.Status = CacheTaskStatus.CompletedWithError;
+			await _curDbContext.SaveChangesAsync(cancellationToken);
+			_logger.LogError(e, message: "An error occurred while recalculating cache.");
+		}
 	}
 
-	public async Task<Currency?> RecalculateCurrencyAsync(string currencyCode, string newBaseCurrencyCode, string oldBaseCurrencyCode, List<Currency> currencies, CancellationToken cancellationToken)
-		=> await Task.Run(() =>
-		{
-			var currency = currencies.SingleOrDefault(c => c.Code.Equals(currencyCode)) ?? throw new CurrencyNotFoundException();
-			if (currencyCode.Equals(oldBaseCurrencyCode)) return currency;
-
-			var baseCurrency = currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode)) ?? throw new CurrencyNotFoundException();
-			var recalculatedCurrency = currency with { Value = currency.Value / baseCurrency.Value };
-
-			return recalculatedCurrency;
-		}, cancellationToken);
-
-	private async Task RecalculateCurrenciesOnDatesAsync(List<CurrenciesOnDateCache> currenciesOnDates, string newBaseCurrencyCode, CancellationToken cancellationToken)
+	private async Task RecalculateCurrencyCacheAsync(List<CurrenciesOnDateCache> currenciesOnDates, string newBaseCurrencyCode, CancellationToken cancellationToken)
 	{
-		foreach (var currenciesOnDate in currenciesOnDates)
+		await Task.Run(() =>
 		{
-			var oldBaseCurrencyCode = currenciesOnDate.BaseCurrencyCode;
-			var recalculatedCurrencies = new CurrenciesOnDateCache
+			foreach (var currenciesOnDate in currenciesOnDates)
 			{
-				LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
-				BaseCurrencyCode = newBaseCurrencyCode,
-				Currencies = new List<Currency>(currenciesOnDate.Currencies.Count)
-			};
-			foreach (var currency in currenciesOnDate.Currencies)
-			{
-				var recalculatedCurrency = await RecalculateCurrencyAsync(currency.Code, newBaseCurrencyCode, oldBaseCurrencyCode, currenciesOnDate.Currencies, cancellationToken)
-				                           ?? throw new CurrencyNotFoundException();
-				recalculatedCurrencies.Currencies.Add(recalculatedCurrency);
+				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode)) continue;
+
+				var relativeBaseCurrencyRate = currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value ?? throw new CurrencyNotFoundException();
+				var newCurrenciesOnDate = new CurrenciesOnDateCache
+				{
+					LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
+					BaseCurrencyCode = newBaseCurrencyCode,
+					Currencies = currenciesOnDate.Currencies.Select(currency =>
+					{
+						currency.Value /= relativeBaseCurrencyRate;
+						return currency;
+					}).ToList()
+				};
+				_curDbContext.CurrenciesOnDate.Remove(currenciesOnDate);
+				_curDbContext.SaveChanges();
+				_curDbContext.Add(newCurrenciesOnDate);
+				_curDbContext.SaveChanges();
 			}
-			_currencyRepo.UpdateCurrenciesOnDate(recalculatedCurrencies);
-		}
+		}, cancellationToken);
 	}
 }

@@ -116,9 +116,9 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpPost("/recalculation")]
 	[ProducesDefaultResponseType(typeof(Guid))]
-	public async Task<AcceptedResult> RecalculateCurrencyCacheA([FromQuery] CurrencyType baseCurrencyCode)
+	public async Task<AcceptedResult> RecalculateCache([FromQuery] CurrencyType baseCurrencyCode)
 	{
-		var taskId = await _cacheTaskManagerService.RecalculateCurrencyCacheAsync((Domain.Enums.CurrencyType)baseCurrencyCode);
+		var taskId = await _cacheTaskManagerService.RecalculateCacheAsync((Domain.Enums.CurrencyType)baseCurrencyCode);
 
 		return Accepted(taskId);
 	}

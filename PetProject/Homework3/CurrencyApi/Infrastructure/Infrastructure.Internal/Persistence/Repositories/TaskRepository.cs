@@ -13,7 +13,6 @@ public sealed class TaskRepository : ITaskRepository
 	{
 		_context = context;
 		_tasks = _context.CacheTasks ?? throw new Exception("Cache tasks not found.");
-		_tasks.AsNoTracking();
 	}
 
 	public void AddCacheTask(CacheTask cacheTask)

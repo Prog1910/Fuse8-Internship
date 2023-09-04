@@ -34,6 +34,8 @@ var app = builder.Build();
 
 	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
 
+	app.MapHealthChecks("/healthz");
+
 	SetupGrpcService(builder, app);
 
 	await app.RunAsync();

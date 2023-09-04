@@ -4,5 +4,5 @@ namespace Application.Internal.Interfaces.Background;
 
 public interface ICacheTaskManagerService
 {
-	Task<Guid> RecalculateCurrencyCacheAsync(CurrencyType baseCurrency);
+	Task<Guid> RecalculateCacheAsync(CurrencyType baseCurrency);
 }

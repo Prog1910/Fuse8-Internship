@@ -28,8 +28,8 @@ public sealed class FavoritesService : IFavoritesService
 		=> await Task.Run(() => _favoritesRepo.GetFavoritesByName(name)?.Adapt<FavoritesDto>()
 		                        ?? throw new Exception("The favorites not found."), cancellationToken);
 
-	public async Task<IEnumerable<FavoritesDto>?> GetAllFavoritesAsync(CancellationToken cancellationToken)
-		=> await Task.Run(() => _favoritesRepo.GetAllFavorites()?.Adapt<IEnumerable<FavoritesDto>>()
+	public async Task<List<FavoritesDto>?> GetAllFavoritesAsync(CancellationToken cancellationToken)
+		=> await Task.Run(() => _favoritesRepo.GetAllFavorites()?.Adapt<List<FavoritesDto>>()
 		                        ?? throw new Exception("The favorites not found."), cancellationToken);
 
 	public async Task AddFavoritesAsync(FavoritesDto favoritesDto, CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public sealed class FavoritesService : IFavoritesService
 		{
 			var favorites = favoritesDto.Adapt<FavoritesCache>();
 			if (_favoritesRepo.TryUpdateFavoritesByName(favorites, name) is false)
-				throw new Exception("The favorites not found.");
+				throw new Exception("An error occured while updating favorites.");
 		}, cancellationToken);
 	}
 }

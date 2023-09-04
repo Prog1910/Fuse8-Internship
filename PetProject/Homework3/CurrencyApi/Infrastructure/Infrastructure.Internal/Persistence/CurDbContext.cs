@@ -9,6 +9,7 @@ public sealed class CurDbContext : DbContext
 	{
 	}
 
+
 	public DbSet<CurrenciesOnDateCache> CurrenciesOnDate { get; set; }
 	public DbSet<CacheTask> CacheTasks { get; set; }
 

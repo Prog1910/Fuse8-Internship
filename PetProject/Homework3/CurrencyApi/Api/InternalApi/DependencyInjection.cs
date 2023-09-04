@@ -23,6 +23,8 @@ public static class DependencyInjection
 
 		services.AddSwagger();
 
+		services.AddHealthChecks();
+
 		return services;
 	}
 

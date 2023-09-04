@@ -9,6 +9,4 @@ public interface ICurrencyRepository
 	IEnumerable<Currency>? GetCurrenciesByBaseCode(string baseCurrency, DateOnly? date = default);
 
 	IEnumerable<CurrenciesOnDateCache>? GetAllCurrenciesOnDates(DateOnly? date = default);
-
-	void UpdateCurrenciesOnDate(CurrenciesOnDateCache currenciesOnDate);
 }

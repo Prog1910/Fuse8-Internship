@@ -6,42 +6,44 @@ namespace Infrastructure.Public.Persistence.Repositories;
 
 public sealed class FavoritesRepository : IFavoritesRepository
 {
-	private readonly UserDbContext _context;
-	private readonly DbSet<FavoritesCache> _favorites;
+	private readonly UserDbContext _userDbContext;
+	private readonly DbSet<FavoritesCache> _favoritesDbSet;
 
-	public FavoritesRepository(UserDbContext context)
+	public FavoritesRepository(UserDbContext userDbContext)
 	{
-		_context = context;
-		_favorites = _context.Favorites ?? throw new Exception("Favorites not found.");
+		_userDbContext = userDbContext;
+		_favoritesDbSet = _userDbContext.Favorites ?? throw new Exception("Favorites not found.");
 	}
 
 	public bool TryAddFavorites(FavoritesCache favorites)
 	{
 		if (IsUnique(favorites) is false) return false;
 
-		_favorites.Add(favorites);
-		_context.SaveChanges();
+		_favoritesDbSet.Add(favorites);
+		_userDbContext.SaveChanges();
 
 		return true;
 	}
 
 	public FavoritesCache? GetFavoritesByName(string name)
 	{
-		var favorites = _favorites.SingleOrDefault(f => f.Name.Equals(name));
+		var favorites = _favoritesDbSet.SingleOrDefault(f => f.Name.Equals(name));
 
 		return favorites;
 	}
 
-	public IEnumerable<FavoritesCache> GetAllFavorites() => _favorites.AsEnumerable();
+	public IEnumerable<FavoritesCache> GetAllFavorites() => _favoritesDbSet.ToList() ?? throw new Exception("Favorites not found in cache.");
 
 	public bool TryUpdateFavoritesByName(FavoritesCache favorites, string name)
 	{
 		if (GetFavoritesByName(name) is not { } favoritesToUpdate) return false;
 
-		if (IsUnique(favorites, true) is false) return false;
+		favoritesToUpdate.Name = favorites.Name;
+		favoritesToUpdate.CurrencyCode = favorites.CurrencyCode;
+		favoritesToUpdate.BaseCurrencyCode = favorites.BaseCurrencyCode;
 
-		_favorites.Update(favoritesToUpdate with { CurrencyCode = favorites.CurrencyCode, BaseCurrencyCode = favorites.BaseCurrencyCode, Name = favorites.Name });
-
+		_favoritesDbSet.Update(favorites);
+		_userDbContext.SaveChanges();
 		return true;
 	}
 
@@ -49,16 +51,21 @@ public sealed class FavoritesRepository : IFavoritesRepository
 	{
 		if (GetFavoritesByName(name) is not { } favorites) return false;
 
-		_favorites.Remove(favorites);
-		_context.SaveChanges();
+		_favoritesDbSet.Remove(favorites);
+		_userDbContext.SaveChanges();
 
 		return true;
 	}
 
-	private bool IsUnique(FavoritesCache favorites, bool checkForFullyUnique = false)
+	private bool IsUnique(FavoritesCache favorites)
 	{
-		var isUniqueByName = GetFavoritesByName(favorites.Name) is null;
-		var isCurrencyCodesUnique = GetAllFavorites().Any(f => f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)) is false;
-		return checkForFullyUnique ? isUniqueByName && isCurrencyCodesUnique : isUniqueByName || isCurrencyCodesUnique;
+		var isUniqueByName = IsUniqueByName(favorites);
+		var isCurrencyCodesUnique = IsUniqueByCode(favorites);
+		return isUniqueByName && isCurrencyCodesUnique;
 	}
+
+	private bool IsUniqueByCode(FavoritesCache favorites)
+		=> GetAllFavorites().Any(f => f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)) is false;
+
+	private bool IsUniqueByName(FavoritesCache favorites) => GetFavoritesByName(favorites.Name) is null;
 }

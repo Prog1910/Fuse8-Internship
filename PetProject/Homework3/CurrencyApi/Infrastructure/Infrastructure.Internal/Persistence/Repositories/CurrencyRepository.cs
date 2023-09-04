@@ -33,7 +33,7 @@ public sealed class CurrencyRepository : ICurrencyRepository
 
 		var queryDate = date is { } dateOnly
 			? queryBaseCurrency.Where(cod => DateOnly.FromDateTime(cod.LastUpdatedAt.ToUniversalTime()).Equals(dateOnly))
-			: queryBaseCurrency.Where(cod => cod.LastUpdatedAt.ToLocalTime().AddHours(2) > DateTime.Now);
+			: queryBaseCurrency.Where(cod => cod.LastUpdatedAt.ToUniversalTime().AddHours(2) > DateTime.UtcNow);
 		var currencies = queryDate.FirstOrDefault()?.Currencies;
 
 		return currencies;
@@ -44,11 +44,5 @@ public sealed class CurrencyRepository : ICurrencyRepository
 		var currenciesOnDate = _dbContext.CurrenciesOnDate.OrderByDescending(cod => cod.LastUpdatedAt).AsEnumerable();
 
 		return currenciesOnDate;
-	}
-
-	public void UpdateCurrenciesOnDate(CurrenciesOnDateCache currenciesOnDate)
-	{
-		_dbContext.CurrenciesOnDate.Update(currenciesOnDate);
-		_dbContext.SaveChanges();
 	}
 }

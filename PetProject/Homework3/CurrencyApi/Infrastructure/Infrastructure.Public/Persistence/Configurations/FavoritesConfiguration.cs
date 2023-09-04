@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Public.Persistence.Configurations;
 
-public sealed class FavoriteCurrencyConfiguration : IEntityTypeConfiguration<FavoritesCache>
+public sealed class FavoritesConfiguration : IEntityTypeConfiguration<FavoritesCache>
 {
 	public void Configure(EntityTypeBuilder<FavoritesCache> builder)
 	{
 		builder.HasKey(f => f.Name);
+
 		builder.HasIndex(f => f.Name).IsUnique();
 		builder.HasIndex(f => new { f.CurrencyCode, f.BaseCurrencyCode }).IsUnique();
 

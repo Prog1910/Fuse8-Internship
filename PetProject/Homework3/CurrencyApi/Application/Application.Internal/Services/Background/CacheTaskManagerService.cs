@@ -16,7 +16,7 @@ public sealed class CacheTaskManagerService : ICacheTaskManagerService
 		_taskQueue = taskQueue;
 	}
 
-	public async Task<Guid> RecalculateCurrencyCacheAsync(CurrencyType baseCurrency)
+	public async Task<Guid> RecalculateCacheAsync(CurrencyType baseCurrency)
 	{
 		var cacheTask = CacheTask.Create(baseCurrency.ToString());
 		_repository.AddCacheTask(cacheTask);

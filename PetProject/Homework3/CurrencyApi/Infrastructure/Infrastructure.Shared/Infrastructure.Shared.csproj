@@ -21,4 +21,5 @@
         <ProjectReference Include="..\..\Application\Application.Shared\Application.Shared.csproj"/>
     </ItemGroup>
 
+
 </Project>

@@ -33,7 +33,7 @@ public sealed class FavoritesController : ControllerBase
 	{
 		var favoritesDtos = await _favoritesService.GetAllFavoritesAsync(cancellationToken);
 
-		return Ok(favoritesDtos?.Adapt<IEnumerable<FavoritesResponse>>());
+		return Ok(favoritesDtos?.Adapt<List<FavoritesResponse>>());
 	}
 
 	/// <summary>

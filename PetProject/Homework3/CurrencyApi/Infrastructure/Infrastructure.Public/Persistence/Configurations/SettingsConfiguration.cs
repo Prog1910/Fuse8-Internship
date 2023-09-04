@@ -10,7 +10,7 @@ public sealed class SettingsConfiguration : IEntityTypeConfiguration<SettingsCac
 	{
 		builder.HasKey(s => s.Id);
 
-		builder.Property(s => s.DefaultCurrencyCode).IsRequired().HasConversion<string>();
+		builder.Property(s => s.DefaultCurrencyCode).IsRequired();
 		builder.Property(s => s.CurrencyRoundCount).IsRequired();
 	}
 }
