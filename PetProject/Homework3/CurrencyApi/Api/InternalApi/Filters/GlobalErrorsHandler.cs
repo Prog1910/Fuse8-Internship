@@ -22,28 +22,24 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 		if (error is RpcException rpcException)
 		{
 			var status = rpcException.Status;
-			var exception = status.DebugException;
+			error = status.DebugException;
 			context.Result = new ObjectResult(new ProblemDetails
 			{
-				Title = exception?.GetType().Name,
+				Title = error?.GetType().Name,
 				Detail = status.Detail,
 				Status = (int)status.StatusCode
 			});
-
-			if (exception is not CurrencyNotFoundException) LogError(exception);
 		}
 		else
 		{
-			if (error is not CurrencyNotFoundException)
+			context.Result = new ObjectResult(new ProblemDetails
 			{
-				context.Result = new ObjectResult(new ProblemDetails
-				{
-					Title = error.GetType().Name,
-					Detail = error.Message,
-				});
-				LogError(error);
-			}
+				Title = error.GetType().Name,
+				Detail = error.Message,
+				Status = (int?)(error as HttpRequestException)?.StatusCode
+			});
 		}
+		if (error is not CurrencyNotFoundException) LogError(error);
 
 		context.ExceptionHandled = true;
 	}

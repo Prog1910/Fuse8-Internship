@@ -39,7 +39,7 @@ public class QueuedHostedService : BackgroundService
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, message: "An error occurred while processing request.");
+				_logger.LogError(ex, message: "An error occurred while recalculating cache.");
 			}
 		}
 	}

@@ -29,14 +29,15 @@ return;
 
 static void SetupSwagger(WebApplication app)
 {
-	if (!app.Environment.IsDevelopment()) return;
-
-	app.UseSwagger();
-	app.UseSwaggerUI(options =>
+	if (app.Environment.IsDevelopment())
 	{
-		options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
-		options.RoutePrefix = "swagger";
-	});
+		app.UseSwagger();
+		app.UseSwaggerUI(options =>
+		{
+			options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+			options.RoutePrefix = "swagger";
+		});
+	}
 }
 
 static void ConfigureSerilog(WebApplicationBuilder builder)

@@ -1,4 +1,5 @@
-﻿using Application.Internal.Interfaces.Rest;
+﻿using Application.Internal.Interfaces.Background;
+using Application.Internal.Interfaces.Rest;
 using Contracts;
 using Contracts.Enums;
 using Mapster;

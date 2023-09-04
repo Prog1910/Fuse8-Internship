@@ -25,6 +25,7 @@ public static class DependencyInjection
 
 	private static void AddBackgroundServices(this IServiceCollection services)
 	{
+		services.AddScoped<ICacheTaskManagerService, CacheTaskManagerService>();
 		services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 		services.AddHostedService<QueuedHostedService>();
 	}

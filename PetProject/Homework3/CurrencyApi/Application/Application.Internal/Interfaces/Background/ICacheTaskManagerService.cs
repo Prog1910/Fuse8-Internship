@@ -1,6 +1,6 @@
 ﻿using Domain.Enums;
 
-namespace Application.Internal.Interfaces.Rest;
+namespace Application.Internal.Interfaces.Background;
 
 public interface ICacheTaskManagerService
 {

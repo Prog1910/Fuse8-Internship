@@ -32,6 +32,8 @@ var app = builder.Build();
 
 	app.UseMiddleware<RequestLoggingMiddleware>();
 
+	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
+
 	SetupGrpcService(builder, app);
 
 	await app.RunAsync();

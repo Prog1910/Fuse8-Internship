@@ -82,7 +82,7 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 			await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
 			if (_taskRepo.GetAllTasks().Any()) throw new Exception("An error occurred while recalculating cache.");
 		}
-		else if (_taskRepo.GetAllTasks().Any(t => t.Status is not CacheTaskStatus.InProgress) == false)
+		else if (_taskRepo.GetAllTasks().Any(t => t.Status is not CacheTaskStatus.InProgress) is false)
 		{
 			if (date.HasValue)
 			{

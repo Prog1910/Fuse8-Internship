@@ -1,10 +1,9 @@
 ﻿using Application.Internal.Interfaces.Background;
-using Application.Internal.Interfaces.Rest;
 using Application.Internal.Persistence;
 using Domain.Aggregates;
 using Domain.Enums;
 
-namespace Application.Internal.Services.Rest;
+namespace Application.Internal.Services.Background;
 
 public sealed class CacheTaskManagerService : ICacheTaskManagerService
 {
