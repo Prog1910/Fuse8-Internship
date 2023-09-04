@@ -22,6 +22,7 @@ public sealed class CurrencyController : ControllerBase
 	/// <summary>
 	///     Gets the current default currency exchange rate.
 	/// </summary>
+	/// <param name="cancellationToken">Cancellation token.</param>
 	/// <response code="200">The default currency exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
@@ -30,9 +31,9 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentCurrency()
+	public async Task<IActionResult> GetCurrentCurrency(CancellationToken cancellationToken)
 	{
-		var currencyDto = await _internalService.GetCurrentCurrencyAsync();
+		var currencyDto = await _internalService.GetCurrentCurrencyAsync(cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -41,6 +42,7 @@ public sealed class CurrencyController : ControllerBase
 	///     Gets the current default currency exchange rate for the specified date.
 	/// </summary>
 	/// <param name="date">The date on which you want to get default currency exchange rate.</param>
+	/// <param name="cancellationToken">Cancellation token.</param>
 	/// <response code="200">The default currency exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
@@ -49,9 +51,9 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrencyOnDate(DateOnly date)
+	public async Task<IActionResult> GetCurrencyOnDate([FromRoute] DateOnly date, CancellationToken cancellationToken)
 	{
-		var currencyDto = await _internalService.GetCurrencyOnDateAsync(date);
+		var currencyDto = await _internalService.GetCurrencyOnDateAsync(date, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -60,6 +62,7 @@ public sealed class CurrencyController : ControllerBase
 	///     Gets the current favorite currencies exchange rate.
 	/// </summary>
 	/// <param name="name">The name of favorite currencies you want to get.</param>
+	/// <param name="cancellationToken">Cancellation token.</param>
 	/// <response code="200">The favorite currencies exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
@@ -68,9 +71,9 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("favorites/{name}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentFavoritesByName(string name)
+	public async Task<IActionResult> GetCurrentFavoritesByName([FromRoute] string name, CancellationToken cancellationToken)
 	{
-		var currencyDto = await _internalService.GetCurrentFavoritesByNameAsync(name);
+		var currencyDto = await _internalService.GetCurrentFavoritesByNameAsync(name, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -80,6 +83,7 @@ public sealed class CurrencyController : ControllerBase
 	/// </summary>
 	/// <param name="name">The name of favorite currencies you want to get.</param>
 	/// <param name="date">The date on which you want to get favorite currencies exchange rate.</param>
+	/// <param name="cancellationToken">Cancellation token.</param>
 	/// <response code="200">The favorite currencies exchange rate was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
@@ -88,9 +92,9 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("favorites/{name}/{date}")]
 	[ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetFavoritesOnDate(string name, DateOnly date)
+	public async Task<IActionResult> GetFavoritesOnDate([FromRoute] string name, [FromRoute] DateOnly date, CancellationToken cancellationToken)
 	{
-		var currencyDto = await _internalService.GetFavoritesOnDateByNameAsync(name, date);
+		var currencyDto = await _internalService.GetFavoritesOnDateByNameAsync(name, date, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -98,15 +102,16 @@ public sealed class CurrencyController : ControllerBase
 	/// <summary>
 	///     Retrieves the API configuration settings.
 	/// </summary>
+	/// <param name="cancellationToken">Cancellation token.</param>
 	/// <response code="200">The settings was successfully obtained.</response>
 	/// <response code="403">You do not have permission to access this endpoint.</response>
 	/// <response code="404">The requested endpoint could not be found.</response>
 	/// <response code="500">An internal server error occurred while processing the request.</response>
 	[HttpGet("settings")]
 	[ProducesDefaultResponseType(typeof(SettingsResponse))]
-	public async Task<IActionResult> GetSettings()
+	public async Task<IActionResult> GetSettings(CancellationToken cancellationToken)
 	{
-		var settingsDto = await _internalService.GetSettingsAsync();
+		var settingsDto = await _internalService.GetSettingsAsync(cancellationToken);
 
 		return Ok(settingsDto.Adapt<SettingsResponse>());
 	}

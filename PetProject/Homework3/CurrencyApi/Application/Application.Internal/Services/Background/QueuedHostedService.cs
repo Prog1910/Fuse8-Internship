@@ -34,7 +34,7 @@ public class QueuedHostedService : BackgroundService
 			try
 			{
 				var taskToComplete = await _taskQueue.DequeueAsync(stoppingToken);
-				var recalculationService = scope.ServiceProvider.GetRequiredService<ICacheRecalculationApi>();
+				var recalculationService = scope.ServiceProvider.GetRequiredService<ICacheRecalculationService>();
 				await recalculationService.RecalculateCacheAsync(taskToComplete.Id, stoppingToken);
 			}
 			catch (Exception ex)

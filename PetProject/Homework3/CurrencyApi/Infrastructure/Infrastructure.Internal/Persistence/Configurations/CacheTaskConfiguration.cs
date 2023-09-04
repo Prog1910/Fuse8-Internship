@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Internal.Persistence.Configurations;
 
-public sealed class TaskConfiguration : IEntityTypeConfiguration<CacheTask>
+public sealed class CacheTaskConfiguration : IEntityTypeConfiguration<CacheTask>
 {
 	public void Configure(EntityTypeBuilder<CacheTask> builder)
 	{
 		builder.HasKey(t => t.Id);
+
+		builder.Property(t => t.Id).HasDefaultValueSql("uuid_generate_v4()");
 
 		builder.Property(t => t.BaseCurrencyCode).IsRequired();
 

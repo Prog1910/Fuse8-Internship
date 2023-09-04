@@ -2,7 +2,7 @@
 
 namespace Application.Internal.Interfaces.Rest;
 
-public interface ICacheRecalculationApi
+public interface ICacheRecalculationService
 {
 	Task RecalculateCacheAsync(Guid cacheTaskId, CancellationToken cancellationToken);
 

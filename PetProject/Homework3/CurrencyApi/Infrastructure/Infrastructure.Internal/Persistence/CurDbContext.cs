@@ -16,6 +16,8 @@ public sealed class CurDbContext : DbContext
 	{
 		modelBuilder.HasDefaultSchema("cur");
 
+		modelBuilder.HasPostgresExtension("uuid-ossp");
+
 		modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
 		base.OnModelCreating(modelBuilder);

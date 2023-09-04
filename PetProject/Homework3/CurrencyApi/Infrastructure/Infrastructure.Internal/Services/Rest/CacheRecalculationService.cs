@@ -9,14 +9,14 @@ using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Internal.Services.Rest;
 
-public sealed class CacheRecalculationService : ICacheRecalculationApi
+public sealed class CacheRecalculationService : ICacheRecalculationService
 {
 	private readonly ICurrencyRepository _currencyRepo;
 	private readonly ITaskRepository _taskRepo;
 	private readonly InternalApiOptions _options;
-	private readonly ILogger<ICacheRecalculationApi> _logger;
+	private readonly ILogger<ICacheRecalculationService> _logger;
 
-	public CacheRecalculationService(IOptionsSnapshot<InternalApiOptions> options, ITaskRepository taskRepo, ICurrencyRepository currencyRepo, ILogger<ICacheRecalculationApi> logger)
+	public CacheRecalculationService(IOptionsSnapshot<InternalApiOptions> options, ITaskRepository taskRepo, ICurrencyRepository currencyRepo, ILogger<ICacheRecalculationService> logger)
 	{
 		_options = options.Value;
 		_taskRepo = taskRepo;

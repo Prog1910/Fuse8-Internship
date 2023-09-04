@@ -15,40 +15,40 @@ public sealed class FavoritesService : IFavoritesService
 		_favoritesRepo = favoritesRepo;
 	}
 
-	public async Task DeleteFavoritesByNameAsync(string name)
+	public async Task DeleteFavoritesByNameAsync(string name, CancellationToken cancellationToken)
 	{
 		await Task.Run(() =>
 		{
 			if (_favoritesRepo.TryDeleteFavoritesByName(name) is false)
 				throw new Exception("The favorites not found.");
-		});
+		}, cancellationToken);
 	}
 
-	public async Task<FavoritesDto?> GetFavoritesByNameAsync(string name)
+	public async Task<FavoritesDto?> GetFavoritesByNameAsync(string name, CancellationToken cancellationToken)
 		=> await Task.Run(() => _favoritesRepo.GetFavoritesByName(name)?.Adapt<FavoritesDto>()
-		                        ?? throw new Exception("The favorites not found."));
+		                        ?? throw new Exception("The favorites not found."), cancellationToken);
 
-	public async Task<IEnumerable<FavoritesDto>?> GetAllFavoritesAsync()
+	public async Task<IEnumerable<FavoritesDto>?> GetAllFavoritesAsync(CancellationToken cancellationToken)
 		=> await Task.Run(() => _favoritesRepo.GetAllFavorites()?.Adapt<IEnumerable<FavoritesDto>>()
-		                        ?? throw new Exception("The favorites not found."));
+		                        ?? throw new Exception("The favorites not found."), cancellationToken);
 
-	public async Task AddFavoritesAsync(FavoritesDto favoritesDto)
+	public async Task AddFavoritesAsync(FavoritesDto favoritesDto, CancellationToken cancellationToken)
 	{
 		await Task.Run(() =>
 		{
 			var favorites = favoritesDto.Adapt<FavoritesCache>();
 			if (_favoritesRepo.TryAddFavorites(favorites) is false)
 				throw new Exception("The favorites already exists.");
-		});
+		}, cancellationToken);
 	}
 
-	public async Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name)
+	public async Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name, CancellationToken cancellationToken)
 	{
 		await Task.Run(() =>
 		{
 			var favorites = favoritesDto.Adapt<FavoritesCache>();
 			if (_favoritesRepo.TryUpdateFavoritesByName(favorites, name) is false)
 				throw new Exception("The favorites not found.");
-		});
+		}, cancellationToken);
 	}
 }

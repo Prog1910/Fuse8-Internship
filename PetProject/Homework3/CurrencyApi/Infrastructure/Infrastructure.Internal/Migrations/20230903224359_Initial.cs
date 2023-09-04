@@ -15,12 +15,15 @@ namespace Infrastructure.Internal.Migrations
             migrationBuilder.EnsureSchema(
                 name: "cur");
 
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
+
             migrationBuilder.CreateTable(
                 name: "cache_tasks",
                 schema: "cur",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
                     base_currency_code = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     status = table.Column<string>(type: "text", nullable: false, defaultValue: "Created")
                 },

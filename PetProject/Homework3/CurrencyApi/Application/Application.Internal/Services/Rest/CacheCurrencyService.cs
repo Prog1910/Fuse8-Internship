@@ -12,13 +12,17 @@ namespace Application.Internal.Services.Rest;
 
 public sealed class CacheCurrencyService : ICacheCurrencyApi
 {
-	private readonly ICacheRecalculationApi _cacheRecalculationService;
+	private readonly ICacheRecalculationService _cacheRecalculationService;
 	private readonly ICurrencyApi _currencyService;
 	private readonly InternalApiOptions _options;
 	private readonly ICurrencyRepository _currencyRepo;
 	private readonly ITaskRepository _taskRepo;
 
-	public CacheCurrencyService(IOptions<InternalApiOptions> options, ICurrencyApi currencyService, ICacheRecalculationApi cacheRecalculationService, ICurrencyRepository currencyRepo, ITaskRepository taskRepo)
+	public CacheCurrencyService(IOptions<InternalApiOptions> options,
+		ICurrencyApi currencyService,
+		ICacheRecalculationService cacheRecalculationService,
+		ICurrencyRepository currencyRepo,
+		ITaskRepository taskRepo)
 	{
 		_options = options.Value;
 		_currencyService = currencyService;
@@ -47,12 +51,12 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 		return currency.Adapt<CurrencyDto>();
 	}
 
-	public async Task<CurrencyDto> GetCurrencyByFavoriteCurrenciesCodesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date, CancellationToken cancellationToken)
+	public async Task<CurrencyDto> GetCurrencyByFavoritesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date, CancellationToken cancellationToken)
 	{
 		var baseCurrencyCode = _options.BaseCurrencyCode;
 		var favoriteCurrencyCodeStr = favoriteCurrencyCode.ToString();
 		var favoriteBaseCurrencyCodeStr = favoriteBaseCurrencyCode.ToString();
-		var currencies = (await GetCurrenciesFromCacheByBaseCodeAsync(baseCurrencyCode, date, cancellationToken))?.ToList() ?? throw new CurrencyNotFoundException();
+		var currencies = (await GetCurrenciesFromCacheByBaseCurrencyCodeAsync(baseCurrencyCode, date, cancellationToken))?.ToList() ?? throw new CurrencyNotFoundException();
 		var currency = _cacheRecalculationService.RecalculateCurrencyAsync(favoriteCurrencyCodeStr, favoriteBaseCurrencyCodeStr, baseCurrencyCode, currencies, cancellationToken);
 
 		return currency.Adapt<CurrencyDto>();
@@ -65,12 +69,12 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 		return settings.Adapt<SettingsDto>();
 	}
 
-	private async Task<IEnumerable<Currency>?> GetCurrenciesFromCacheByBaseCodeAsync(string baseCurrencyCode, DateOnly? date, CancellationToken cancellationToken)
+	private async Task<IEnumerable<Currency>?> GetCurrenciesFromCacheByBaseCurrencyCodeAsync(string baseCurrencyCode, DateOnly? date, CancellationToken cancellationToken)
 		=> await Task.Run(() => _currencyRepo.GetCurrenciesByBaseCode(baseCurrencyCode, date), cancellationToken);
 
 	private async Task<IEnumerable<Currency>?> TryGetCurrenciesFromCacheByBaseCodeAsync(string baseCurrencyCode, DateOnly? date, CancellationToken cancellationToken)
 	{
-		var currencies = await GetCurrenciesFromCacheByBaseCodeAsync(baseCurrencyCode, date, cancellationToken);
+		var currencies = await GetCurrenciesFromCacheByBaseCurrencyCodeAsync(baseCurrencyCode, date, cancellationToken);
 		if (currencies is not null) return currencies;
 
 		if (_taskRepo.GetAllTasks().Any(t => t.Status is CacheTaskStatus.Created or CacheTaskStatus.InProgress))

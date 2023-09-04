@@ -7,16 +7,16 @@ option csharp_namespace = "Protos";
 
 service CurrencyGrpc {
     rpc GetCurrentCurrency (CurrencyRequest) returns (CurrencyResponse);
- 
+
     rpc GetCurrencyOnDate (CurrencyOnDateRequest) returns (CurrencyResponse);
 
-    rpc GetCurrentFavoriteCurrency (FavoriteCurrencyRequest) returns (CurrencyResponse);
+    rpc GetCurrentFavorites (FavoriteCurrencyRequest) returns (CurrencyResponse);
 
-    rpc GetFavoriteCurrencyOnDate (FavoriteCurrencyOnDateRequest) returns (CurrencyResponse);
+    rpc GetFavoritesOnDate (FavoriteCurrencyOnDateRequest) returns (CurrencyResponse);
 
     rpc GetSettings (google.protobuf.Empty) returns (SettingsResponse);
 }
-
+ 
 message CurrencyRequest {
     CurrencyType default_currency_code = 1;
 }

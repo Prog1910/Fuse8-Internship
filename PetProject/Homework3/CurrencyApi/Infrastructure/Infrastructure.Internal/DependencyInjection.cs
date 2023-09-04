@@ -27,7 +27,7 @@ public static class DependencyInjection
 
 	private static void AddRestServices(this IServiceCollection services)
 	{
-		services.AddScoped<ICacheRecalculationApi, CacheRecalculationService>();
+		services.AddScoped<ICacheRecalculationService, CacheRecalculationService>();
 	}
 
 	private static void AddInternalDbContext(this IServiceCollection services, IConfiguration configuration)

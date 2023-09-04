@@ -2,7 +2,7 @@
 
 namespace Application.Internal.Interfaces.Rest;
 
-public interface IRestApi
+public interface ICacheTaskManagerService
 {
 	Task<Guid> RecalculateCurrencyCacheAsync(CurrencyType baseCurrency);
 }

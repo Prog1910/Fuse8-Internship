@@ -17,7 +17,7 @@ public sealed class FavoritesRepository : IFavoritesRepository
 
 	public bool TryAddFavorites(FavoritesCache favorites)
 	{
-		if (GetFavoritesByName(favorites.Name) is not null) return false;
+		if (IsUnique(favorites) is false) return false;
 
 		_favorites.Add(favorites);
 		_context.SaveChanges();
@@ -36,20 +36,29 @@ public sealed class FavoritesRepository : IFavoritesRepository
 
 	public bool TryUpdateFavoritesByName(FavoritesCache favorites, string name)
 	{
-		if (GetFavoritesByName(name) is null) return false;
+		if (GetFavoritesByName(name) is not { } favoritesToUpdate) return false;
 
-		_favorites.Update(favorites);
+		if (IsUnique(favorites, true) is false) return false;
+
+		_favorites.Update(favoritesToUpdate with { CurrencyCode = favorites.CurrencyCode, BaseCurrencyCode = favorites.BaseCurrencyCode, Name = favorites.Name });
 
 		return true;
 	}
 
 	public bool TryDeleteFavoritesByName(string name)
 	{
-		if (GetFavoritesByName(name) is not { } favorites) return true;
+		if (GetFavoritesByName(name) is not { } favorites) return false;
 
 		_favorites.Remove(favorites);
 		_context.SaveChanges();
 
 		return true;
+	}
+
+	private bool IsUnique(FavoritesCache favorites, bool checkForFullyUnique = false)
+	{
+		var isUniqueByName = GetFavoritesByName(favorites.Name) is null;
+		var isCurrencyCodesUnique = GetAllFavorites().Any(f => f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)) is false;
+		return checkForFullyUnique ? isUniqueByName && isCurrencyCodesUnique : isUniqueByName || isCurrencyCodesUnique;
 	}
 }

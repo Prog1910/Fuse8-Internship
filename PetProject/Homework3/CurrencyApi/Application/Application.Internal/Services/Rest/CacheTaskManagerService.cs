@@ -6,12 +6,12 @@ using Domain.Enums;
 
 namespace Application.Internal.Services.Rest;
 
-public sealed class RestService : IRestApi
+public sealed class CacheTaskManagerService : ICacheTaskManagerService
 {
 	private readonly ITaskRepository _repository;
 	private readonly IBackgroundTaskQueue _taskQueue;
 
-	public RestService(ITaskRepository repository, IBackgroundTaskQueue taskQueue)
+	public CacheTaskManagerService(ITaskRepository repository, IBackgroundTaskQueue taskQueue)
 	{
 		_repository = repository;
 		_taskQueue = taskQueue;
@@ -22,6 +22,7 @@ public sealed class RestService : IRestApi
 		var cacheTask = CacheTask.Create(baseCurrency.ToString());
 		_repository.AddCacheTask(cacheTask);
 		await _taskQueue.QueueAsync(cacheTask);
+
 		return cacheTask.Id;
 	}
 }

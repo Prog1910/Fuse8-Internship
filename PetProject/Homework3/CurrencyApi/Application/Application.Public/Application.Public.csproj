@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="**\*.proto" GrpcServices="Client" Link="Protos"/>
+        <Protobuf Include="..\..\Application\Application.Shared\**\currency.proto" GrpcServices="Client" Link="Protos"/>
     </ItemGroup>
 
     <ItemGroup>

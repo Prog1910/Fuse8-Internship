@@ -32,7 +32,7 @@ public sealed class CurrencyRepository : ICurrencyRepository
 		if (queryBaseCurrency.Any() is false) return null;
 
 		var queryDate = date is { } dateOnly
-			? queryBaseCurrency.Where(cod => DateOnly.FromDateTime(cod.LastUpdatedAt.ToLocalTime()).Equals(dateOnly))
+			? queryBaseCurrency.Where(cod => DateOnly.FromDateTime(cod.LastUpdatedAt.ToUniversalTime()).Equals(dateOnly))
 			: queryBaseCurrency.Where(cod => cod.LastUpdatedAt.ToLocalTime().AddHours(2) > DateTime.Now);
 		var currencies = queryDate.FirstOrDefault()?.Currencies;
 

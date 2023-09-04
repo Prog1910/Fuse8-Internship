@@ -49,13 +49,13 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		}
 	}
 
-	public override async Task<CurrencyResponse> GetCurrentFavoriteCurrency(FavoriteCurrencyRequest request, ServerCallContext context)
+	public override async Task<CurrencyResponse> GetCurrentFavorites(FavoriteCurrencyRequest request, ServerCallContext context)
 	{
 		try
 		{
 			var favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
 			var favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
-			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoriteCurrenciesCodesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, default, context.CancellationToken);
+			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, default, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -65,14 +65,14 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		}
 	}
 
-	public override async Task<CurrencyResponse> GetFavoriteCurrencyOnDate(FavoriteCurrencyOnDateRequest request, ServerCallContext context)
+	public override async Task<CurrencyResponse> GetFavoritesOnDate(FavoriteCurrencyOnDateRequest request, ServerCallContext context)
 	{
 		try
 		{
 			var favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
 			var favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
 			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
-			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoriteCurrenciesCodesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
+			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}

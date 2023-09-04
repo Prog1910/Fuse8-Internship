@@ -19,7 +19,10 @@ var builder = WebApplication.CreateBuilder();
 	builder.WebHost.UseKestrel((builderContext, options) =>
 	{
 		var grpcPort = builderContext.Configuration.GetValue<int>("GrpcPort");
-		options.ConfigureEndpointDefaults(p => p.Protocols = p.IPEndPoint!.Port == grpcPort ? HttpProtocols.Http2 : HttpProtocols.Http1);
+		options.ConfigureEndpointDefaults(p =>
+		{
+			p.Protocols = p.IPEndPoint!.Port == grpcPort ? HttpProtocols.Http2 : HttpProtocols.Http1;
+		});
 	});
 }
 
@@ -33,8 +36,9 @@ var app = builder.Build();
 
 	await app.RunAsync();
 }
+return;
 
-static void SetupGrpcService(WebApplicationBuilder builder, WebApplication app)
+static void SetupGrpcService(WebApplicationBuilder builder, IApplicationBuilder app)
 {
 	app.UseWhen(context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
 	            grpcBuilder =>

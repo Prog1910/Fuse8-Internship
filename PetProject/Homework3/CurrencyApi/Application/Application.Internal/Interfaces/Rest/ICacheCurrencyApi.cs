@@ -9,7 +9,7 @@ public interface ICacheCurrencyApi
 
 	Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType defaultCurrencyCode, DateOnly date, CancellationToken cancellationToken);
 
-	Task<CurrencyDto> GetCurrencyByFavoriteCurrenciesCodesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date, CancellationToken cancellationToken);
+	Task<CurrencyDto> GetCurrencyByFavoritesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date, CancellationToken cancellationToken);
 
 	Task<SettingsDto> GetSettingsAsync(CancellationToken cancellationToken);
 }
