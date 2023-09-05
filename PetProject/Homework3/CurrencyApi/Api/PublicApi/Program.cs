@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 	builder.Services.AddPresentation(builder.Configuration)
 		.AddInfrastructure(builder.Configuration)
 		.AddApplication(builder.Configuration);
+
+	builder.Services.AddHealthChecks();
 }
 
 var app = builder.Build();
@@ -22,6 +24,8 @@ var app = builder.Build();
 	app.UseMiddleware<RequestLoggingMiddleware>();
 
 	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
+
+	app.MapHealthChecks("/health");
 
 	await app.RunAsync();
 }

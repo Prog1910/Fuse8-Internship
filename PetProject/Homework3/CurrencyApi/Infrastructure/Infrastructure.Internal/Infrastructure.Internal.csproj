@@ -12,8 +12,4 @@
     </ItemGroup>
 
 
-    <ItemGroup>
-        <PackageReference Include="RestSharp" Version="110.2.0"/>
-    </ItemGroup>
-
 </Project>

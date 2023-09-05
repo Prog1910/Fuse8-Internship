@@ -3,6 +3,7 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -12,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="7.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +24,13 @@
         <ProjectReference Include="..\..\Application\Application.Internal\Application.Internal.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.Internal\Infrastructure.Internal.csproj"/>
         <ProjectReference Include="..\Api.Shared\Api.Shared.csproj"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Content Include="..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
 </Project>

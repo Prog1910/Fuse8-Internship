@@ -1,4 +1,5 @@
 using Application.Internal;
+using Audit.Core;
 using Infrastructure.Internal;
 using Infrastructure.Internal.Services.Grpc;
 using InternalApi;
@@ -16,9 +17,8 @@ var builder = WebApplication.CreateBuilder();
 		.AddInfrastructure(builder.Configuration)
 		.AddApplication(builder.Configuration);
 
-	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://localhost:5000"), "InternalApi");
-	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://localhost:50051"), "GrpcServer");
-	builder.Services.AddHealthChecks().AddUrlGroup(new Uri("http://currencyapi.com"), "CurrencyApi");
+	builder.Services.AddHealthChecks()
+		.AddNpgSql(builder.Configuration.GetConnectionString("SummerSchool")!);
 
 	builder.WebHost.UseKestrel((builderContext, options) =>
 	{
@@ -38,7 +38,7 @@ var app = builder.Build();
 
 	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
 
-	app.MapHealthChecks("/health-check");
+	app.MapHealthChecks("/health");
 
 	SetupGrpcService(builder, app);
 
