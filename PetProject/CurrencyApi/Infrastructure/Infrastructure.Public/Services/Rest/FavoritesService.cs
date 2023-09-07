@@ -3,52 +3,68 @@ using Application.Public.Persistence;
 using Application.Shared.Dtos;
 using Domain.Aggregates;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Public.Services.Rest;
 
 public sealed class FavoritesService : IFavoritesService
 {
-	private readonly IFavoritesRepository _favoritesRepo;
+	private readonly IUserDbContext _userDbContext;
 
-	public FavoritesService(IFavoritesRepository favoritesRepo)
+	public FavoritesService(IUserDbContext userDbContext)
 	{
-		_favoritesRepo = favoritesRepo;
+		_userDbContext = userDbContext;
 	}
 
 	public async Task DeleteFavoritesByNameAsync(string name, CancellationToken cancellationToken)
 	{
-		await Task.Run(() =>
-		{
-			if (_favoritesRepo.TryDeleteFavoritesByName(name) is false)
-				throw new Exception("The favorites not found.");
-		}, cancellationToken);
+		FavoritesCache favorites = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken)
+								   ?? throw new Exception("An error occured while deleting favorites.");
+		_userDbContext.Favorites.Remove(favorites);
+		await _userDbContext.SaveChangesAsync();
 	}
 
 	public async Task<FavoritesDto?> GetFavoritesByNameAsync(string name, CancellationToken cancellationToken)
-		=> await Task.Run(() => _favoritesRepo.GetFavoritesByName(name)?.Adapt<FavoritesDto>()
-		                        ?? throw new Exception("The favorites not found."), cancellationToken);
+	{
+		FavoritesCache favorites = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken)
+								   ?? throw new Exception("An error occured while getting favorites.");
 
-	public async Task<List<FavoritesDto>?> GetAllFavoritesAsync(CancellationToken cancellationToken)
-		=> await Task.Run(() => _favoritesRepo.GetAllFavorites()?.Adapt<List<FavoritesDto>>()
-		                        ?? throw new Exception("The favorites not found."), cancellationToken);
+		return favorites.Adapt<FavoritesDto>();
+	}
+
+	public async Task<List<FavoritesDto>> GetAllFavoritesAsync()
+	{
+		List<FavoritesCache> allFavorites = await _userDbContext.Favorites.ToListAsync() ?? throw new Exception("An error occurred while getting favorites.");
+		return allFavorites.Adapt<List<FavoritesDto>>();
+	}
 
 	public async Task AddFavoritesAsync(FavoritesDto favoritesDto, CancellationToken cancellationToken)
 	{
-		await Task.Run(() =>
-		{
-			var favorites = favoritesDto.Adapt<FavoritesCache>();
-			if (_favoritesRepo.TryAddFavorites(favorites) is false)
-				throw new Exception("The favorites already exists.");
-		}, cancellationToken);
+		FavoritesCache favorites = favoritesDto.Adapt<FavoritesCache>();
+		if (_userDbContext.Favorites.Any(
+				f => f.Name.Equals(favorites.Name)
+					 || f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)))
+			throw new Exception("An error occured while adding favorites.");
+
+		_userDbContext.Favorites.Add(favorites);
+		await _userDbContext.SaveChangesAsync();
 	}
 
 	public async Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name, CancellationToken cancellationToken)
 	{
-		await Task.Run(() =>
-		{
-			var favorites = favoritesDto.Adapt<FavoritesCache>();
-			if (_favoritesRepo.TryUpdateFavoritesByName(favorites, name) is false)
-				throw new Exception("An error occured while updating favorites.");
-		}, cancellationToken);
+		FavoritesCache favorites = favoritesDto.Adapt<FavoritesCache>();
+		FavoritesCache favoritesToUpdate = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken) ?? throw new Exception("An error occured while updating favorites.");
+
+		// if (favoritesToUpdate.Equals(favorites)) return;
+
+		if (_userDbContext.Favorites.Where(f => f.Name.Equals(name) == false)
+			.Any(f => f.Name.Equals(favorites.Name)
+					  || f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)))
+			throw new Exception("An error occured while updating favorites.");
+
+		favoritesToUpdate.Name = favorites.Name;
+		favoritesToUpdate.CurrencyCode = favorites.CurrencyCode;
+		favoritesToUpdate.BaseCurrencyCode = favorites.BaseCurrencyCode;
+		await _userDbContext.SaveChangesAsync();
 	}
 }

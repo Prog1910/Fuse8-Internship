@@ -8,7 +8,7 @@ public sealed class FavoritesConfiguration : IEntityTypeConfiguration<FavoritesC
 {
 	public void Configure(EntityTypeBuilder<FavoritesCache> builder)
 	{
-		builder.HasKey(f => f.Name);
+		builder.HasKey(f => f.Id);
 
 		builder.HasIndex(f => f.Name).IsUnique();
 		builder.HasIndex(f => new { f.CurrencyCode, f.BaseCurrencyCode }).IsUnique();

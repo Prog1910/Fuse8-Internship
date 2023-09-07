@@ -1,5 +1,4 @@
 ﻿using Application.Internal.Interfaces.Rest;
-using Application.Internal.Persistence;
 using Domain.Aggregates;
 using Domain.Enums;
 using Domain.Errors;
@@ -12,31 +11,27 @@ namespace Infrastructure.Internal.Services.Rest;
 
 public sealed class CacheRecalculationService : ICacheRecalculationService
 {
-	private readonly ICurrencyRepository _currencyRepo;
-	private readonly ITaskRepository _taskRepo;
-	private readonly InternalApiOptions _options;
-	private readonly ILogger<ICacheRecalculationService> _logger;
 	private readonly CurDbContext _curDbContext;
+	private readonly ILogger<ICacheRecalculationService> _logger;
+	private readonly InternalApiOptions _options;
 
-	public CacheRecalculationService(IOptions<InternalApiOptions> options, ITaskRepository taskRepo, ICurrencyRepository currencyRepo, ILogger<ICacheRecalculationService> logger, CurDbContext curDbContext)
+	public CacheRecalculationService(IOptions<InternalApiOptions> options, CurDbContext curDbContext, ILogger<ICacheRecalculationService> logger)
 	{
 		_options = options.Value;
-		_taskRepo = taskRepo;
-		_currencyRepo = currencyRepo;
-		_logger = logger;
 		_curDbContext = curDbContext;
+		_logger = logger;
 	}
 
 	public async Task RecalculateCacheAsync(Guid cacheTaskId, CancellationToken cancellationToken)
 	{
-		var cacheTask = await _taskRepo.GetCacheTaskById(cacheTaskId) ?? throw new Exception("Cache task not found.");
+		CacheTask cacheTask = _curDbContext.CacheTasks.SingleOrDefault(t => t.Id.Equals(cacheTaskId)) ?? throw new Exception("Cache task not found.");
 		try
 		{
 			cacheTask.Status = CacheTaskStatus.InProgress;
 			await _curDbContext.SaveChangesAsync(cancellationToken);
-			if (_currencyRepo.GetAllCurrenciesOnDates()?.ToList() is { } currenciesOnDates)
+			if (_curDbContext.CurrenciesOnDates.OrderByDescending(cod => cod.LastUpdatedAt).AsEnumerable().ToList() is { } currenciesOnDates)
 			{
-				var newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
+				string newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
 				await RecalculateCurrencyCacheAsync(currenciesOnDates, newBaseCurrencyCode, cancellationToken);
 				_options.BaseCurrencyCode = newBaseCurrencyCode;
 				cacheTask.Status = CacheTaskStatus.CompletedSuccessfully;
@@ -55,15 +50,14 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 	{
 		await Task.Run(() =>
 		{
-			foreach (var currenciesOnDate in currenciesOnDates)
+			foreach (CurrenciesOnDateCache currenciesOnDate in currenciesOnDates)
 			{
 				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode)) continue;
 
 				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
-				// var relativeBaseCurrencyRate = currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value ?? throw new CurrencyNotFoundException();
-				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate) continue;
+				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate) throw new CurrencyNotFoundException();
 
-				var newCurrenciesOnDate = new CurrenciesOnDateCache
+				CurrenciesOnDateCache newCurrenciesOnDate = new CurrenciesOnDateCache
 				{
 					LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
 					BaseCurrencyCode = newBaseCurrencyCode,
@@ -73,7 +67,7 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 						return currency;
 					}).ToList()
 				};
-				_curDbContext.CurrenciesOnDate.Remove(currenciesOnDate);
+				_curDbContext.CurrenciesOnDates.Remove(currenciesOnDate);
 				_curDbContext.SaveChanges();
 				_curDbContext.Add(newCurrenciesOnDate);
 				_curDbContext.SaveChanges();

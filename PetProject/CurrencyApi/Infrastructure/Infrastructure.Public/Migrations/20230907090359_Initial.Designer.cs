@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Public.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230903222155_Initial")]
+    [Migration("20230907090359_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,24 +27,32 @@ namespace Infrastructure.Public.Migrations
 
             modelBuilder.Entity("Domain.Aggregates.FavoritesCache", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("name");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BaseCurrencyCode")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
                         .HasColumnName("base_currency_code");
 
                     b.Property<string>("CurrencyCode")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
                         .HasColumnName("currency_code");
 
-                    b.HasKey("Name")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
                         .HasName("pk_favorites");
 
                     b.HasIndex("Name")
@@ -80,8 +88,8 @@ namespace Infrastructure.Public.Migrations
 
                     b.Property<string>("DefaultCurrencyCode")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
                         .HasColumnName("default_currency_code");
 
                     b.HasKey("Id")
@@ -92,6 +100,14 @@ namespace Infrastructure.Public.Migrations
                             t.HasCheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 10");
 
                             t.HasCheckConstraint("CK_settings_default_currency_code_MinLength", "LENGTH(default_currency_code) >= 3");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CurrencyRoundCount = 2,
+                            DefaultCurrencyCode = "RUB"
                         });
                 });
 #pragma warning restore 612, 618

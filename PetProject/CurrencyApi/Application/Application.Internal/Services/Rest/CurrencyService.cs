@@ -29,24 +29,24 @@ public sealed class CurrencyService : ICurrencyApi
 
 	public async Task<Currency[]> GetAllCurrentCurrenciesAsync(string baseCurrencyCode, CancellationToken cancellationToken)
 	{
-		var requestUri = $"{_baseUrl}/latest?currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
-		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		var currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
+		string requestUri = $"{_baseUrl}/latest?currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
+		HttpResponseMessage response = await _httpClient.GetAsync(requestUri, cancellationToken);
+		CurrencyResponse currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
 
-		var currencies = currencyResponse.Data.Values.ToArray().Adapt<Currency[]>();
+		Currency[] currencies = currencyResponse.Data.Values.ToArray().Adapt<Currency[]>();
 
 		return currencies;
 	}
 
 	public async Task<CurrenciesOnDate> GetAllCurrenciesOnDateAsync(string baseCurrencyCode, DateOnly date, CancellationToken cancellationToken)
 	{
-		var requestUri = $"{_baseUrl}/historical?date={date}&currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
-		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		var currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
+		string requestUri = $"{_baseUrl}/historical?date={date}&currencies={_currencyTypes}&base_currency={baseCurrencyCode}";
+		HttpResponseMessage response = await _httpClient.GetAsync(requestUri, cancellationToken);
+		CurrencyResponse currencyResponse = await EnsureValidAndDeserializeResponse<CurrencyResponse>(response, cancellationToken);
 
-		var lastUpdatedAt = currencyResponse.Meta.LastUpdatedAt;
-		var currencies = currencyResponse.Data.Values.Adapt<Currency[]>();
-		var currenciesOnDate = new CurrenciesOnDate
+		string lastUpdatedAt = currencyResponse.Meta.LastUpdatedAt;
+		Currency[] currencies = currencyResponse.Data.Values.Adapt<Currency[]>();
+		CurrenciesOnDate currenciesOnDate = new CurrenciesOnDate
 		{
 			LastUpdatedAt = DateTime.Parse(lastUpdatedAt).Date.ToUniversalTime(),
 			Currencies = currencies
@@ -57,12 +57,12 @@ public sealed class CurrencyService : ICurrencyApi
 
 	public async Task<Settings> GetSettingsAsync(CancellationToken cancellationToken)
 	{
-		var requestUri = $"{_baseUrl}/status";
-		var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-		var settingsResponse = await EnsureValidAndDeserializeResponse<SettingsResponse>(response, cancellationToken);
+		string requestUri = $"{_baseUrl}/status";
+		HttpResponseMessage response = await _httpClient.GetAsync(requestUri, cancellationToken);
+		SettingsResponse settingsResponse = await EnsureValidAndDeserializeResponse<SettingsResponse>(response, cancellationToken);
 
-		var month = settingsResponse.Quotas.Month;
-		var settings = new Settings
+		MonthResponse month = settingsResponse.Quotas.Month;
+		Settings settings = new Settings
 		{
 			BaseCurrencyCode = _options.BaseCurrencyCode,
 			NewRequestsAvailable = month.Total > month.Used
@@ -87,11 +87,17 @@ public sealed class CurrencyService : ICurrencyApi
 	}
 
 	private void ConfigureRequestHeaders()
-		=> _httpClient.DefaultRequestHeaders.Add(name: "apikey", _options.ApiKey);
+	{
+		_httpClient.DefaultRequestHeaders.Add(name: "apikey", _options.ApiKey);
+	}
 
 	private static string CombineCurrencyTypesWithCommas()
-		=> string.Join(separator: ",", Enum.GetValues<CurrencyType>());
+	{
+		return string.Join(separator: ",", Enum.GetValues<CurrencyType>());
+	}
 
 	private static Exception GenerateInternalServerError(string message = "An error occurred.", Exception? exception = default)
-		=> new HttpRequestException(message, exception, HttpStatusCode.InternalServerError);
+	{
+		return new HttpRequestException(message, exception, HttpStatusCode.InternalServerError);
+	}
 }

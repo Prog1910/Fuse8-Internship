@@ -34,10 +34,10 @@ public static class DependencyInjection
 			{
 				if (auditEvent is not AuditEventHttpClient httpClientEvent) return auditEvent.ToJson();
 
-				var contentBody = httpClientEvent.Action?.Response?.Content?.Body;
+				object? contentBody = httpClientEvent.Action?.Response?.Content?.Body;
 				if (contentBody is not string { Length: > 1000 } stringBody) return auditEvent.ToJson();
 
-				var responseContent = httpClientEvent.Action!.Response?.Content;
+				Content? responseContent = httpClientEvent.Action!.Response?.Content;
 				if (responseContent is not null) responseContent.Body = stringBody[..1000] + "<...>";
 				return auditEvent.ToJson();
 			}));

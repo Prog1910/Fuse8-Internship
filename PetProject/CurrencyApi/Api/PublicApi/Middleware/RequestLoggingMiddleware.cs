@@ -13,7 +13,7 @@ public sealed class RequestLoggingMiddleware
 
 	public async Task InvokeAsync(HttpContext context)
 	{
-		var request = context.Request;
+		HttpRequest request = context.Request;
 		_logger.LogInformation(message: "Request - {Method} {Path} {QueryString}", request.Method, request.Path, request.QueryString);
 		await _next(context);
 	}

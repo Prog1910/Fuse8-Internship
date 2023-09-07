@@ -1,15 +1,16 @@
 using Application.Internal;
-using Audit.Core;
 using Infrastructure.Internal;
+using Infrastructure.Internal.Persistence;
 using Infrastructure.Internal.Services.Grpc;
 using InternalApi;
 using InternalApi.Middleware;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 
-var builder = WebApplication.CreateBuilder();
+WebApplicationBuilder builder = WebApplication.CreateBuilder();
 {
 	ConfigureSerilog(builder);
 
@@ -22,7 +23,7 @@ var builder = WebApplication.CreateBuilder();
 
 	builder.WebHost.UseKestrel((builderContext, options) =>
 	{
-		var grpcPort = builderContext.Configuration.GetValue<int>("GrpcPort");
+		int grpcPort = builderContext.Configuration.GetValue<int>("GrpcPort");
 		options.ConfigureEndpointDefaults(p =>
 		{
 			p.Protocols = p.IPEndPoint!.Port == grpcPort ? HttpProtocols.Http2 : HttpProtocols.Http1;
@@ -30,7 +31,7 @@ var builder = WebApplication.CreateBuilder();
 	});
 }
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 {
 	SetupSwagger(app);
 
@@ -42,6 +43,13 @@ var app = builder.Build();
 
 	SetupGrpcService(builder, app);
 
+	using IServiceScope scope = app.Services.CreateScope();
+	{
+		IServiceProvider services = scope.ServiceProvider;
+		CurDbContext context = services.GetRequiredService<CurDbContext>();
+		if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
+	}
+
 	await app.RunAsync();
 }
 return;
@@ -49,11 +57,11 @@ return;
 static void SetupGrpcService(WebApplicationBuilder builder, IApplicationBuilder app)
 {
 	app.UseWhen(context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
-	            grpcBuilder =>
-	            {
-		            grpcBuilder.UseRouting();
-		            grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
-	            });
+				grpcBuilder =>
+				{
+					grpcBuilder.UseRouting();
+					grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
+				});
 }
 
 static void SetupSwagger(WebApplication app)

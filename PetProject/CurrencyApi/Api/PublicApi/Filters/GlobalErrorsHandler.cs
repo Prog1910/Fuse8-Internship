@@ -17,12 +17,12 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 
 	public void OnException(ExceptionContext context)
 	{
-		var error = context.Exception;
+		Exception error = context.Exception;
 
 		if (error is RpcException rpcException)
 		{
-			var status = rpcException.Status;
-			var exception = status.DebugException;
+			Status status = rpcException.Status;
+			Exception? exception = status.DebugException;
 			context.Result = new ObjectResult(new ProblemDetails
 			{
 				Title = exception?.GetType().Name,
@@ -39,7 +39,7 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 				context.Result = new ObjectResult(new ProblemDetails
 				{
 					Title = error.GetType().Name,
-					Detail = error.Message,
+					Detail = error.Message
 				});
 				LogError(error);
 			}
@@ -48,5 +48,8 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 		context.ExceptionHandled = true;
 	}
 
-	private void LogError(Exception? exception) => _logger.LogError(exception, "An error occurred.");
+	private void LogError(Exception? exception)
+	{
+		_logger.LogError(exception, message: "An error occurred.");
+	}
 }

@@ -16,7 +16,7 @@ service CurrencyGrpc {
 
     rpc GetSettings (google.protobuf.Empty) returns (SettingsResponse);
 }
- 
+
 message CurrencyRequest {
     CurrencyType default_currency_code = 1;
 }

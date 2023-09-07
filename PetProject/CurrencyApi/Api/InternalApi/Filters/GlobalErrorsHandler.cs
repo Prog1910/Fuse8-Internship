@@ -17,11 +17,11 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 
 	public void OnException(ExceptionContext context)
 	{
-		var error = context.Exception;
+		Exception? error = context.Exception;
 
 		if (error is RpcException rpcException)
 		{
-			var status = rpcException.Status;
+			Status status = rpcException.Status;
 			error = status.DebugException;
 			context.Result = new ObjectResult(new ProblemDetails
 			{
@@ -44,5 +44,8 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 		context.ExceptionHandled = true;
 	}
 
-	private void LogError(Exception? exception) => _logger.LogError(exception, "An error occurred.");
+	private void LogError(Exception? exception)
+	{
+		_logger.LogError(exception, message: "An error occurred.");
+	}
 }

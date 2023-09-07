@@ -48,7 +48,12 @@ namespace Infrastructure.Internal.Migrations
                     b.HasKey("Id")
                         .HasName("pk_cache_tasks");
 
-                    b.ToTable("cache_tasks", "cur");
+                    b.ToTable("cache_tasks", "cur", t =>
+                        {
+                            t.HasCheckConstraint("CK_cache_tasks_base_currency_code_MinLength", "LENGTH(base_currency_code) >= 3");
+
+                            t.HasCheckConstraint("CK_cache_tasks_status_Enum", "status IN ('Created', 'InProgress', 'CompletedSuccessfully', 'CompletedWithError', 'Cancelled')");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Aggregates.CurrenciesOnDateCache", b =>
@@ -63,9 +68,12 @@ namespace Infrastructure.Internal.Migrations
                         .HasColumnName("base_currency_code");
 
                     b.HasKey("LastUpdatedAt", "BaseCurrencyCode")
-                        .HasName("pk_currencies_on_date");
+                        .HasName("pk_currencies_on_dates");
 
-                    b.ToTable("currencies_on_date", "cur");
+                    b.ToTable("currencies_on_dates", "cur", t =>
+                        {
+                            t.HasCheckConstraint("CK_currencies_on_dates_base_currency_code_MinLength", "LENGTH(base_currency_code) >= 3");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Aggregates.CurrenciesOnDateCache", b =>
@@ -103,11 +111,14 @@ namespace Infrastructure.Internal.Migrations
                             b1.HasIndex("Code")
                                 .HasDatabaseName("ix_currency_code");
 
-                            b1.ToTable("currency", "cur");
+                            b1.ToTable("currency", "cur", t =>
+                                {
+                                    t.HasCheckConstraint("CK_currency_currency_code_MinLength", "LENGTH(currency_code) >= 3");
+                                });
 
                             b1.WithOwner()
                                 .HasForeignKey("LastUpdatedAt", "BaseCurrencyCode")
-                                .HasConstraintName("fk_currency_currencies_on_date_currencies_on_date_cache_temp_id");
+                                .HasConstraintName("fk_currency_currencies_on_dates_currencies_on_date_cache_temp_");
                         });
 
                     b.Navigation("Currencies");

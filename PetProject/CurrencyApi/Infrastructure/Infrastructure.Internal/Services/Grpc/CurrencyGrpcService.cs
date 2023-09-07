@@ -1,4 +1,5 @@
 ﻿using Application.Internal.Interfaces.Rest;
+using Application.Shared.Dtos;
 using Domain.Errors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -22,8 +23,8 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var defaultCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
-			var currencyDto = await _cacheCurrencyService.GetCurrentCurrencyAsync(defaultCurrencyCode, context.CancellationToken);
+			CurrencyType defaultCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
+			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrentCurrencyAsync(defaultCurrencyCode, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -37,9 +38,9 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var defaultCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
-			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
-			var currencyDto = await _cacheCurrencyService.GetCurrencyOnDateAsync(defaultCurrencyCode, date, context.CancellationToken);
+			CurrencyType defaultCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
+			DateOnly date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
+			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyOnDateAsync(defaultCurrencyCode, date, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -53,9 +54,9 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
-			var favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
-			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, default, context.CancellationToken);
+			CurrencyType favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
+			CurrencyType favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
+			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date: default, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -69,10 +70,10 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
-			var favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
-			var date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
-			var currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
+			CurrencyType favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
+			CurrencyType favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
+			DateOnly date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
+			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -86,7 +87,7 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 	{
 		try
 		{
-			var settingsDto = await _cacheCurrencyService.GetSettingsAsync(context.CancellationToken);
+			SettingsDto settingsDto = await _cacheCurrencyService.GetSettingsAsync(context.CancellationToken);
 
 			return settingsDto.Adapt<SettingsResponse>();
 		}
@@ -105,6 +106,9 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 			_ => new RpcException(CreateStatus(HttpStatusCode.InternalServerError))
 		};
 
-		Status CreateStatus(HttpStatusCode httpStatusCode) => new((StatusCode)httpStatusCode, exception.Message, exception);
+		Status CreateStatus(HttpStatusCode httpStatusCode)
+		{
+			return new Status((StatusCode)httpStatusCode, exception.Message, exception);
+		}
 	}
 }

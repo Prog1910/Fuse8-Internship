@@ -1,7 +1,6 @@
 ﻿using Application.Public.Interfaces.Rest;
 using Application.Public.Persistence;
 using Infrastructure.Public.Persistence;
-using Infrastructure.Public.Persistence.Repositories;
 using Infrastructure.Public.Services.Rest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -18,9 +17,7 @@ public static class DependencyInjection
 	{
 		services.AddRestServices();
 
-		services.AddPersistence();
-
-		services.AddPublicDbContext(configuration);
+		services.AddPersistence(configuration);
 
 		return services;
 	}
@@ -32,7 +29,7 @@ public static class DependencyInjection
 		services.AddScoped<ISettingsService, SettingsService>();
 	}
 
-	private static void AddPublicDbContext(this IServiceCollection services, IConfiguration configuration)
+	private static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<UserDbContext>(options =>
 		{
@@ -46,18 +43,14 @@ public static class DependencyInjection
 				.UseAllCheckConstraints()
 				.EnableDetailedErrors()
 				.ConfigureWarnings(p => p.Log(
-						                   (CoreEventId.StartedTracking, LogLevel.Information),
-						                   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
-						                   (RelationalEventId.CommandCanceled, LogLevel.Warning))
-					                   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
+										   (CoreEventId.StartedTracking, LogLevel.Information),
+										   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
+										   (RelationalEventId.CommandCanceled, LogLevel.Warning))
+									   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
 
 			options.UseSnakeCaseNamingConvention();
 		});
-	}
 
-	private static void AddPersistence(this IServiceCollection services)
-	{
-		services.AddScoped<ISettingsRepository, SettingsRepository>();
-		services.AddScoped<IFavoritesRepository, FavoritesRepository>();
+		services.AddScoped<IUserDbContext>(provider => provider.GetRequiredService<UserDbContext>());
 	}
 }

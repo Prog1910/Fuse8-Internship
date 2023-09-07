@@ -19,13 +19,15 @@ namespace Infrastructure.Public.Migrations
                 schema: "user",
                 columns: table => new
                 {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    currency_code = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
-                    base_currency_code = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false)
+                    currency_code = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
+                    base_currency_code = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_favorites", x => x.name);
+                    table.PrimaryKey("pk_favorites", x => x.id);
                     table.CheckConstraint("CK_favorites_base_currency_code_MinLength", "LENGTH(base_currency_code) >= 3");
                     table.CheckConstraint("CK_favorites_currency_code_MinLength", "LENGTH(currency_code) >= 3");
                     table.CheckConstraint("CK_favorites_name_MinLength", "LENGTH(name) >= 1");
@@ -38,7 +40,7 @@ namespace Infrastructure.Public.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    default_currency_code = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    default_currency_code = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
                     currency_round_count = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -51,9 +53,9 @@ namespace Infrastructure.Public.Migrations
             migrationBuilder.InsertData(
                 schema: "user",
                 table: "settings",
-                columns: new[] { "id", "default_currency_code", "currency_round_count" },
-                values: new object[] { 1, "RUB", 2 });
-            
+                columns: new[] { "id", "currency_round_count", "default_currency_code" },
+                values: new object[] { 1, 2, "RUB" });
+
             migrationBuilder.CreateIndex(
                 name: "ix_favorites_currency_code_base_currency_code",
                 schema: "user",

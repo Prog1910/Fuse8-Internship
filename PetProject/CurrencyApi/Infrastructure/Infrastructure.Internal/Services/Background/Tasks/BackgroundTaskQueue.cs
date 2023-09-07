@@ -2,7 +2,7 @@
 using Domain.Aggregates;
 using System.Threading.Channels;
 
-namespace Application.Internal.Services.Background.Tasks;
+namespace Infrastructure.Internal.Services.Background.Tasks;
 
 public sealed class BackgroundTaskQueue : IBackgroundTaskQueue
 {
@@ -10,13 +10,17 @@ public sealed class BackgroundTaskQueue : IBackgroundTaskQueue
 
 	public BackgroundTaskQueue()
 	{
-		var options = new BoundedChannelOptions(32) { FullMode = BoundedChannelFullMode.Wait };
+		BoundedChannelOptions options = new BoundedChannelOptions(32) { FullMode = BoundedChannelFullMode.Wait };
 		_queue = Channel.CreateBounded<CacheTask>(options);
 	}
 
 	public ValueTask QueueAsync(CacheTask cacheTask)
-		=> _queue.Writer.WriteAsync(cacheTask);
+	{
+		return _queue.Writer.WriteAsync(cacheTask);
+	}
 
 	public ValueTask<CacheTask> DequeueAsync(CancellationToken cancellationToken)
-		=> _queue.Reader.ReadAsync(cancellationToken);
+	{
+		return _queue.Reader.ReadAsync(cancellationToken);
+	}
 }

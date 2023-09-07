@@ -1,12 +1,14 @@
 ﻿using Application.Public;
 using Infrastructure.Public;
+using Infrastructure.Public.Persistence;
+using Microsoft.EntityFrameworkCore;
 using PublicApi;
 using PublicApi.Middleware;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 {
 	ConfigureSerilog(builder);
 
@@ -17,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 	builder.Services.AddHealthChecks();
 }
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 {
 	SetupSwagger(app);
 
@@ -26,6 +28,13 @@ var app = builder.Build();
 	app.UseRouting().UseEndpoints(endpoints => endpoints.MapControllers());
 
 	app.MapHealthChecks("/health");
+
+	using IServiceScope scope = app.Services.CreateScope();
+	{
+		IServiceProvider services = scope.ServiceProvider;
+		UserDbContext context = services.GetRequiredService<UserDbContext>();
+		if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
+	}
 
 	await app.RunAsync();
 }

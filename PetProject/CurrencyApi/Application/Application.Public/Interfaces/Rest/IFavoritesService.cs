@@ -6,7 +6,7 @@ public interface IFavoritesService
 {
 	Task<FavoritesDto?> GetFavoritesByNameAsync(string name, CancellationToken cancellationToken);
 
-	Task<List<FavoritesDto>?> GetAllFavoritesAsync(CancellationToken cancellationToken);
+	Task<List<FavoritesDto>> GetAllFavoritesAsync();
 
 	Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name, CancellationToken cancellationToken);
 

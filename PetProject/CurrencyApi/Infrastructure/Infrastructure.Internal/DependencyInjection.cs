@@ -1,7 +1,9 @@
-﻿using Application.Internal.Interfaces.Rest;
-using Application.Internal.Persistence;
+﻿using Application.Internal.Interfaces.Background;
+using Application.Internal.Interfaces.Persistence;
+using Application.Internal.Interfaces.Rest;
 using Infrastructure.Internal.Persistence;
-using Infrastructure.Internal.Persistence.Repositories;
+using Infrastructure.Internal.Services.Background;
+using Infrastructure.Internal.Services.Background.Tasks;
 using Infrastructure.Internal.Services.Rest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -16,9 +18,9 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddInternalDbContext(configuration);
+		services.AddPersistence(configuration);
 
-		services.AddPersistence();
+		services.AddBackgroundServices();
 
 		services.AddRestServices();
 
@@ -30,7 +32,14 @@ public static class DependencyInjection
 		services.AddScoped<ICacheRecalculationService, CacheRecalculationService>();
 	}
 
-	private static void AddInternalDbContext(this IServiceCollection services, IConfiguration configuration)
+	private static void AddBackgroundServices(this IServiceCollection services)
+	{
+		services.AddScoped<ICacheTaskManagerService, CacheTaskManagerService>();
+		services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+		services.AddHostedService<QueuedHostedService>();
+	}
+
+	private static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<CurDbContext>(options =>
 		{
@@ -41,19 +50,16 @@ public static class DependencyInjection
 						sqlOptionsBuilder.EnableRetryOnFailure();
 						sqlOptionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName, schema: "cur");
 					})
+				.UseAllCheckConstraints()
 				.EnableDetailedErrors()
 				.ConfigureWarnings(p => p.Log(
-						                   (CoreEventId.StartedTracking, LogLevel.Information),
-						                   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
-						                   (RelationalEventId.CommandCanceled, LogLevel.Warning))
-					                   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
+										   (CoreEventId.StartedTracking, LogLevel.Information),
+										   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
+										   (RelationalEventId.CommandCanceled, LogLevel.Warning))
+									   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
 			options.UseSnakeCaseNamingConvention();
 		});
-	}
 
-	private static void AddPersistence(this IServiceCollection services)
-	{
-		services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-		services.AddScoped<ITaskRepository, TaskRepository>();
+		services.AddScoped<ICurDbContext>(provider => provider.GetRequiredService<CurDbContext>());
 	}
 }
