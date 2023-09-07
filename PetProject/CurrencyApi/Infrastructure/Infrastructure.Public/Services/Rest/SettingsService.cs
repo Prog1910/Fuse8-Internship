@@ -1,7 +1,6 @@
 using Application.Public.Interfaces.Rest;
 using Application.Public.Persistence;
 using Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Public.Services.Rest;
 

@@ -26,7 +26,7 @@ public sealed class UserDbContext : DbContext, IUserDbContext
 
 		modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
-		SettingsCache settings = new SettingsCache { Id = 1, DefaultCurrencyCode = CurrencyType.RUB.ToString(), CurrencyRoundCount = 2 };
+		SettingsCache settings = new() { Id = 1, DefaultCurrencyCode = CurrencyType.RUB.ToString(), CurrencyRoundCount = 2 };
 		modelBuilder.Entity<SettingsCache>().HasData(settings);
 
 		base.OnModelCreating(modelBuilder);

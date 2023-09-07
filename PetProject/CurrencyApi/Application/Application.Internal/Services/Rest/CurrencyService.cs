@@ -46,7 +46,7 @@ public sealed class CurrencyService : ICurrencyApi
 
 		string lastUpdatedAt = currencyResponse.Meta.LastUpdatedAt;
 		Currency[] currencies = currencyResponse.Data.Values.Adapt<Currency[]>();
-		CurrenciesOnDate currenciesOnDate = new CurrenciesOnDate
+		CurrenciesOnDate currenciesOnDate = new()
 		{
 			LastUpdatedAt = DateTime.Parse(lastUpdatedAt).Date.ToUniversalTime(),
 			Currencies = currencies
@@ -62,7 +62,7 @@ public sealed class CurrencyService : ICurrencyApi
 		SettingsResponse settingsResponse = await EnsureValidAndDeserializeResponse<SettingsResponse>(response, cancellationToken);
 
 		MonthResponse month = settingsResponse.Quotas.Month;
-		Settings settings = new Settings
+		Settings settings = new()
 		{
 			BaseCurrencyCode = _options.BaseCurrencyCode,
 			NewRequestsAvailable = month.Total > month.Used

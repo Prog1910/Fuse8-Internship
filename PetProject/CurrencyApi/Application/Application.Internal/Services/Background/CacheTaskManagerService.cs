@@ -1,16 +1,16 @@
 ﻿using Application.Internal.Interfaces.Background;
+using Application.Internal.Interfaces.Persistence;
 using Domain.Aggregates;
 using Domain.Enums;
-using Infrastructure.Internal.Persistence;
 
-namespace Infrastructure.Internal.Services.Background;
+namespace Application.Internal.Services.Background;
 
 public sealed class CacheTaskManagerService : ICacheTaskManagerService
 {
-	private readonly CurDbContext _curDbContext;
+	private readonly ICurDbContext _curDbContext;
 	private readonly IBackgroundTaskQueue _taskQueue;
 
-	public CacheTaskManagerService(CurDbContext curDbContext, IBackgroundTaskQueue taskQueue)
+	public CacheTaskManagerService(ICurDbContext curDbContext, IBackgroundTaskQueue taskQueue)
 	{
 		_curDbContext = curDbContext;
 		_taskQueue = taskQueue;

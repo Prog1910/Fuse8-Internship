@@ -3,12 +3,11 @@ using Application.Internal.Interfaces.Persistence;
 using Application.Internal.Interfaces.Rest;
 using Domain.Aggregates;
 using Domain.Enums;
-using Infrastructure.Internal.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Internal.Services.Background;
+namespace Application.Internal.Services.Background;
 
 public sealed class QueuedHostedService : BackgroundService
 {
@@ -26,12 +25,12 @@ public sealed class QueuedHostedService : BackgroundService
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
 		using IServiceScope scope = _services.CreateScope();
-		ICurDbContext curDbContext = scope.ServiceProvider.GetRequiredService<CurDbContext>();
+		ICurDbContext curDbContext = scope.ServiceProvider.GetRequiredService<ICurDbContext>();
 		List<CacheTask> incompleteTasks = curDbContext.CacheTasks.Where(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress).ToList();
 		if (incompleteTasks.FirstOrDefault() is { } taskToQueue)
 		{
 			await _taskQueue.QueueAsync(taskToQueue);
-			foreach (CacheTask taskToCancel in incompleteTasks.Where(taskToCancel => !taskToCancel.Id.Equals(taskToQueue.Id)))
+			foreach (CacheTask taskToCancel in incompleteTasks.Where(taskToCancel => taskToCancel.Id.Equals(taskToQueue.Id) == false))
 			{
 				taskToCancel.Status = CacheTaskStatus.Cancelled;
 			}

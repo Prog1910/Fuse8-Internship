@@ -52,7 +52,7 @@ services:
     depends_on:
       postgres:
         condition:
-          service_started
+          service_healthy
     healthcheck:
       test: curl --fail http://${INTERNAL_API_CONTAINER_NAME}:${INTERNAL_API_REST_PORT}/health || exit 1
       interval: 60s

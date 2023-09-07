@@ -1,4 +1,7 @@
-﻿using Application.Internal.Interfaces.Rest;
+﻿using Application.Internal.Interfaces.Background;
+using Application.Internal.Interfaces.Rest;
+using Application.Internal.Services.Background;
+using Application.Internal.Services.Background.Tasks;
 using Application.Internal.Services.Rest;
 using Audit.Http;
 using Domain.Options;
@@ -15,7 +18,16 @@ public static class DependencyInjection
 	{
 		services.Configure<InternalApiOptions>(configuration.GetSection(InternalApiOptions.SectionName));
 
+		services.AddBackgroundServices();
+
 		services.AddRestServices();
+	}
+
+	private static void AddBackgroundServices(this IServiceCollection services)
+	{
+		services.AddScoped<ICacheTaskManagerService, CacheTaskManagerService>();
+		services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+		services.AddHostedService<QueuedHostedService>();
 	}
 
 	private static void AddRestServices(this IServiceCollection services)

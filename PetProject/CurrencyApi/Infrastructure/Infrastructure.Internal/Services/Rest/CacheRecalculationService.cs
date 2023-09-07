@@ -57,7 +57,7 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
 				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate) throw new CurrencyNotFoundException();
 
-				CurrenciesOnDateCache newCurrenciesOnDate = new CurrenciesOnDateCache
+				CurrenciesOnDateCache newCurrenciesOnDate = new()
 				{
 					LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
 					BaseCurrencyCode = newBaseCurrencyCode,

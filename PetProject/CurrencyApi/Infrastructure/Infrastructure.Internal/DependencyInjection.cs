@@ -1,9 +1,6 @@
-﻿using Application.Internal.Interfaces.Background;
-using Application.Internal.Interfaces.Persistence;
+﻿using Application.Internal.Interfaces.Persistence;
 using Application.Internal.Interfaces.Rest;
 using Infrastructure.Internal.Persistence;
-using Infrastructure.Internal.Services.Background;
-using Infrastructure.Internal.Services.Background.Tasks;
 using Infrastructure.Internal.Services.Rest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -20,8 +17,6 @@ public static class DependencyInjection
 	{
 		services.AddPersistence(configuration);
 
-		services.AddBackgroundServices();
-
 		services.AddRestServices();
 
 		return services;
@@ -30,13 +25,6 @@ public static class DependencyInjection
 	private static void AddRestServices(this IServiceCollection services)
 	{
 		services.AddScoped<ICacheRecalculationService, CacheRecalculationService>();
-	}
-
-	private static void AddBackgroundServices(this IServiceCollection services)
-	{
-		services.AddScoped<ICacheTaskManagerService, CacheTaskManagerService>();
-		services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-		services.AddHostedService<QueuedHostedService>();
 	}
 
 	private static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
