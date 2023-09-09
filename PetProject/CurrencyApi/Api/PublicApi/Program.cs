@@ -47,7 +47,7 @@ static void SetupSwagger(WebApplication app)
 		app.UseSwagger();
 		app.UseSwaggerUI(options =>
 		{
-			options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+			options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 			options.RoutePrefix = "swagger";
 		});
 	}

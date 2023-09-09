@@ -24,10 +24,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder();
 	builder.WebHost.UseKestrel((builderContext, options) =>
 	{
 		int grpcPort = builderContext.Configuration.GetValue<int>("GrpcPort");
-		options.ConfigureEndpointDefaults(p =>
-		{
-			p.Protocols = p.IPEndPoint!.Port == grpcPort ? HttpProtocols.Http2 : HttpProtocols.Http1;
-		});
+		options.ConfigureEndpointDefaults(p => { p.Protocols = p.IPEndPoint!.Port == grpcPort ? HttpProtocols.Http2 : HttpProtocols.Http1; });
 	});
 }
 
@@ -57,11 +54,11 @@ return;
 static void SetupGrpcService(WebApplicationBuilder builder, IApplicationBuilder app)
 {
 	app.UseWhen(context => context.Connection.LocalPort == builder.Configuration.GetValue<int>("GrpcPort"),
-				grpcBuilder =>
-				{
-					grpcBuilder.UseRouting();
-					grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
-				});
+		grpcBuilder =>
+		{
+			grpcBuilder.UseRouting();
+			grpcBuilder.UseEndpoints(endpoints => endpoints.MapGrpcService<CurrencyGrpcService>());
+		});
 }
 
 static void SetupSwagger(WebApplication app)
@@ -71,7 +68,7 @@ static void SetupSwagger(WebApplication app)
 		app.UseSwagger();
 		app.UseSwaggerUI(options =>
 		{
-			options.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+			options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 			options.RoutePrefix = "swagger";
 		});
 	}

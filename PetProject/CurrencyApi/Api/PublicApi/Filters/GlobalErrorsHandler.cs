@@ -50,6 +50,6 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 
 	private void LogError(Exception? exception)
 	{
-		_logger.LogError(exception, message: "An error occurred.");
+		_logger.LogError(exception, "An error occurred.");
 	}
 }

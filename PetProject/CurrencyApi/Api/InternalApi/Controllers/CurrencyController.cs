@@ -67,9 +67,11 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="429"> You have reached your rate or monthly limit for accessing this endpoint. </response>
 	/// <response code="500"> An internal server error occurred while processing the request. </response>
 	[HttpGet("favorites/"), ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentFavoritesByName([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrentFavoritesByName([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode,
+		CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode, (Domain.Enums.CurrencyType)baseCurrencyCode, date: default, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode,
+			(Domain.Enums.CurrencyType)baseCurrencyCode, default, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -86,9 +88,11 @@ public sealed class CurrencyController : ControllerBase
 	/// <response code="429"> You have reached your rate or monthly limit for accessing this endpoint. </response>
 	/// <response code="500"> An internal server error occurred while processing the request. </response>
 	[HttpGet("favorites/{date}"), ProducesDefaultResponseType(typeof(CurrencyResponse))]
-	public async Task<IActionResult> GetCurrentFavorites([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode, [FromRoute] DateOnly date, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCurrentFavorites([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode,
+		[FromRoute] DateOnly date, CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode, (Domain.Enums.CurrencyType)baseCurrencyCode, date, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode,
+			(Domain.Enums.CurrencyType)baseCurrencyCode, date, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}

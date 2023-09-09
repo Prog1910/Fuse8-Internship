@@ -36,15 +36,15 @@ public static class DependencyInjection
 					sqlOptionsBuilder =>
 					{
 						sqlOptionsBuilder.EnableRetryOnFailure();
-						sqlOptionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName, schema: "cur");
+						sqlOptionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "cur");
 					})
 				.UseAllCheckConstraints()
 				.EnableDetailedErrors()
 				.ConfigureWarnings(p => p.Log(
-										   (CoreEventId.StartedTracking, LogLevel.Information),
-										   (RelationalEventId.TransactionRolledBack, LogLevel.Warning),
-										   (RelationalEventId.CommandCanceled, LogLevel.Warning))
-									   .Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
+						(CoreEventId.StartedTracking, LogLevel.Information),
+						(RelationalEventId.TransactionRolledBack, LogLevel.Warning),
+						(RelationalEventId.CommandCanceled, LogLevel.Warning))
+					.Ignore(RelationalEventId.CommandCreated, RelationalEventId.ConnectionCreated));
 			options.UseSnakeCaseNamingConvention();
 		});
 

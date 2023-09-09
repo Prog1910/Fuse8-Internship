@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http.Json;
 using Application.Internal.Interfaces.Rest;
 using Application.Internal.Services.Rest.Responses;
 using Domain.Aggregates;
@@ -6,8 +8,6 @@ using Domain.Errors;
 using Domain.Options;
 using Mapster;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Http.Json;
 
 namespace Application.Internal.Services.Rest;
 
@@ -88,12 +88,12 @@ public sealed class CurrencyService : ICurrencyApi
 
 	private void ConfigureRequestHeaders()
 	{
-		_httpClient.DefaultRequestHeaders.Add(name: "apikey", _options.ApiKey);
+		_httpClient.DefaultRequestHeaders.Add("apikey", _options.ApiKey);
 	}
 
 	private static string CombineCurrencyTypesWithCommas()
 	{
-		return string.Join(separator: ",", Enum.GetValues<CurrencyType>());
+		return string.Join(",", Enum.GetValues<CurrencyType>());
 	}
 
 	private static Exception GenerateInternalServerError(string message = "An error occurred.", Exception? exception = default)

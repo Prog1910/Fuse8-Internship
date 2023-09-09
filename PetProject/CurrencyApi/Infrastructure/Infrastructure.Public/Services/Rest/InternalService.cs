@@ -44,7 +44,8 @@ public sealed class InternalService : IInternalApi
 
 	public async Task<CurrencyDto> GetCurrentFavoritesByNameAsync(string name, CancellationToken cancellationToken)
 	{
-		FavoritesDto favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name, cancellationToken) ?? throw new Exception("The favorite currencies not found.");
+		FavoritesDto favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name, cancellationToken)
+								   ?? throw new Exception("The favorite currencies not found.");
 
 		CurrencyResponse? currencyProto = await _grpcClient.GetCurrentFavoritesAsync(new FavoriteCurrencyRequest
 		{
@@ -58,7 +59,8 @@ public sealed class InternalService : IInternalApi
 
 	public async Task<CurrencyDto> GetFavoritesOnDateByNameAsync(string name, DateOnly date, CancellationToken cancellationToken)
 	{
-		FavoritesDto favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name, cancellationToken) ?? throw new Exception("The favorite currencies not found.");
+		FavoritesDto favoriteDto = await _favoritesService.GetFavoritesByNameAsync(name, cancellationToken)
+								   ?? throw new Exception("The favorite currencies not found.");
 
 		CurrencyResponse? currencyProto = await _grpcClient.GetFavoritesOnDateAsync(new FavoriteCurrencyOnDateRequest
 		{

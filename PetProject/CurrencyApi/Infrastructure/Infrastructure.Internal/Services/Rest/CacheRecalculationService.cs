@@ -47,7 +47,7 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 		{
 			cacheTask.Status = CacheTaskStatus.CompletedWithError;
 			await _curDbContext.SaveChangesAsync(cancellationToken);
-			_logger.LogError(e, message: "An error occurred while recalculating cache.");
+			_logger.LogError(e, "An error occurred while recalculating cache.");
 		}
 	}
 
@@ -58,11 +58,16 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 		{
 			foreach (CurrenciesOnDateCache currenciesOnDate in currenciesOnDates)
 			{
-				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode)) continue;
+				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode))
+				{
+					continue;
+				}
 
 				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
 				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate)
+				{
 					throw new CurrencyNotFoundException();
+				}
 
 				CurrenciesOnDateCache newCurrenciesOnDate = new()
 				{

@@ -43,8 +43,10 @@ public sealed class FavoritesService : IFavoritesService
 		FavoritesCache favorites = favoritesDto.Adapt<FavoritesCache>();
 		if (_userDbContext.Favorites.Any(
 				f => f.Name.Equals(favorites.Name)
-					 || f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)))
+					 || (f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode))))
+		{
 			throw new Exception("An error occured while adding favorites.");
+		}
 
 		_userDbContext.Favorites.Add(favorites);
 		await _userDbContext.SaveChangesAsync();
@@ -53,14 +55,17 @@ public sealed class FavoritesService : IFavoritesService
 	public async Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name, CancellationToken cancellationToken)
 	{
 		FavoritesCache favorites = favoritesDto.Adapt<FavoritesCache>();
-		FavoritesCache favoritesToUpdate = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken) ?? throw new Exception("An error occured while updating favorites.");
+		FavoritesCache favoritesToUpdate = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken)
+										   ?? throw new Exception("An error occured while updating favorites.");
 
 		// if (favoritesToUpdate.Equals(favorites)) return;
 
 		if (_userDbContext.Favorites.Where(f => f.Name.Equals(name) == false)
 			.Any(f => f.Name.Equals(favorites.Name)
-					  || f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode)))
+					  || (f.CurrencyCode.Equals(favorites.CurrencyCode) && f.BaseCurrencyCode.Equals(favorites.BaseCurrencyCode))))
+		{
 			throw new Exception("An error occured while updating favorites.");
+		}
 
 		favoritesToUpdate.Name = favorites.Name;
 		favoritesToUpdate.CurrencyCode = favorites.CurrencyCode;

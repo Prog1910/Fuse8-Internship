@@ -1,10 +1,10 @@
-﻿using Audit.Core;
+﻿using System.Text.Json.Serialization;
+using Audit.Core;
 using Audit.Http;
 using Microsoft.OpenApi.Models;
 using Protos;
 using PublicApi.Filters;
 using PublicApi.Mapping;
-using System.Text.Json.Serialization;
 
 namespace PublicApi;
 
@@ -60,7 +60,7 @@ public static class DependencyInjection
 		services.AddSwaggerGen(options =>
 
 		{
-			options.SwaggerDoc(name: "v1", new OpenApiInfo
+			options.SwaggerDoc("v1", new OpenApiInfo
 			{
 				Version = "v1",
 				Title = "Public API"

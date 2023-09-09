@@ -1,5 +1,5 @@
-﻿using Domain.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Domain.Enums;
 
 namespace Domain.Aggregates;
 
@@ -13,7 +13,7 @@ public sealed record CacheTask
 	}
 
 	public Guid Id { get; init; }
-	[StringLength(maximumLength: 5, MinimumLength = 3)] public string BaseCurrencyCode { get; set; }
+	[StringLength(5, MinimumLength = 3)] public string BaseCurrencyCode { get; set; }
 	public CacheTaskStatus Status { get; set; }
 
 	public static CacheTask Create(string baseCurrencyCode)

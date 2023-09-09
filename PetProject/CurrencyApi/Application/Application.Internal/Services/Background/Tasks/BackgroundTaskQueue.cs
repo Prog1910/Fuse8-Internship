@@ -1,6 +1,6 @@
-﻿using Application.Internal.Interfaces.Background;
+﻿using System.Threading.Channels;
+using Application.Internal.Interfaces.Background;
 using Domain.Aggregates;
-using System.Threading.Channels;
 
 namespace Application.Internal.Services.Background.Tasks;
 

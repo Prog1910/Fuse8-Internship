@@ -66,7 +66,8 @@ public sealed class FavoritesController : ControllerBase
 	/// <response code="404"> The requested endpoint could not be found. </response>
 	/// <response code="500"> An internal server error occurred while processing the request. </response>
 	[HttpPut("{name}"), ProducesDefaultResponseType(typeof(void))]
-	public async Task<IActionResult> UpdateFavoritesByName([FromQuery] FavoritesRequest favoritesRequest, [FromRoute] string name, CancellationToken cancellationToken)
+	public async Task<IActionResult> UpdateFavoritesByName([FromQuery] FavoritesRequest favoritesRequest, [FromRoute] string name,
+		CancellationToken cancellationToken)
 	{
 		await _favoritesService.UpdateFavoritesByNameAsync(favoritesRequest.Adapt<FavoritesDto>(), name, cancellationToken);
 

@@ -39,6 +39,7 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 				Status = (int?)(error as HttpRequestException)?.StatusCode
 			});
 		}
+
 		if (error is not CurrencyNotFoundException) LogError(error);
 
 		context.ExceptionHandled = true;
@@ -46,6 +47,6 @@ public sealed class GlobalErrorsHandler : IExceptionFilter
 
 	private void LogError(Exception? exception)
 	{
-		_logger.LogError(exception, message: "An error occurred.");
+		_logger.LogError(exception, "An error occurred.");
 	}
 }

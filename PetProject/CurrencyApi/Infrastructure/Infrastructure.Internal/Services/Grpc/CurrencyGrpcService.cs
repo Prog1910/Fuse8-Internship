@@ -1,11 +1,11 @@
-﻿using Application.Internal.Interfaces.Rest;
+﻿using System.Net;
+using Application.Internal.Interfaces.Rest;
 using Application.Shared.Dtos;
 using Domain.Errors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Mapster;
 using Protos;
-using System.Net;
 using CurrencyType = Domain.Enums.CurrencyType;
 
 namespace Infrastructure.Internal.Services.Grpc;
@@ -56,7 +56,8 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 		{
 			CurrencyType favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
 			CurrencyType favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
-			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date: default, context.CancellationToken);
+			CurrencyDto currencyDto =
+				await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, default, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}
@@ -73,7 +74,8 @@ public sealed class CurrencyGrpcService : CurrencyGrpc.CurrencyGrpcBase
 			CurrencyType favoriteCurrencyCode = (CurrencyType)request.DefaultCurrencyCode;
 			CurrencyType favoriteBaseCurrencyCode = (CurrencyType)request.BaseCurrencyCode;
 			DateOnly date = DateOnly.FromDateTime(request.Date.ToDateTime().ToUniversalTime());
-			CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
+			CurrencyDto currencyDto =
+				await _cacheCurrencyService.GetCurrencyByFavoritesAsync(favoriteCurrencyCode, favoriteBaseCurrencyCode, date, context.CancellationToken);
 
 			return currencyDto.Adapt<CurrencyResponse>();
 		}

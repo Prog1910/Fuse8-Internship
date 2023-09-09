@@ -40,11 +40,11 @@ public static class DependencyInjection
 	{
 		services.AddHttpClient<ICurrencyApi, CurrencyService>("CurrencyClient")
 			.AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
-								  .WaitAndRetryAsync(retryCount: 3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(x: 2, retryAttempt) - 1)))
+				.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt) - 1)))
 			.AddAuditHandler(audit => audit.IncludeRequestHeaders()
-								 .IncludeRequestBody()
-								 .IncludeResponseHeaders()
-								 .IncludeResponseBody()
-								 .IncludeContentHeaders());
+				.IncludeRequestBody()
+				.IncludeResponseHeaders()
+				.IncludeResponseBody()
+				.IncludeContentHeaders());
 	}
 }

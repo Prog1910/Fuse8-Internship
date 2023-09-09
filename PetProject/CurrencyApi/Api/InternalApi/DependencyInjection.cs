@@ -1,9 +1,9 @@
+using System.Text.Json.Serialization;
 using Audit.Core;
 using Audit.Http;
 using InternalApi.Filters;
 using InternalApi.Mapping;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
 
 namespace InternalApi;
 
@@ -52,7 +52,7 @@ public static class DependencyInjection
 	{
 		services.AddSwaggerGen(options =>
 		{
-			options.SwaggerDoc(name: "v1", new OpenApiInfo
+			options.SwaggerDoc("v1", new OpenApiInfo
 			{
 				Version = "v1",
 				Title = "Internal API"

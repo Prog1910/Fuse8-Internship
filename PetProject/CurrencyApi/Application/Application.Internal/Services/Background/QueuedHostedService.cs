@@ -26,7 +26,8 @@ public sealed class QueuedHostedService : BackgroundService
 	{
 		using IServiceScope scope = _services.CreateScope();
 		ICurDbContext curDbContext = scope.ServiceProvider.GetRequiredService<ICurDbContext>();
-		List<CacheTask> incompleteTasks = curDbContext.CacheTasks.Where(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress).ToList();
+		List<CacheTask> incompleteTasks =
+			curDbContext.CacheTasks.Where(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress).ToList();
 		if (incompleteTasks.FirstOrDefault() is { } taskToQueue)
 		{
 			await _taskQueue.QueueAsync(taskToQueue);
@@ -34,6 +35,7 @@ public sealed class QueuedHostedService : BackgroundService
 			{
 				taskToCancel.Status = CacheTaskStatus.Cancelled;
 			}
+
 			await curDbContext.SaveChangesAsync();
 		}
 
@@ -47,7 +49,7 @@ public sealed class QueuedHostedService : BackgroundService
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, message: "An error occurred while recalculating cache.");
+				_logger.LogError(ex, "An error occurred while recalculating cache.");
 			}
 		}
 	}
