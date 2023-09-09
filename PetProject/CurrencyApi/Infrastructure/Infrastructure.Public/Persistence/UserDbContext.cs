@@ -15,7 +15,7 @@ public sealed class UserDbContext : DbContext, IUserDbContext
 	public DbSet<FavoritesCache> Favorites { get; set; }
 
 
-	public Task<int> SaveChangesAsync()
+	public Task SaveChangesAsync()
 	{
 		return base.SaveChangesAsync();
 	}

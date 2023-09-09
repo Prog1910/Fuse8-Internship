@@ -13,7 +13,7 @@ public sealed class CurDbContext : DbContext, ICurDbContext
 	public DbSet<CacheTask> CacheTasks { get; set; }
 	public DbSet<CurrenciesOnDateCache> CurrenciesOnDates { get; set; }
 
-	public Task<int> SaveChangesAsync()
+	public Task SaveChangesAsync()
 	{
 		return base.SaveChangesAsync();
 	}
