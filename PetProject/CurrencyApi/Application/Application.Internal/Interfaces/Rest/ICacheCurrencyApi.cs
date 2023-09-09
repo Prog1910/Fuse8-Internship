@@ -5,12 +5,12 @@ namespace Application.Internal.Interfaces.Rest;
 
 public interface ICacheCurrencyApi
 {
-	Task<CurrencyDto> GetCurrentCurrencyAsync(CurrencyType defaultCurrencyCode, CancellationToken cancellationToken);
+	Task<CurrencyDto> GetCurrentCurrencyAsync(CurrencyType defaultCurrencyCode, CancellationToken cancellationToken = default);
 
-	Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType defaultCurrencyCode, DateOnly date, CancellationToken cancellationToken);
+	Task<CurrencyDto> GetCurrencyOnDateAsync(CurrencyType defaultCurrencyCode, DateOnly date, CancellationToken cancellationToken = default);
 
 	Task<CurrencyDto> GetCurrencyByFavoritesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date,
-		CancellationToken cancellationToken);
+		CancellationToken cancellationToken = default);
 
-	Task<SettingsDto> GetSettingsAsync(CancellationToken cancellationToken);
+	Task<SettingsDto> GetSettingsAsync(CancellationToken cancellationToken = default);
 }

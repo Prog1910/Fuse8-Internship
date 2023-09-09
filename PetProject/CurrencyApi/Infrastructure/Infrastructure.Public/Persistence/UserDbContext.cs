@@ -15,9 +15,9 @@ public sealed class UserDbContext : DbContext, IUserDbContext
 	public DbSet<FavoritesCache> Favorites { get; set; }
 
 
-	public Task SaveChangesAsync()
+	public new Task SaveChangesAsync(CancellationToken cancellationToken)
 	{
-		return base.SaveChangesAsync();
+		return base.SaveChangesAsync(cancellationToken);
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)

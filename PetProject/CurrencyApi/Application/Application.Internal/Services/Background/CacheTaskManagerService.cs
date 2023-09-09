@@ -16,14 +16,14 @@ public sealed class CacheTaskManagerService : ICacheTaskManagerService
 		_taskQueue = taskQueue;
 	}
 
-	public async Task<Guid> RecalculateCacheAsync(CurrencyType baseCurrency)
+	public async Task<Guid> RecalculateCacheAsync(CurrencyType baseCurrency, CancellationToken cancellationToken)
 	{
 		CacheTask cacheTask = CacheTask.Create(baseCurrency.ToString());
 
-		_curDbContext.CacheTasks.Add(cacheTask);
-		await _curDbContext.SaveChangesAsync();
+		await _curDbContext.CacheTasks.AddAsync(cacheTask, cancellationToken);
+		await _curDbContext.SaveChangesAsync(cancellationToken);
 
-		await _taskQueue.QueueAsync(cacheTask);
+		await _taskQueue.QueueAsync(cacheTask, cancellationToken);
 
 		return cacheTask.Id;
 	}

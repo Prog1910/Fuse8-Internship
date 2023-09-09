@@ -8,5 +8,5 @@ public interface ICurDbContext
 	DbSet<CacheTask> CacheTasks { get; set; }
 	DbSet<CurrenciesOnDateCache> CurrenciesOnDates { get; set; }
 
-	Task SaveChangesAsync();
+	Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

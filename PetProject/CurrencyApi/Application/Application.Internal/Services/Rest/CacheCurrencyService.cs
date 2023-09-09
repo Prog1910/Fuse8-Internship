@@ -6,6 +6,7 @@ using Domain.Enums;
 using Domain.Errors;
 using Domain.Options;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Application.Internal.Services.Rest;
@@ -46,21 +47,18 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 	public async Task<CurrencyDto> GetCurrencyByFavoritesAsync(CurrencyType favoriteCurrencyCode, CurrencyType favoriteBaseCurrencyCode, DateOnly? date,
 		CancellationToken cancellationToken)
 	{
-		return await Task.Run(() =>
+		string baseCurrencyCode = _options.BaseCurrencyCode;
+		string favoriteCurrencyCodeStr = favoriteCurrencyCode.ToString();
+		string favoriteBaseCurrencyCodeStr = favoriteBaseCurrencyCode.ToString();
+		List<Currency> currencies = (await GetCurrenciesFromCacheByBaseCurrencyCode(baseCurrencyCode, date))?.ToList() ?? throw new CurrencyNotFoundException();
+		Currency currency = currencies.SingleOrDefault(c => c.Code.Equals(favoriteCurrencyCodeStr)) ?? throw new CurrencyNotFoundException();
+		if (baseCurrencyCode.Equals(favoriteBaseCurrencyCodeStr) is false)
 		{
-			string baseCurrencyCode = _options.BaseCurrencyCode;
-			string favoriteCurrencyCodeStr = favoriteCurrencyCode.ToString();
-			string favoriteBaseCurrencyCodeStr = favoriteBaseCurrencyCode.ToString();
-			List<Currency> currencies = GetCurrenciesFromCacheByBaseCurrencyCode(baseCurrencyCode, date)?.ToList() ?? throw new CurrencyNotFoundException();
-			Currency currency = currencies.SingleOrDefault(c => c.Code.Equals(favoriteCurrencyCodeStr)) ?? throw new CurrencyNotFoundException();
-			if (baseCurrencyCode.Equals(favoriteBaseCurrencyCodeStr) is false)
-			{
-				Currency baseCurrency = currencies.SingleOrDefault(c => c.Code.Equals(favoriteBaseCurrencyCodeStr)) ?? throw new CurrencyNotFoundException();
-				currency.Value /= baseCurrency.Value;
-			}
+			Currency baseCurrency = currencies.SingleOrDefault(c => c.Code.Equals(favoriteBaseCurrencyCodeStr)) ?? throw new CurrencyNotFoundException();
+			currency.Value /= baseCurrency.Value;
+		}
 
-			return currency.Adapt<CurrencyDto>();
-		}, cancellationToken);
+		return currency.Adapt<CurrencyDto>();
 	}
 
 	public async Task<SettingsDto> GetSettingsAsync(CancellationToken cancellationToken)
@@ -70,20 +68,22 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 		return settings.Adapt<SettingsDto>();
 	}
 
-	private IEnumerable<Currency>? GetCurrenciesFromCacheByBaseCurrencyCode(string baseCurrencyCode, DateOnly? date)
+	private async Task<IEnumerable<Currency>?> GetCurrenciesFromCacheByBaseCurrencyCode(string baseCurrencyCode, DateOnly? date)
 	{
 		IQueryable<CurrenciesOnDateCache> queryBaseCurrency = _curDbContext.CurrenciesOnDates.Where(cod => cod.BaseCurrencyCode.Equals(baseCurrencyCode));
 		IQueryable<CurrenciesOnDateCache> queryDate = date is { } dateOnly
 			? queryBaseCurrency.Where(cod => DateOnly.FromDateTime(cod.LastUpdatedAt.ToUniversalTime()).Equals(dateOnly))
 			: queryBaseCurrency.Where(cod => cod.LastUpdatedAt.ToUniversalTime().AddHours(2) > DateTime.UtcNow);
 
-		return queryDate.FirstOrDefault()?.Currencies;
+		CurrenciesOnDateCache? currenciesOnDate = await queryDate.FirstOrDefaultAsync();
+
+		return currenciesOnDate?.Currencies;
 	}
 
 	private async Task<IEnumerable<Currency>?> TryGetCurrenciesFromCacheByBaseCodeAsync(string baseCurrencyCode, DateOnly? date,
 		CancellationToken cancellationToken)
 	{
-		IEnumerable<Currency>? currencies = GetCurrenciesFromCacheByBaseCurrencyCode(baseCurrencyCode, date);
+		IEnumerable<Currency>? currencies = await GetCurrenciesFromCacheByBaseCurrencyCode(baseCurrencyCode, date);
 		if (currencies is not null) return currencies;
 
 		if (_curDbContext.CacheTasks.Any(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress))
@@ -118,7 +118,7 @@ public sealed class CacheCurrencyService : ICacheCurrencyApi
 				});
 			}
 
-			await _curDbContext.SaveChangesAsync();
+			await _curDbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		return currencies;

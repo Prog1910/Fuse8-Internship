@@ -99,13 +99,14 @@ public sealed class CurrencyController : ControllerBase
 
 	/// <summary> Recalculates cached currency exchange rates relative to the specified base currency. </summary>
 	/// <param name="baseCurrencyCode"> The base currency for which exchange rates should be recalculated. </param>
+	/// <param name="cancellationToken">Cancellation token. </param>
 	/// <response code="200"> Currencies was successfully recalculated. </response>
 	/// <response code="404"> The requested endpoint could not be found. </response>
 	/// <response code="500"> An internal server error occurred while processing the request. </response>
 	[HttpPost("/recalculation"), ProducesDefaultResponseType(typeof(Guid))]
-	public async Task<AcceptedResult> RecalculateCache([FromQuery] CurrencyType baseCurrencyCode)
+	public async Task<AcceptedResult> RecalculateCache([FromQuery] CurrencyType baseCurrencyCode, CancellationToken cancellationToken)
 	{
-		Guid taskId = await _cacheTaskManagerService.RecalculateCacheAsync((Domain.Enums.CurrencyType)baseCurrencyCode);
+		Guid taskId = await _cacheTaskManagerService.RecalculateCacheAsync((Domain.Enums.CurrencyType)baseCurrencyCode, cancellationToken);
 
 		return Accepted(taskId);
 	}

@@ -54,36 +54,33 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 	private async Task RecalculateCurrencyCacheAsync(List<CurrenciesOnDateCache> currenciesOnDates, string newBaseCurrencyCode,
 		CancellationToken cancellationToken)
 	{
-		await Task.Run(() =>
+		foreach (CurrenciesOnDateCache currenciesOnDate in currenciesOnDates)
 		{
-			foreach (CurrenciesOnDateCache currenciesOnDate in currenciesOnDates)
+			if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode))
 			{
-				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode))
-				{
-					continue;
-				}
-
-				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
-				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate)
-				{
-					throw new CurrencyNotFoundException();
-				}
-
-				CurrenciesOnDateCache newCurrenciesOnDate = new()
-				{
-					LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
-					BaseCurrencyCode = newBaseCurrencyCode,
-					Currencies = currenciesOnDate.Currencies.Select(currency =>
-					{
-						currency.Value /= relativeBaseCurrencyRate;
-						return currency;
-					}).ToList()
-				};
-				_curDbContext.CurrenciesOnDates.Remove(currenciesOnDate);
-				_curDbContext.SaveChanges();
-				_curDbContext.Add(newCurrenciesOnDate);
-				_curDbContext.SaveChanges();
+				continue;
 			}
-		}, cancellationToken);
+
+			// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
+			if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate)
+			{
+				throw new CurrencyNotFoundException();
+			}
+
+			CurrenciesOnDateCache newCurrenciesOnDate = new()
+			{
+				LastUpdatedAt = currenciesOnDate.LastUpdatedAt,
+				BaseCurrencyCode = newBaseCurrencyCode,
+				Currencies = currenciesOnDate.Currencies.Select(currency =>
+				{
+					currency.Value /= relativeBaseCurrencyRate;
+					return currency;
+				}).ToList()
+			};
+			_curDbContext.CurrenciesOnDates.Remove(currenciesOnDate);
+			await _curDbContext.SaveChangesAsync(cancellationToken);
+			await _curDbContext.AddAsync(newCurrenciesOnDate, cancellationToken);
+			await _curDbContext.SaveChangesAsync(cancellationToken);
+		}
 	}
 }

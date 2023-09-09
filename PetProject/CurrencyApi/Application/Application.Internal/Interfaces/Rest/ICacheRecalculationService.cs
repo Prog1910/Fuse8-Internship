@@ -2,5 +2,5 @@
 
 public interface ICacheRecalculationService
 {
-	Task RecalculateCacheAsync(Guid cacheTaskId, CancellationToken cancellationToken);
+	Task RecalculateCacheAsync(Guid cacheTaskId, CancellationToken cancellationToken = default);
 }

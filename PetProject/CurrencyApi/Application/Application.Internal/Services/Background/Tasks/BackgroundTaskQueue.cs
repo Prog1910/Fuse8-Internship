@@ -14,9 +14,9 @@ public sealed class BackgroundTaskQueue : IBackgroundTaskQueue
 		_queue = Channel.CreateBounded<CacheTask>(options);
 	}
 
-	public ValueTask QueueAsync(CacheTask cacheTask)
+	public ValueTask QueueAsync(CacheTask cacheTask, CancellationToken cancellationToken)
 	{
-		return _queue.Writer.WriteAsync(cacheTask);
+		return _queue.Writer.WriteAsync(cacheTask, cancellationToken);
 	}
 
 	public ValueTask<CacheTask> DequeueAsync(CancellationToken cancellationToken)

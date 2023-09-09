@@ -21,7 +21,7 @@ public sealed class FavoritesService : IFavoritesService
 		FavoritesCache favorites = await _userDbContext.Favorites.SingleOrDefaultAsync(f => f.Name.Equals(name), cancellationToken)
 								   ?? throw new Exception("An error occured while deleting favorites.");
 		_userDbContext.Favorites.Remove(favorites);
-		await _userDbContext.SaveChangesAsync();
+		await _userDbContext.SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task<FavoritesDto?> GetFavoritesByNameAsync(string name, CancellationToken cancellationToken)
@@ -32,9 +32,10 @@ public sealed class FavoritesService : IFavoritesService
 		return favorites.Adapt<FavoritesDto>();
 	}
 
-	public async Task<List<FavoritesDto>> GetAllFavoritesAsync()
+	public async Task<List<FavoritesDto>> GetAllFavoritesAsync(CancellationToken cancellationToken)
 	{
-		List<FavoritesCache> allFavorites = await _userDbContext.Favorites.ToListAsync() ?? throw new Exception("An error occurred while getting favorites.");
+		List<FavoritesCache> allFavorites = await _userDbContext.Favorites.ToListAsync(cancellationToken)
+											?? throw new Exception("An error occurred while getting favorites.");
 		return allFavorites.Adapt<List<FavoritesDto>>();
 	}
 
@@ -49,7 +50,7 @@ public sealed class FavoritesService : IFavoritesService
 		}
 
 		_userDbContext.Favorites.Add(favorites);
-		await _userDbContext.SaveChangesAsync();
+		await _userDbContext.SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task UpdateFavoritesByNameAsync(FavoritesDto favoritesDto, string name, CancellationToken cancellationToken)
@@ -70,6 +71,6 @@ public sealed class FavoritesService : IFavoritesService
 		favoritesToUpdate.Name = favorites.Name;
 		favoritesToUpdate.CurrencyCode = favorites.CurrencyCode;
 		favoritesToUpdate.BaseCurrencyCode = favorites.BaseCurrencyCode;
-		await _userDbContext.SaveChangesAsync();
+		await _userDbContext.SaveChangesAsync(cancellationToken);
 	}
 }

@@ -30,13 +30,13 @@ public sealed class QueuedHostedService : BackgroundService
 			curDbContext.CacheTasks.Where(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress).ToList();
 		if (incompleteTasks.FirstOrDefault() is { } taskToQueue)
 		{
-			await _taskQueue.QueueAsync(taskToQueue);
+			await _taskQueue.QueueAsync(taskToQueue, stoppingToken);
 			foreach (CacheTask taskToCancel in incompleteTasks.Where(taskToCancel => taskToCancel.Id.Equals(taskToQueue.Id) == false))
 			{
 				taskToCancel.Status = CacheTaskStatus.Cancelled;
 			}
 
-			await curDbContext.SaveChangesAsync();
+			await curDbContext.SaveChangesAsync(stoppingToken);
 		}
 
 		while (stoppingToken.IsCancellationRequested is false)

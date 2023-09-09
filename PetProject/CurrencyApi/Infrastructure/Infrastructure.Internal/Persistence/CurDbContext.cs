@@ -13,9 +13,9 @@ public sealed class CurDbContext : DbContext, ICurDbContext
 	public DbSet<CacheTask> CacheTasks { get; set; }
 	public DbSet<CurrenciesOnDateCache> CurrenciesOnDates { get; set; }
 
-	public Task SaveChangesAsync()
+	public new Task SaveChangesAsync(CancellationToken cancellationToken)
 	{
-		return base.SaveChangesAsync();
+		return base.SaveChangesAsync(cancellationToken);
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
