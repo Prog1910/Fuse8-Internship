@@ -4,6 +4,7 @@ using Domain.Enums;
 using Domain.Errors;
 using Domain.Options;
 using Infrastructure.Internal.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -29,14 +30,18 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 		{
 			cacheTask.Status = CacheTaskStatus.InProgress;
 			await _curDbContext.SaveChangesAsync(cancellationToken);
-			if (_curDbContext.CurrenciesOnDates.OrderByDescending(cod => cod.LastUpdatedAt).AsEnumerable().ToList() is { } currenciesOnDates)
+			List<CurrenciesOnDateCache> currenciesOnDates =
+				await _curDbContext.CurrenciesOnDates.OrderByDescending(cod => cod.LastUpdatedAt).ToListAsync(cancellationToken);
+			if (currenciesOnDates.Count is 0)
 			{
-				string newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
-				await RecalculateCurrencyCacheAsync(currenciesOnDates, newBaseCurrencyCode, cancellationToken);
-				_options.BaseCurrencyCode = newBaseCurrencyCode;
-				cacheTask.Status = CacheTaskStatus.CompletedSuccessfully;
-				await _curDbContext.SaveChangesAsync(cancellationToken);
+				throw new Exception("Currencies not found.");
 			}
+
+			string newBaseCurrencyCode = cacheTask.BaseCurrencyCode;
+			await RecalculateCurrencyCacheAsync(currenciesOnDates, newBaseCurrencyCode, cancellationToken);
+			_options.BaseCurrencyCode = newBaseCurrencyCode;
+			cacheTask.Status = CacheTaskStatus.CompletedSuccessfully;
+			await _curDbContext.SaveChangesAsync(cancellationToken);
 		}
 		catch (Exception e)
 		{
@@ -46,7 +51,8 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 		}
 	}
 
-	private async Task RecalculateCurrencyCacheAsync(List<CurrenciesOnDateCache> currenciesOnDates, string newBaseCurrencyCode, CancellationToken cancellationToken)
+	private async Task RecalculateCurrencyCacheAsync(List<CurrenciesOnDateCache> currenciesOnDates, string newBaseCurrencyCode,
+		CancellationToken cancellationToken)
 	{
 		await Task.Run(() =>
 		{
@@ -55,7 +61,8 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 				if (currenciesOnDate.BaseCurrencyCode.Equals(newBaseCurrencyCode)) continue;
 
 				// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
-				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate) throw new CurrencyNotFoundException();
+				if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate)
+					throw new CurrencyNotFoundException();
 
 				CurrenciesOnDateCache newCurrenciesOnDate = new()
 				{
