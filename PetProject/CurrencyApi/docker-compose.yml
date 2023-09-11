@@ -46,7 +46,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=${INTERNAL_API_ASPNETCORE_ENVIRONMENT}
     build:
       context: .
-      dockerfile: Api/InternalApi/Dockerfile
+      dockerfile: ${INTERNAL_API_DOCKERFILE}
     networks:
       - currency-api
     depends_on:
@@ -75,7 +75,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=${PUBLIC_API_ASPNETCORE_ENVIRONMENT}
     build:
       context: .
-      dockerfile: Api/PublicApi/Dockerfile
+      dockerfile: ${PUBLIC_API_DOCKERFILE}
     networks:
       - currency-api
     depends_on:
