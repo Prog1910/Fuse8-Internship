@@ -8,10 +8,10 @@ using PublicApi.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Infrastructure.Public.Migrations
+namespace PublicApi.Infrastructure.Migrations
 {
-	[DbContext(typeof(UserDbContext))]
-    [Migration("20230907090359_Initial")]
+    [DbContext(typeof(UserDbContext))]
+    [Migration("20230911104040_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -97,7 +97,7 @@ namespace Infrastructure.Public.Migrations
 
                     b.ToTable("settings", "user", t =>
                         {
-                            t.HasCheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 10");
+                            t.HasCheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 2147483647");
 
                             t.HasCheckConstraint("CK_settings_default_currency_code_MinLength", "LENGTH(default_currency_code) >= 3");
                         });

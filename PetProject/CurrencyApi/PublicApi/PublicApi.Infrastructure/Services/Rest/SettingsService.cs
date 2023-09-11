@@ -14,27 +14,24 @@ public sealed class SettingsService : ISettingsService
 	}
 
 	public CurrencyType DefaultCurrencyCode
-	{
-		get => Enum.Parse<CurrencyType>(_userDbContext.Settings.SingleOrDefault()?.DefaultCurrencyCode ?? throw new Exception("Settings not found."));
-		set
-		{
-			if (_userDbContext.Settings.SingleOrDefault() is not { } settings) throw new Exception("Settings not found.");
+		=> Enum.Parse<CurrencyType>(_userDbContext.Settings.SingleOrDefault()?.DefaultCurrencyCode ?? throw new Exception("Settings not found."));
 
-			settings.DefaultCurrencyCode = value.ToString();
-			_userDbContext.SaveChangesAsync();
-		}
+	public async Task UpdateDefaultCurrencyCodeAsync(CurrencyType currencyCode, CancellationToken cancellationToken)
+	{
+		if (_userDbContext.Settings.SingleOrDefault() is not { } settings) throw new Exception("Settings not found.");
+		settings.DefaultCurrencyCode = currencyCode.ToString();
+		await _userDbContext.SaveChangesAsync(cancellationToken);
 	}
 
 	public int CurrencyRoundCount
-	{
-		get => _userDbContext.Settings.SingleOrDefault()?.CurrencyRoundCount ?? throw new Exception("Settings not found.");
-		set
-		{
-			if (value < 0) throw new Exception("Currency round count must be non-negative.");
-			if (_userDbContext.Settings.SingleOrDefault() is not { } settings) throw new Exception("Settings not found.");
+		=> _userDbContext.Settings.SingleOrDefault()?.CurrencyRoundCount ?? throw new Exception("Settings not found.");
 
-			settings.CurrencyRoundCount = value;
-			_userDbContext.SaveChangesAsync();
-		}
+	public async Task UpdateCurrencyRoundCountAsync(int currencyRoundCount, CancellationToken cancellationToken)
+	{
+		if (currencyRoundCount is > 15 or < 0) throw new Exception("Rounding digits must be between 0 and 15");
+		if (_userDbContext.Settings.SingleOrDefault() is not { } settings) throw new Exception("Settings not found.");
+
+		settings.CurrencyRoundCount = currencyRoundCount;
+		await _userDbContext.SaveChangesAsync(cancellationToken);
 	}
 }

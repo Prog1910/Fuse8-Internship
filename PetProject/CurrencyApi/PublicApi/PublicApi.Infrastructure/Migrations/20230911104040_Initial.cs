@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Public.Migrations
+namespace PublicApi.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -46,7 +46,7 @@ namespace Infrastructure.Public.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_settings", x => x.id);
-                    table.CheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 10");
+                    table.CheckConstraint("CK_settings_currency_round_count_Range", "currency_round_count >= 0 AND currency_round_count <= 2147483647");
                     table.CheckConstraint("CK_settings_default_currency_code_MinLength", "LENGTH(default_currency_code) >= 3");
                 });
 

@@ -24,7 +24,7 @@ public sealed class SettingsController : ControllerBase
 	[HttpPut("default-currency-code"), ProducesDefaultResponseType(typeof(void))]
 	public async Task<IActionResult> UpdateDefaultCurrency([FromQuery] CurrencyType defaultCurrencyCode, CancellationToken cancellationToken)
 	{
-		await Task.Run(() => _settingsService.DefaultCurrencyCode = (Domain.Enums.CurrencyType)defaultCurrencyCode, cancellationToken);
+		await _settingsService.UpdateDefaultCurrencyCodeAsync((Domain.Enums.CurrencyType)defaultCurrencyCode, cancellationToken);
 
 		return NoContent();
 	}
@@ -38,7 +38,7 @@ public sealed class SettingsController : ControllerBase
 	[HttpPut("currency-round-count"), ProducesDefaultResponseType(typeof(void))]
 	public async Task<IActionResult> UpdateCurrencyRoundCount([FromQuery] int currencyRoundCount, CancellationToken cancellationToken)
 	{
-		await Task.Run(() => _settingsService.CurrencyRoundCount = currencyRoundCount, cancellationToken);
+		await _settingsService.UpdateCurrencyRoundCountAsync(currencyRoundCount, cancellationToken);
 
 		return NoContent();
 	}
