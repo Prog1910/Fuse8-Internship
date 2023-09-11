@@ -16,7 +16,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 		.AddInfrastructure(builder.Configuration)
 		.AddApplication(builder.Configuration);
 
-	builder.Services.AddHealthChecks();
+	builder.Services.AddHealthChecks()
+		.AddNpgSql(builder.Configuration.GetConnectionString("SummerSchool")!);
 }
 
 WebApplication app = builder.Build();
