@@ -1,6 +1,6 @@
-using Contracts.Enums;
+using Shared.Contracts.Enums;
 
-namespace Contracts;
+namespace PublicApi.Contracts;
 
 /// <summary> Represents a request for managing favorite currencies. </summary>
 /// <param name="Name"> The name of favorite currencies. </param>

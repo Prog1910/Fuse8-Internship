@@ -12,7 +12,7 @@ public sealed class CurrenciesMappingConfig : IRegister
 		config.NewConfig<CurrencyResponse, CurrencyDto>()
 			.Map(dest => dest.Code, src => Enum.Parse<CurrencyType>(src.CurrencyCode));
 
-		config.NewConfig<CurrencyDto, Contracts.CurrencyResponse>()
+		config.NewConfig<CurrencyDto, Shared.Contracts.CurrencyResponse>()
 			.Map(dest => dest.Code, src => src.Code.ToString());
 	}
 }

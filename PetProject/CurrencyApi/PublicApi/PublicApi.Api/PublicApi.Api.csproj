@@ -28,8 +28,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\PublicApi.Application\PublicApi.Application.csproj"/>
+        <ProjectReference Include="..\PublicApi.Contracts\PublicApi.Contracts.csproj"/>
         <ProjectReference Include="..\PublicApi.Infrastructure\PublicApi.Infrastructure.csproj"/>
     </ItemGroup>
 

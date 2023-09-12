@@ -1,7 +1,7 @@
-using Contracts;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using PublicApi.Application.Interfaces.Rest;
+using PublicApi.Contracts;
 using Shared.Application.Dtos;
 
 namespace PublicApi.Api.Controllers;
@@ -25,7 +25,7 @@ public sealed class FavoritesController : ControllerBase
 	[HttpGet, ProducesDefaultResponseType(typeof(List<FavoritesResponse>))]
 	public async Task<IActionResult> GetAllFavoriteCurrencies(CancellationToken cancellationToken)
 	{
-		List<FavoritesDto> favoritesDtos = await _favoritesService.GetAllFavoritesAsync();
+		List<FavoritesDto> favoritesDtos = await _favoritesService.GetAllFavoritesAsync(cancellationToken);
 
 		return Ok(favoritesDtos.Adapt<List<FavoritesResponse>>());
 	}

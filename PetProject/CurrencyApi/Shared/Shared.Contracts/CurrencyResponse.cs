@@ -1,4 +1,4 @@
-﻿namespace Contracts;
+﻿namespace Shared.Contracts;
 
 /// <summary> Represents a response containing currency code and corresponding value. </summary>
 /// <param name="Code"> The currency code. </param>

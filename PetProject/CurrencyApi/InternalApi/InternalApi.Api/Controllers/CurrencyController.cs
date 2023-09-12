@@ -1,10 +1,10 @@
-﻿using Contracts;
-using Contracts.Enums;
-using InternalApi.Application.Interfaces.Background;
+﻿using InternalApi.Application.Interfaces.Background;
 using InternalApi.Application.Interfaces.Rest;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Application.Dtos;
+using Shared.Contracts;
+using Shared.Contracts.Enums;
 
 namespace InternalApi.Api.Controllers;
 

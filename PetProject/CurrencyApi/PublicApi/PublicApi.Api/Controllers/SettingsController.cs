@@ -1,6 +1,6 @@
-using Contracts.Enums;
 using Microsoft.AspNetCore.Mvc;
 using PublicApi.Application.Interfaces.Rest;
+using Shared.Contracts.Enums;
 
 namespace PublicApi.Api.Controllers;
 

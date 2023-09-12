@@ -1,8 +1,9 @@
-﻿using Contracts;
-using Mapster;
+﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using PublicApi.Application.Interfaces.Rest;
+using PublicApi.Contracts;
 using Shared.Application.Dtos;
+using Shared.Contracts;
 
 namespace PublicApi.Api.Controllers;
 

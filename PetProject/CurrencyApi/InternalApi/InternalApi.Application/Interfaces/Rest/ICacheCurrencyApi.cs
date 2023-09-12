@@ -1,5 +1,5 @@
-﻿using Shared.Domain.Enums;
-using Shared.Application.Dtos;
+﻿using Shared.Application.Dtos;
+using Shared.Domain.Enums;
 
 namespace InternalApi.Application.Interfaces.Rest;
 

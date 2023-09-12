@@ -14,12 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\..\Shared\Shared.Application\**\currency.proto" GrpcServices="Server" Link="Protos" />
+        <Protobuf Include="..\..\Shared\Shared.Application\**\currency.proto" GrpcServices="Server" Link="Protos"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj" />
-      <ProjectReference Include="..\InternalApi.Domain\InternalApi.Domain.csproj" />
+        <ProjectReference Include="..\..\Shared\Shared.Application\Shared.Application.csproj"/>
+        <ProjectReference Include="..\InternalApi.Domain\InternalApi.Domain.csproj"/>
     </ItemGroup>
 
 </Project>

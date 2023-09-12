@@ -1,8 +1,8 @@
-﻿using Shared.Domain.Errors;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using PublicApi.Api.Middleware;
+using Shared.Domain.Errors;
 
 namespace PublicApi.Api.Filters;
 

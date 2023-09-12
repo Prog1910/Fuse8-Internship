@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\Shared\Shared.Contracts\Shared.Contracts.csproj"/>
         <ProjectReference Include="..\InternalApi.Application\InternalApi.Application.csproj"/>
         <ProjectReference Include="..\InternalApi.Infrastructure\InternalApi.Infrastructure.csproj"/>
     </ItemGroup>

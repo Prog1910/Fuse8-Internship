@@ -1,4 +1,4 @@
-﻿namespace Contracts;
+﻿namespace PublicApi.Contracts;
 
 /// <summary> Represents a response containing settings information. </summary>
 /// <param name="DefaultCurrencyCode"> The default currency. </param>

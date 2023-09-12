@@ -1,4 +1,4 @@
-namespace Contracts;
+namespace PublicApi.Contracts;
 
 /// <summary> Represents a response containing favorite currencies information. </summary>
 /// <param name="Name"> The of favorite currencies. </param>

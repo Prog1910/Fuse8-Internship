@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Contracts.Enums;
+namespace Shared.Contracts.Enums;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CurrencyType
