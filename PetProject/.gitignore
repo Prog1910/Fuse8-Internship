@@ -359,3 +359,6 @@ MigrationBackup/
 # Assets
 dist/
 appsettings.Development.json
+
+# Docker
+**/DockerData
