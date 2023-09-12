@@ -2,8 +2,8 @@
 using PublicApi.Api;
 using PublicApi.Api.Middleware;
 using PublicApi.Application;
+using PublicApi.Domain.Persistence;
 using PublicApi.Infrastructure;
-using PublicApi.Infrastructure.Persistence;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;

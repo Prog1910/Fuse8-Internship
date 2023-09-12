@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using Protos;
 using Shared.Application.Dtos;
-using CurrencyType = Domain.Enums.CurrencyType;
+using CurrencyType = Shared.Domain.Enums.CurrencyType;
 
 namespace PublicApi.Api.Mapping;
 

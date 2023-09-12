@@ -1,12 +1,12 @@
 ﻿using System.Net;
-using Domain.Errors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using InternalApi.Application.Interfaces.Rest;
 using Mapster;
 using Protos;
 using Shared.Application.Dtos;
-using CurrencyType = Domain.Enums.CurrencyType;
+using Shared.Domain.Errors;
+using CurrencyType = Shared.Domain.Enums.CurrencyType;
 
 namespace InternalApi.Infrastructure.Services.Grpc;
 

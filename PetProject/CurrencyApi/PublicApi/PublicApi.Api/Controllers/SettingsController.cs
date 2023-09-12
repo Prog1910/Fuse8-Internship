@@ -24,7 +24,7 @@ public sealed class SettingsController : ControllerBase
 	[HttpPut("default-currency-code"), ProducesDefaultResponseType(typeof(void))]
 	public async Task<IActionResult> UpdateDefaultCurrency([FromQuery] CurrencyType defaultCurrencyCode, CancellationToken cancellationToken)
 	{
-		await _settingsService.UpdateDefaultCurrencyCodeAsync((Domain.Enums.CurrencyType)defaultCurrencyCode, cancellationToken);
+		await _settingsService.UpdateDefaultCurrencyCodeAsync((Shared.Domain.Enums.CurrencyType)defaultCurrencyCode, cancellationToken);
 
 		return NoContent();
 	}

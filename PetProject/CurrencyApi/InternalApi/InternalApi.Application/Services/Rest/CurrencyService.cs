@@ -1,13 +1,13 @@
 using System.Net;
 using System.Net.Http.Json;
-using Domain.Aggregates;
-using Domain.Enums;
-using Domain.Errors;
-using Domain.Options;
 using InternalApi.Application.Interfaces.Rest;
 using InternalApi.Application.Services.Rest.Responses;
+using InternalApi.Domain.Aggregates;
+using InternalApi.Domain.Options;
 using Mapster;
 using Microsoft.Extensions.Options;
+using Shared.Domain.Enums;
+using Shared.Domain.Errors;
 
 namespace InternalApi.Application.Services.Rest;
 

@@ -1,10 +1,10 @@
 ﻿using Audit.Http;
-using Domain.Options;
 using InternalApi.Application.Interfaces.Background;
 using InternalApi.Application.Interfaces.Rest;
 using InternalApi.Application.Services.Background;
 using InternalApi.Application.Services.Background.Tasks;
 using InternalApi.Application.Services.Rest;
+using InternalApi.Domain.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;

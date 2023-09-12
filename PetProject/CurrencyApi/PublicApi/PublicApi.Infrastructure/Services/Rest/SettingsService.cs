@@ -1,14 +1,14 @@
-using Domain.Enums;
 using PublicApi.Application.Interfaces.Rest;
-using PublicApi.Application.Persistence;
+using PublicApi.Domain.Persistence;
+using Shared.Domain.Enums;
 
 namespace PublicApi.Infrastructure.Services.Rest;
 
 public sealed class SettingsService : ISettingsService
 {
-	private readonly IUserDbContext _userDbContext;
+	private readonly UserDbContext _userDbContext;
 
-	public SettingsService(IUserDbContext userDbContext)
+	public SettingsService(UserDbContext userDbContext)
 	{
 		_userDbContext = userDbContext;
 	}

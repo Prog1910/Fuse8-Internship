@@ -1,8 +1,8 @@
 using InternalApi.Api;
 using InternalApi.Api.Middleware;
 using InternalApi.Application;
+using InternalApi.Domain.Persistence;
 using InternalApi.Infrastructure;
-using InternalApi.Infrastructure.Persistence;
 using InternalApi.Infrastructure.Services.Grpc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;

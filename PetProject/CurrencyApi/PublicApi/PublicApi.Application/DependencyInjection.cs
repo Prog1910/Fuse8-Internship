@@ -1,6 +1,6 @@
-﻿using Domain.Options;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PublicApi.Domain.Options;
 
 namespace PublicApi.Application;
 

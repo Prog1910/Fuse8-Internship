@@ -1,6 +1,6 @@
-﻿using InternalApi.Application.Interfaces.Persistence;
+﻿using System.Reflection;
 using InternalApi.Application.Interfaces.Rest;
-using InternalApi.Infrastructure.Persistence;
+using InternalApi.Domain.Persistence;
 using InternalApi.Infrastructure.Services.Rest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -35,6 +35,7 @@ public static class DependencyInjection
 					configuration.GetConnectionString("SummerSchool"),
 					sqlOptionsBuilder =>
 					{
+						sqlOptionsBuilder.MigrationsAssembly(Assembly.GetExecutingAssembly().ToString());
 						sqlOptionsBuilder.EnableRetryOnFailure();
 						sqlOptionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName, "cur");
 					})
@@ -48,6 +49,6 @@ public static class DependencyInjection
 			options.UseSnakeCaseNamingConvention();
 		});
 
-		services.AddScoped<ICurDbContext>(provider => provider.GetRequiredService<CurDbContext>());
+		services.AddScoped<DbContext, CurDbContext>();
 	}
 }

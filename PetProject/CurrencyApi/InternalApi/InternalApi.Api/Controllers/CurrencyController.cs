@@ -33,7 +33,7 @@ public sealed class CurrencyController : ControllerBase
 	[HttpGet("currencies"), ProducesDefaultResponseType(typeof(CurrencyResponse))]
 	public async Task<IActionResult> GetCurrentCurrency([FromQuery] CurrencyType currencyCode, CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrentCurrencyAsync((Domain.Enums.CurrencyType)currencyCode, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrentCurrencyAsync((Shared.Domain.Enums.CurrencyType)currencyCode, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -51,7 +51,7 @@ public sealed class CurrencyController : ControllerBase
 	[HttpGet("currencies/{date}"), ProducesDefaultResponseType(typeof(CurrencyResponse))]
 	public async Task<IActionResult> GetCurrencyOnDate([FromQuery] CurrencyType currencyCode, [FromRoute] DateOnly date, CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyOnDateAsync((Domain.Enums.CurrencyType)currencyCode, date, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyOnDateAsync((Shared.Domain.Enums.CurrencyType)currencyCode, date, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -70,8 +70,8 @@ public sealed class CurrencyController : ControllerBase
 	public async Task<IActionResult> GetCurrentFavoritesByName([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode,
 		CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode,
-			(Domain.Enums.CurrencyType)baseCurrencyCode, default, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Shared.Domain.Enums.CurrencyType)currencyCode,
+			(Shared.Domain.Enums.CurrencyType)baseCurrencyCode, default, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -91,8 +91,8 @@ public sealed class CurrencyController : ControllerBase
 	public async Task<IActionResult> GetCurrentFavorites([FromQuery] CurrencyType currencyCode, [FromQuery] CurrencyType baseCurrencyCode,
 		[FromRoute] DateOnly date, CancellationToken cancellationToken)
 	{
-		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Domain.Enums.CurrencyType)currencyCode,
-			(Domain.Enums.CurrencyType)baseCurrencyCode, date, cancellationToken);
+		CurrencyDto currencyDto = await _cacheCurrencyService.GetCurrencyByFavoritesAsync((Shared.Domain.Enums.CurrencyType)currencyCode,
+			(Shared.Domain.Enums.CurrencyType)baseCurrencyCode, date, cancellationToken);
 
 		return Ok(currencyDto.Adapt<CurrencyResponse>());
 	}
@@ -106,7 +106,7 @@ public sealed class CurrencyController : ControllerBase
 	[HttpPost("/recalculation"), ProducesDefaultResponseType(typeof(Guid))]
 	public async Task<AcceptedResult> RecalculateCache([FromQuery] CurrencyType baseCurrencyCode, CancellationToken cancellationToken)
 	{
-		Guid taskId = await _cacheTaskManagerService.RecalculateCacheAsync((Domain.Enums.CurrencyType)baseCurrencyCode, cancellationToken);
+		Guid taskId = await _cacheTaskManagerService.RecalculateCacheAsync((Shared.Domain.Enums.CurrencyType)baseCurrencyCode, cancellationToken);
 
 		return Accepted(taskId);
 	}

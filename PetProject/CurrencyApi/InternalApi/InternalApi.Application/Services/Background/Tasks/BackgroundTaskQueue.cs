@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
-using Domain.Aggregates;
 using InternalApi.Application.Interfaces.Background;
+using InternalApi.Domain.Aggregates;
 
 namespace InternalApi.Application.Services.Background.Tasks;
 

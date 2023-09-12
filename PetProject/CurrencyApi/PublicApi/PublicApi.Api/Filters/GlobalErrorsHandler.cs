@@ -1,4 +1,4 @@
-﻿using Domain.Errors;
+﻿using Shared.Domain.Errors;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

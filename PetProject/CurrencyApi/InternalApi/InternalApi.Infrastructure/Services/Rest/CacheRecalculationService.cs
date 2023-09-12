@@ -1,12 +1,12 @@
-﻿using Domain.Aggregates;
-using Domain.Enums;
-using Domain.Errors;
-using Domain.Options;
-using InternalApi.Application.Interfaces.Rest;
-using InternalApi.Infrastructure.Persistence;
+﻿using InternalApi.Application.Interfaces.Rest;
+using InternalApi.Domain.Aggregates;
+using InternalApi.Domain.Enums;
+using InternalApi.Domain.Options;
+using InternalApi.Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Shared.Domain.Errors;
 
 namespace InternalApi.Infrastructure.Services.Rest;
 
@@ -61,7 +61,7 @@ public sealed class CacheRecalculationService : ICacheRecalculationService
 				continue;
 			}
 
-			// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится 
+			// За 2002-ой год маната (AZN) нет, поэтому относительно него пересчитать кэш за 2002-ой год не получится
 			if (currenciesOnDate.Currencies.SingleOrDefault(c => c.Code.Equals(newBaseCurrencyCode))?.Value is not { } relativeBaseCurrencyRate)
 			{
 				throw new CurrencyNotFoundException();

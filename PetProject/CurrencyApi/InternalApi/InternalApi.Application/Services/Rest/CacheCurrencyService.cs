@@ -1,23 +1,24 @@
-﻿using Domain.Aggregates;
-using Domain.Enums;
-using Domain.Errors;
-using Domain.Options;
-using InternalApi.Application.Interfaces.Persistence;
-using InternalApi.Application.Interfaces.Rest;
+﻿using InternalApi.Application.Interfaces.Rest;
+using InternalApi.Domain.Aggregates;
+using InternalApi.Domain.Enums;
+using InternalApi.Domain.Options;
+using InternalApi.Domain.Persistence;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Application.Dtos;
+using Shared.Domain.Enums;
+using Shared.Domain.Errors;
 
 namespace InternalApi.Application.Services.Rest;
 
 public sealed class CacheCurrencyService : ICacheCurrencyApi
 {
-	private readonly ICurDbContext _curDbContext;
+	private readonly CurDbContext _curDbContext;
 	private readonly ICurrencyApi _currencyService;
 	private readonly InternalApiOptions _options;
 
-	public CacheCurrencyService(IOptions<InternalApiOptions> options, ICurDbContext curDbContext, ICurrencyApi currencyService)
+	public CacheCurrencyService(IOptions<InternalApiOptions> options, CurDbContext curDbContext, ICurrencyApi currencyService)
 	{
 		_options = options.Value;
 		_curDbContext = curDbContext;

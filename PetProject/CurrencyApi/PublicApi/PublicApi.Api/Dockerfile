@@ -12,11 +12,12 @@ COPY --from=prepare-restore /src/restore_subset/ .
 RUN dotnet restore "PublicApi/PublicApi.Api/PublicApi.Api.csproj"
 
 COPY ["PublicApi/*.Api", "PublicApi/PublicApi.Api/"]
-COPY ["PublicApi/*.Application", "PublicApi/PublicApi.Application/"]
 COPY ["PublicApi/*.Infrastructure", "PublicApi/PublicApi.Infrastructure/"]
+COPY ["PublicApi/*.Application", "PublicApi/PublicApi.Application/"]
+COPY ["PublicApi/*.Domain", "PublicApi/PublicApi.Domain/"]
 COPY ["Shared/*.Application", "Shared/Shared.Application/"]
+COPY ["Shared/*.Domain", "Shared/Shared.Domain/"]
 COPY ["Contracts", "Contracts/"]
-COPY ["Domain", "Domain/"]
 RUN dotnet publish "PublicApi/PublicApi.Api/PublicApi.Api.csproj" -c Release -o /app/publish --no-restore 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime

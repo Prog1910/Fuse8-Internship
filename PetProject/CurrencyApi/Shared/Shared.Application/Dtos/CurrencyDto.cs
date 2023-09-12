@@ -1,4 +1,4 @@
-using Domain.Enums;
+using Shared.Domain.Enums;
 
 namespace Shared.Application.Dtos;
 

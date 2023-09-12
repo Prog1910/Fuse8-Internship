@@ -1,4 +1,4 @@
-﻿using Domain.Aggregates;
+﻿using InternalApi.Domain.Aggregates;
 
 namespace InternalApi.Application.Interfaces.Rest;
 

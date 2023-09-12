@@ -1,17 +1,17 @@
-using Domain.Aggregates;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using PublicApi.Application.Interfaces.Rest;
-using PublicApi.Application.Persistence;
+using PublicApi.Domain.Aggregates;
+using PublicApi.Domain.Persistence;
 using Shared.Application.Dtos;
 
 namespace PublicApi.Infrastructure.Services.Rest;
 
 public sealed class FavoritesService : IFavoritesService
 {
-	private readonly IUserDbContext _userDbContext;
+	private readonly UserDbContext _userDbContext;
 
-	public FavoritesService(IUserDbContext userDbContext)
+	public FavoritesService(UserDbContext userDbContext)
 	{
 		_userDbContext = userDbContext;
 	}

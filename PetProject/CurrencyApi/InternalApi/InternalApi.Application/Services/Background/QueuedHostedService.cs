@@ -1,8 +1,8 @@
-﻿using Domain.Aggregates;
-using Domain.Enums;
-using InternalApi.Application.Interfaces.Background;
-using InternalApi.Application.Interfaces.Persistence;
+﻿using InternalApi.Application.Interfaces.Background;
 using InternalApi.Application.Interfaces.Rest;
+using InternalApi.Domain.Aggregates;
+using InternalApi.Domain.Enums;
+using InternalApi.Domain.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,7 +25,7 @@ public sealed class QueuedHostedService : BackgroundService
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
 		using IServiceScope scope = _services.CreateScope();
-		ICurDbContext curDbContext = scope.ServiceProvider.GetRequiredService<ICurDbContext>();
+		CurDbContext curDbContext = scope.ServiceProvider.GetRequiredService<CurDbContext>();
 		List<CacheTask> incompleteTasks =
 			curDbContext.CacheTasks.Where(t => t.Status == CacheTaskStatus.Created || t.Status == CacheTaskStatus.InProgress).ToList();
 		if (incompleteTasks.FirstOrDefault() is { } taskToQueue)

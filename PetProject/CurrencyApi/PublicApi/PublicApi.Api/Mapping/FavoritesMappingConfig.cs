@@ -1,7 +1,7 @@
 using Contracts;
-using Domain.Aggregates;
-using Domain.Enums;
+using Contracts.Enums;
 using Mapster;
+using PublicApi.Domain.Aggregates;
 using Shared.Application.Dtos;
 
 namespace PublicApi.Api.Mapping;

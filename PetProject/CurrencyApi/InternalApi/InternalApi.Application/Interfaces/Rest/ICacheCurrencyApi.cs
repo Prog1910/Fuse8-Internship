@@ -1,4 +1,4 @@
-﻿using Domain.Enums;
+﻿using Shared.Domain.Enums;
 using Shared.Application.Dtos;
 
 namespace InternalApi.Application.Interfaces.Rest;
