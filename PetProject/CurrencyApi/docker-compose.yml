@@ -1,0 +1,91 @@
+﻿version: '3.9'
+
+networks:
+  currency-api:
+    driver: bridge
+
+volumes:
+  postgres:
+  internalapi:
+  publicapi:
+
+services:
+  postgres:
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    image: ${POSTGRES_IMAGE}
+    restart: always
+    ports:
+      - "5432:${POSTGRES_PORT}"
+    volumes:
+      - ${HOST_LOGS_BASE}${POSTGRES_CONTAINER_NAME}/data:${POSTGRES_LOGS}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${POSTGRES_LOGS}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - currency-api
+  
+  internal_api:
+    container_name: ${INTERNAL_API_CONTAINER_NAME}
+    image: ${INTERNAL_API_IMAGE}
+    restart: unless-stopped
+    ports:
+      - "5000:${INTERNAL_API_REST_PORT}"
+      - "50051:${INTERNAL_API_RPC_PORT}"
+    volumes:
+      - ${HOST_LOGS_BASE}${INTERNAL_API_CONTAINER_NAME}/logs:${API_LOGS}
+    environment:
+      - ConnectionStrings__SummerSchool=Host=${POSTGRES_CONTAINER_NAME};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_URLS=${INTERNAL_API_ASPNETCORE_URLS}
+      - ASPNETCORE_ENVIRONMENT=${INTERNAL_API_ASPNETCORE_ENVIRONMENT}
+    build:
+      context: .
+      dockerfile: ${INTERNAL_API_DOCKERFILE}
+    networks:
+      - currency-api
+    depends_on:
+      postgres:
+        condition:
+          service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:${INTERNAL_API_REST_PORT}/health || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+  
+  public_api:
+    container_name: ${PUBLIC_API_CONTAINER_NAME}
+    image: ${PUBLIC_API_IMAGE}
+    restart: unless-stopped
+    ports:
+      - "5166:${PUBLIC_API_PORT}"
+    volumes:
+      - ${HOST_LOGS_BASE}${PUBLIC_API_CONTAINER_NAME}/logs:${API_LOGS}
+    environment:
+      - InternalApi__BaseUrl=http://${INTERNAL_API_CONTAINER_NAME}:${INTERNAL_API_RPC_PORT}
+      - ConnectionStrings__SummerSchool=Host=${POSTGRES_CONTAINER_NAME};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_URLS=${PUBLIC_API_ASPNETCORE_URLS}
+      - ASPNETCORE_ENVIRONMENT=${PUBLIC_API_ASPNETCORE_ENVIRONMENT}
+    build:
+      context: .
+      dockerfile: ${PUBLIC_API_DOCKERFILE}
+    networks:
+      - currency-api
+    depends_on:
+      internal_api:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:${PUBLIC_API_PORT}/health || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
